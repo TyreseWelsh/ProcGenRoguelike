@@ -21,7 +21,7 @@ AExitGenerator::AExitGenerator()
 	PathGenCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("PathGenCollider"));
 	PathGenCollider->SetRelativeRotation(FRotator(0, 0, -90));
 	PathGenCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	PathGenCollider->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
+	PathGenCollider->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
 	PathGenCollider->SetCollisionResponseToAllChannels(ECR_Ignore);
 	PathGenCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECR_Overlap);
 	PathGenCollider->SetHiddenInGame(false);
@@ -32,7 +32,6 @@ void AExitGenerator::Init(int _TileSize)
 {
 	TileSize = _TileSize;
 	PathGenCollider->SetRelativeLocation(FVector(TileSize / 2, 0, 0));
-	UE_LOG(LogTemp, Warning, TEXT("%i"), (TileSize / 2));
 
 	PathGenCollider->SetCapsuleRadius(TileSize / 4);
 	InitPathGenCollider();

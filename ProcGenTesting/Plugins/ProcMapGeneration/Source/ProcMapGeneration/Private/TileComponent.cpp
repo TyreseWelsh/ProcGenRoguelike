@@ -3,6 +3,7 @@
 
 #include "TileComponent.h"
 #include "MapRoom.h"
+#include "ExitGenerator.h"
 
 // Sets default values for this component's properties
 UTileComponent::UTileComponent()
@@ -10,21 +11,36 @@ UTileComponent::UTileComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
+	
 	// ...
 }
 
-void UTileComponent::InitTile_Implementation(UMapRoom* OwnerRoom, int NewRoomIndexX, int NewRoomIndexY)
+void UTileComponent::InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY)
 {
 	OwningRoom = OwnerRoom;
+	TileSize = NewTileSize;
 	RoomIndexX = NewRoomIndexX;
 	RoomIndexY = NewRoomIndexY;
 
+	int BoxSize = TileSize / 2;
+	
+	SetRelativeLocation(FVector(BoxSize, BoxSize, BoxSize));
+	//InitBoxExtent();
+	SetBoxExtent(FVector(BoxSize, BoxSize, BoxSize));
+	SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SetCollisionObjectType(ECC_WorldStatic);
+	SetCollisionResponseToAllChannels(ECR_Ignore);
+	SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
+	SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
+	
 	SetTileType();
 }
 
 void UTileComponent::SetTileType()
 {
+	SetTileTypeToGround();
+
 	if(RoomIndexX == 0 or RoomIndexX == OwningRoom->LastIndexX or RoomIndexY == 0 or RoomIndexY == OwningRoom->LastIndexY)
 	{
 		// Set tile type as wall
@@ -37,14 +53,15 @@ void UTileComponent::SetTileType()
 		{
 			// Set tile type as wall
 			SetTileTypeToWall();
-			return;
 		}
 	}
-	//
-	//if()
-	
-	//
-	SetTileTypeToGround();
+
+	TArray<AActor*> NearbyExits;
+	GetOverlappingActors(NearbyExits, AExitGenerator::StaticClass());
+	if(NearbyExits.Num() > 0)
+	{
+		SetTileTypeToPath();
+	}
 }
 
 // Called when the game starts

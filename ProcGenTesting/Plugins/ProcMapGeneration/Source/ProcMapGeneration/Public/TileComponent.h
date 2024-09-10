@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+//#include "Components/ActorComponent.h"
+#include "Components/BoxComponent.h"
 #include "TileComponent.generated.h"
 
 UENUM()
@@ -29,7 +30,7 @@ class UMapRoom;
  *  These functions will act as an interface to interact with the Actor and will be called by the plugin's custom Controller
  */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
-class PROCMAPGENERATION_API UTileComponent : public UActorComponent
+class PROCMAPGENERATION_API UTileComponent : public UBoxComponent
 {
 	GENERATED_BODY()
 
@@ -38,8 +39,8 @@ public:
 	UTileComponent();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void InitTile(UMapRoom* OwnerRoom, int NewRoomIndexX, int NewRoomIndexY);
-	virtual void InitTile_Implementation(UMapRoom* OwnerRoom, int NewRoomIndexX, int NewRoomIndexY);
+	void InitTile(UMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY);
+	virtual void InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY);
 
 	void SetTileType();
 	
@@ -100,8 +101,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FTileTypeToExitSignature TileTypeToExitDelegate;
 private:
-
-	
+	int TileSize = 0;
 	
 	int RoomIndexX = 0;
 	int RoomIndexY = 0;

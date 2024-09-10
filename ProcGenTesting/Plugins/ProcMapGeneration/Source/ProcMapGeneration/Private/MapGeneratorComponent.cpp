@@ -26,7 +26,9 @@ void UMapGeneratorComponent::InitMap()
 	{
 		Exit->Destroy();
 	}
-	
+	AllRoomExits.Empty();
+
+
 	MapSizeX = RoundToTileSizeMultiple(MapSizeX, false);
 	MapSizeY = RoundToTileSizeMultiple(MapSizeY, false);
 	MapTiles.SetNum((MapSizeX / TileSize) * (MapSizeY / TileSize));  
@@ -41,8 +43,6 @@ void UMapGeneratorComponent::InitMap()
 	{
 		for(AExitGenerator* Exit : AllRoomExits)
 		{
-			// TODO: Will need to create blueprint class of Exit actor that will be spawned and stored in this array
-			// Get Left and right tile vectors from Exit and use to calculate map index.
 			if(IsValid(MapTiles[CalculateMapIndexFromTilePos(Exit->LeftExitTilePos)]))
 			{
 				MapTiles[CalculateMapIndexFromTilePos(Exit->LeftExitTilePos)]->FindComponentByClass<UTileComponent>()->SetTileTypeToExit();
@@ -51,7 +51,6 @@ void UMapGeneratorComponent::InitMap()
 			{
 				MapTiles[CalculateMapIndexFromTilePos(Exit->RightExitTilePos)]->FindComponentByClass<UTileComponent>()->SetTileTypeToExit();
 			}
-			// If valid tiles are found, SetTileTypeExit
 		}
 	}
 }

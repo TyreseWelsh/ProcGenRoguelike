@@ -109,8 +109,17 @@ void UMapRoom::SplitHorizontally(const float SplitPercent)
 	SplitLocationY = (SplitPercent >= 0.5f) ? RoundToTileSizeMultiple(SplitLocationY, false) : RoundToTileSizeMultiple(SplitLocationY, true);
 	
 	// Setup and spawn of Exit actor along split
-	int RandLocationAlongSplit = RoomSizeX * /*FMath::RandRange(0.25, 0.75);*/
-		(FMath::RandBool() ? FMath::RandRange(0.1, 0.25) : FMath::RandRange(0.75, 0.9));
+	int RandLocationAlongSplit;
+	if(NumSplitsRemaining == 1)
+	{
+		RandLocationAlongSplit = RoomSizeX * FMath::RandRange(0.25, 0.75);
+	}
+	else
+	{
+		RandLocationAlongSplit = RoomSizeX *
+			(FMath::RandBool() ? FMath::RandRange(LowerMin, LowerMax) : FMath::RandRange(UpperMin, UpperMax));
+	}
+
 	int ExitSpawnPosX = RoomOrigin.X + RoundToTileSizeMultiple(RandLocationAlongSplit, true);
 ;
 	FVector ExitSpawnPos = FVector(ExitSpawnPosX, SplitLocationY, RoomOrigin.Z);
@@ -141,9 +150,16 @@ void UMapRoom::SplitVertically(const float SplitPercent)
 	int SplitLocationX = RoomOrigin.X + ((RoomRight - RoomOrigin.X) * SplitPercent);
 	SplitLocationX = (SplitPercent >= 0.5f) ? RoundToTileSizeMultiple(SplitLocationX, false) : RoundToTileSizeMultiple(SplitLocationX, true);
 	
-	// Setup and spawn of Exit actor along split
-	int RandLocationAlongSplit = RoomSizeY *
-		(FMath::RandBool() ? FMath::RandRange(0.1, 0.2) : FMath::RandRange(0.8, 0.9));
+	int RandLocationAlongSplit;
+	if(NumSplitsRemaining == 1)
+	{
+		RandLocationAlongSplit = RoomSizeY * FMath::RandRange(0.25, 0.75);
+	}
+	else
+	{
+		RandLocationAlongSplit = RoomSizeY *
+			(FMath::RandBool() ? FMath::RandRange(LowerMin, LowerMax) : FMath::RandRange(UpperMin, UpperMax));
+	}
 	int ExitSpawnPosY = RoomOrigin.Y + RoundToTileSizeMultiple(RandLocationAlongSplit, true);
 	
 	FVector ExitSpawnPos = FVector(SplitLocationX, ExitSpawnPosY, RoomOrigin.Z);
@@ -206,7 +222,7 @@ void UMapRoom::GenerateTiles()
 			{
 				if(UTileComponent* CurrentTileComponent = MapGenerator->MapTiles[TileMapArrayIndex]->FindComponentByClass<UTileComponent>())
 				{
-					CurrentTileComponent->InitTile(this, i, j);
+					CurrentTileComponent->InitTile(this, TileSize, i, j);
 				}
 				RoomTiles.Add(MapGenerator->MapTiles[TileMapArrayIndex]);
 			}

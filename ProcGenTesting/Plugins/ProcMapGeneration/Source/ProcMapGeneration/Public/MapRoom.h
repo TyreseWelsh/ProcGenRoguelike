@@ -62,6 +62,11 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TArray<AActor*> RoomTiles;
 
+	float LowerMin = 0.2;
+	float LowerMax = 0.3;
+	float UpperMin = 0.7;
+	float UpperMax = 0.8;
+	
 	int LastIndexX = 0;
 	int LastIndexY = 0;
 };

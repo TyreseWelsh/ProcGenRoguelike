@@ -13,5 +13,8 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class PROCGENTESTING_API UTileInteractionComponent : public UBoxComponent
 {
 	GENERATED_BODY()
-	
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void TestFunctonNumeroUno();
 };

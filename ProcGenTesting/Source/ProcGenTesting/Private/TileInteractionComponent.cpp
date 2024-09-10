@@ -3,3 +3,7 @@
 
 #include "TileInteractionComponent.h"
 
+void UTileInteractionComponent::TestFunctonNumeroUno()
+{
+	
+}
