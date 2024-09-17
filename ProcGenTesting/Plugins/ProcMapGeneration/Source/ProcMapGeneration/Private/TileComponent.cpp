@@ -2,6 +2,7 @@
 
 
 #include "TileComponent.h"
+#include "MapGeneratorComponent.h"
 #include "MapRoom.h"
 #include "ExitGenerator.h"
 
@@ -21,11 +22,11 @@ void UTileComponent::InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSiz
 	TileSize = NewTileSize;
 	RoomIndexX = NewRoomIndexX;
 	RoomIndexY = NewRoomIndexY;
-
+	TileHeight = OwnerRoom->MapGenerator->CalculateTileHeight(GetOwner()->GetActorLocation().X, GetOwner()->GetActorLocation().Y);
+	
 	int BoxSize = TileSize / 2;
 	
 	SetRelativeLocation(FVector(BoxSize, BoxSize, BoxSize));
-	//InitBoxExtent();
 	SetBoxExtent(FVector(BoxSize, BoxSize, BoxSize));
 	SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SetCollisionObjectType(ECC_WorldStatic);
@@ -34,12 +35,18 @@ void UTileComponent::InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSiz
 	SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
 	
+	FindSurroundingTiles();
 	SetTileType();
 }
 
 void UTileComponent::SetTileType()
 {
 	SetTileTypeToGround();
+
+	/*if(FMath::RandRange(1, 40) == 1)
+	{
+		SetTileTypeToWall();
+	}*/
 
 	if(RoomIndexX == 0 or RoomIndexX == OwningRoom->LastIndexX or RoomIndexY == 0 or RoomIndexY == OwningRoom->LastIndexY)
 	{
@@ -56,6 +63,8 @@ void UTileComponent::SetTileType()
 		}
 	}
 
+	//CheckSurroundedByWalls();
+	
 	TArray<AActor*> NearbyExits;
 	GetOverlappingActors(NearbyExits, AExitGenerator::StaticClass());
 	if(NearbyExits.Num() > 0)
@@ -130,5 +139,106 @@ void UTileComponent::SetTileTypeToExit()
 	if(TileTypeToExitDelegate.IsBound())
 	{
 		TileTypeToExitDelegate.Broadcast();
+	}
+}
+
+void UTileComponent::FindSurroundingTiles()
+{
+	TObjectPtr<UMapGeneratorComponent> Generator = OwningRoom->MapGenerator;
+
+	// Left tile
+	int LeftTileIndex = Generator->CalculateMapIndexFromTilePos(GetOwner()->GetActorLocation() - FVector(TileSize, 0, 0));
+	if(LeftTileIndex >= 0 && LeftTileIndex < Generator->MapTiles.Num())
+	{
+		/*if(AActor* OActor = Generator->MapTiles[LeftTileIndex])
+		{
+			if(UTileComponent* TComponent = OActor->FindComponentByClass<UTileComponent>())
+			{
+				LeftTile = TComponent;
+				SurroundingTiles.Add(TopTile);
+
+				LeftTile->RightTile = this;
+				LeftTile->SurroundingTiles.Add(this);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Invalid tile component (LEFT)"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Invalid Owning actor (LEFT)"));
+		}*/
+
+		if(AActor* TileActor = Generator->MapTiles[LeftTileIndex])
+		{
+			LeftTile = TileActor;
+			SurroundingTiles.Add(LeftTile);
+
+			TObjectPtr<UTileComponent> LeftTileComponent = LeftTile->FindComponentByClass<UTileComponent>();
+			LeftTileComponent->RightTile = GetOwner();
+			LeftTileComponent->SurroundingTiles.Add(GetOwner());
+		}
+	}
+
+	// Top tile
+	int TopTileIndex = Generator->CalculateMapIndexFromTilePos(GetOwner()->GetActorLocation() - FVector(0, TileSize, 0));
+	if(TopTileIndex >= 0 && TopTileIndex < Generator->MapTiles.Num())
+	{
+		/*if(AActor* OActor = Generator->MapTiles[TopTileIndex])
+		{
+			if(UTileComponent* TComponent = OActor->FindComponentByClass<UTileComponent>())
+			{
+				TopTile = TComponent;
+				SurroundingTiles.Add(TopTile);
+
+				TopTile->BottomTile = this;
+				TopTile->SurroundingTiles.Add(this);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Invalid tile component (TOP)"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Invalid Owning actor (TOP)"));
+		}*/
+
+		if(AActor* TileActor = Generator->MapTiles[TopTileIndex])
+		{
+			TopTile = TileActor;
+			SurroundingTiles.Add(TopTile);
+			
+			TObjectPtr<UTileComponent> TopTileComponent = TopTile->FindComponentByClass<UTileComponent>();
+			TopTileComponent->BottomTile = GetOwner();
+			TopTileComponent->SurroundingTiles.Add(GetOwner());
+		}
+	}
+}
+
+void UTileComponent::CheckSurroundedByWalls()
+{
+	int SurroundingWallsCounter = 0;
+	for(AActor* Tile : SurroundingTiles)
+	{
+		if(IsValid(Tile))
+		{
+			if(Tile->FindComponentByClass<UTileComponent>()->TileType == ETileType::Wall)
+			{
+				SurroundingWallsCounter++;
+			}
+		}
+		else
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Invalid wall"));
+
+			SurroundingWallsCounter++;
+		}
+	}
+	if(SurroundingWallsCounter == SurroundingTiles.Num())
+	{
+		SetTileTypeToWall();
+		//UE_LOG(LogTemp, Warning, TEXT("Surrounded by walls"));
 	}
 }

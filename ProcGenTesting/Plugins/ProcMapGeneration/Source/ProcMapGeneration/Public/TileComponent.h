@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "Components/ActorComponent.h"
 #include "Components/BoxComponent.h"
 #include "TileComponent.generated.h"
 
@@ -43,7 +42,8 @@ public:
 	virtual void InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY);
 
 	void SetTileType();
-	
+	void CheckSurroundedByWalls();
+
 	// API Functions
 	/*UFUNCTION(BlueprintCallable)
 	void OnTileClick();
@@ -86,10 +86,15 @@ public:
 	void SetTileTypeToPath();
 	void SetTileTypeToGround();
 	void SetTileTypeToExit();
-	
+
 	TObjectPtr<UMapRoom> GetOwningRoom() const { return OwningRoom; }
+	UFUNCTION(BlueprintCallable)
 	TEnumAsByte<ETileType> GetTileType() const { return TileType; }
+	UFUNCTION(BlueprintCallable)
+	float GetTileHeight() const { return TileHeight; }
+	UFUNCTION(BlueprintCallable)
 	int GetRoomIndexX() const { return RoomIndexX; }
+	UFUNCTION(BlueprintCallable)
 	int GetRoomIndexY() const { return RoomIndexY; }
 
 	UPROPERTY(BlueprintAssignable)
@@ -101,8 +106,22 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FTileTypeToExitSignature TileTypeToExitDelegate;
 private:
+	void FindSurroundingTiles();
+	
 	int TileSize = 0;
+	float TileHeight = 0.f;
 	
 	int RoomIndexX = 0;
 	int RoomIndexY = 0;
+
+	UPROPERTY()
+	TObjectPtr<AActor> LeftTile;
+	UPROPERTY()
+	TObjectPtr<AActor> RightTile;
+	UPROPERTY()
+	TObjectPtr<AActor> TopTile;
+	UPROPERTY()
+	TObjectPtr<AActor> BottomTile;
+	UPROPERTY()
+	TArray<AActor*> SurroundingTiles;
 };

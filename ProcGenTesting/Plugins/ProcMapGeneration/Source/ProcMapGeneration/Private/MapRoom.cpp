@@ -55,11 +55,9 @@ void UMapRoom::InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* Paren
 void UMapRoom::SplitRoom()
 {
 	float SplitPercent = FMath::RandRange(0.3, 0.7);
-
-
+	
 	if(RoomSizeY > RoomSizeX)
 	{
-		int aaa = (SplitPercent * RoomSizeY);
 		// Check to split horizontally
 		// Making sure both rooms produced by the split are larger than the minimum room size
 		if(MinRoomSize < SplitPercent * RoomSizeY && MinRoomSize < (1 - SplitPercent) * RoomSizeY)
@@ -201,12 +199,30 @@ void UMapRoom::GenerateTiles()
 			FVector TileSpawnPos = FVector::ZeroVector;
 			TileSpawnPos.X = RoomStartPos.X + i * TileSize;
 			TileSpawnPos.Y = RoomStartPos.Y + j * TileSize;
-			TileSpawnPos.Z = RoomStartPos.Z /*+ RandZ*/;
 
-			// TODO: Call tile function to choose "TileType"
-			
 			int TileMapArrayIndex = MapGenerator->CalculateMapIndexFromTilePos(TileSpawnPos);
 
+			
+			// Finding Z
+			/*float TileHeight = MapGenerator->MapTileHeights[TileMapArrayIndex];
+			if(TileHeight < -0.5)
+			{
+				TileSpawnPos.Z = 0;
+			}
+			else if(TileHeight > -0.5 && TileHeight < 0)
+			{
+				TileSpawnPos.Z = 10;
+			}
+			else if(TileHeight > 0 && TileHeight < 0.5)
+			{
+				TileSpawnPos.Z = 20;
+			}
+			else // Height > 0.5 and < 1 (max)
+			{
+				TileSpawnPos.Z = 30;
+			}*/
+			TileSpawnPos.Z = RoomStartPos.Z;
+			
 			// Spawns new tile actor if it does not exist inside the "MapTiles" array
 			if(!IsValid(MapGenerator->MapTiles[TileMapArrayIndex]))
 			{

@@ -7,6 +7,7 @@
 #include "MapGeneratorComponent.generated.h"
 
 class UMapRoom;
+class FastNoiseLite;
 class AExitGenerator;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -26,9 +27,12 @@ public:
 	float CalculateNodeXPos(int Index);
 	float CalculateNodeYPos(int Index);
 	float RoundToTileSizeMultiple(float OldValue, bool bRoundUp);
+	FVector2D ConvertIndex1Dto2D(int index);
 	int ConvertIndex2DTo1D(FVector2D Index2D);
 	int CalculateMapIndexFromTilePos(FVector TilePos);
-	
+
+	float CalculateTileHeight(int x, int y);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -65,6 +69,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
 	int InitialRoomSplitNum = 4;
 
+	// Noise
+	TSharedPtr<FastNoiseLite> HeightNoise;
+	UPROPERTY()
+	TArray<float> MapTileHeights;
+	
 	// Room properties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Room")
 	int RoomMinSize = 512;
