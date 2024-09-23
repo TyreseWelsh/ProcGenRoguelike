@@ -8,6 +8,8 @@
 #include "TileComponent.h"
 #include "ExitGenerator.h"
 
+#include "DrawDebugHelpers.h"
+
 UMapRoom::UMapRoom()
 {
 }
@@ -147,6 +149,8 @@ void UMapRoom::SplitVertically(const float SplitPercent)
 	
 	int SplitLocationX = RoomOrigin.X + ((RoomRight - RoomOrigin.X) * SplitPercent);
 	SplitLocationX = (SplitPercent >= 0.5f) ? RoundToTileSizeMultiple(SplitLocationX, false) : RoundToTileSizeMultiple(SplitLocationX, true);
+
+	DrawDebugLine(MapGenerator->GetOwner()->GetWorld(), FVector(SplitLocationX, RoomOrigin.Y, RoomOrigin.Z), FVector(SplitLocationX, RoomOrigin.Y, RoomOrigin.Z + 1000.f), FColor::Green, false, 120, 0, 5.f);
 	
 	int RandLocationAlongSplit;
 	if(NumSplitsRemaining == 1)
@@ -236,6 +240,7 @@ void UMapRoom::GenerateTiles()
 			// Initialises the current tile component
 			if(IsValid(MapGenerator->MapTiles[TileMapArrayIndex]))
 			{
+				MapGenerator->MapTiles[TileMapArrayIndex]->SetActorLocation(TileSpawnPos);
 				if(UTileComponent* CurrentTileComponent = MapGenerator->MapTiles[TileMapArrayIndex]->FindComponentByClass<UTileComponent>())
 				{
 					CurrentTileComponent->InitTile(this, TileSize, i, j);

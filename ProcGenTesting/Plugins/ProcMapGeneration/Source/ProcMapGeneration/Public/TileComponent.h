@@ -15,6 +15,13 @@ enum ETileType
 	Exit	UMETA(DisplayName = "Exit"),
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMouseHoverSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMouseHoverSelectedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMouseUnHoverSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftClickSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRightClickSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnSelectSignature);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTileTypeToWallSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTileTypeToPathSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTileTypeToGroundSignature);
@@ -44,29 +51,6 @@ public:
 	void SetTileType();
 	void CheckSurroundedByWalls();
 
-	// API Functions
-	/*UFUNCTION(BlueprintCallable)
-	void OnTileClick();
-	
-	UFUNCTION(BlueprintCallable)
-	void OnMouseRelease();
-	
-	UFUNCTION(BlueprintCallable)
-	void OnMouseHeld();
-	
-	UFUNCTION(BlueprintCallable)
-	void OnMouseHover();
-	
-	UFUNCTION(BlueprintCallable)
-	void OnMouseUnhover();
-
-	UFUNCTION(BlueprintCallable)
-	void ClearTile();*/
-	
-	/*UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void SetTileType();
-	virtual void SetTileType_Implementation();*/
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -82,6 +66,14 @@ public:
 	void SetRoomIndexX(int NewIndex);
 	void SetRoomIndexY(int NewIndex);
 
+	void TileHover();
+	void TileHoverSelected();
+	void TileUnHover();
+	void TileLeftClick();
+	//void TileLeftRelease();
+	void TileRightClick();
+	void TileUnSelect();
+	
 	void SetTileTypeToWall();
 	void SetTileTypeToPath();
 	void SetTileTypeToGround();
@@ -97,6 +89,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetRoomIndexY() const { return RoomIndexY; }
 
+	// Tile Interaction Delegeates
+	UPROPERTY(BlueprintAssignable)
+	FOnMouseHoverSignature HoverDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnMouseHoverSelectedSignature HoverSelectedDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnMouseUnHoverSignature UnHoverDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnLeftClickSignature LeftClickDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnRightClickSignature RightClickDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FUnSelectSignature UnSelectDelegate;
+	
+	// Tile Type Delegates
 	UPROPERTY(BlueprintAssignable)
 	FTileTypeToWallSignature TileTypeToWallDelegate;
 	UPROPERTY(BlueprintAssignable)

@@ -30,7 +30,10 @@ void UMapGeneratorComponent::InitMap()
 	AllRoomExits.Empty();
 	MapTileHeights.Empty();
 
-	MapOrigin = GetOwner()->GetActorLocation();
+	int MapOriginX = RoundToTileSizeMultiple(GetOwner()->GetActorLocation().X, false);
+	int MapOriginY = RoundToTileSizeMultiple(GetOwner()->GetActorLocation().Y, false);
+	MapOrigin =  FVector(MapOriginX, MapOriginY, GetOwner()->GetActorLocation().Z);
+	
 	MapSizeX = RoundToTileSizeMultiple(MapSizeX, false);
 	MapSizeY = RoundToTileSizeMultiple(MapSizeY, false);
 	int NumTilesX = MapSizeX / TileSize;
@@ -52,28 +55,20 @@ void UMapGeneratorComponent::InitMap()
 
 	MapTileHeights.SetNum(NumTilesX * NumTilesY);
 
-	/*for(int y = 0; y < NumTilesY; y++)
-	{
-		for(int x = 0; x < NumTilesX; x++)
-		{
-			FVector2D index = FVector2D(x, y);
-			MapTileHeights[ConvertIndex2DTo1D(index)] = HeightNoise->GetNoise(float(x), float(y));
-		}
-	}*/
 	
 	RootRoom = NewObject<UMapRoom>();
 	if(IsValid(RootRoom))
 	{
-		RootRoom->InitRoom(this, nullptr, GetOwner()->GetActorLocation(), MapSizeX, MapSizeY, InitialRoomSplitNum);
+		RootRoom->InitRoom(this, nullptr, MapOrigin, MapSizeX, MapSizeY, InitialRoomSplitNum);
 	}
 
-	for(AActor* Tile : MapTiles)
+	/*for(AActor* Tile : MapTiles)
 	{
 		if(UTileComponent* TComponent = Tile->FindComponentByClass<UTileComponent>())
 		{
 			TComponent->CheckSurroundedByWalls();
 		}
-	}
+	}*/
 	
 	// Set room exit tiles
 	if(AllRoomExits.Num() > 0)

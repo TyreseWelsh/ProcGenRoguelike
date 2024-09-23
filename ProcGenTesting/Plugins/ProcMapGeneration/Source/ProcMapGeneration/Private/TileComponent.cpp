@@ -106,6 +106,54 @@ void UTileComponent::SetRoomIndexY(int NewIndex)
 	RoomIndexY = NewIndex;
 }
 
+void UTileComponent::TileHover()
+{
+	if(HoverDelegate.IsBound())
+	{
+		HoverDelegate.Broadcast();
+	}
+}
+
+void UTileComponent::TileHoverSelected()
+{
+	if(HoverSelectedDelegate.IsBound())
+	{
+		HoverSelectedDelegate.Broadcast();
+	}
+}
+
+void UTileComponent::TileUnHover()
+{
+	if(UnHoverDelegate.IsBound())
+	{
+		UnHoverDelegate.Broadcast();
+	}
+}
+
+void UTileComponent::TileLeftClick()
+{
+	if(LeftClickDelegate.IsBound())
+	{
+		LeftClickDelegate.Broadcast();
+	}
+}
+
+void UTileComponent::TileRightClick()
+{
+	if(RightClickDelegate.IsBound())
+	{
+		RightClickDelegate.Broadcast();
+	}
+}
+
+void UTileComponent::TileUnSelect()
+{
+	if(UnSelectDelegate.IsBound())
+	{
+		UnSelectDelegate.Broadcast();
+	}
+}
+
 void UTileComponent::SetTileTypeToWall()
 {
 	TileType = ETileType::Wall;

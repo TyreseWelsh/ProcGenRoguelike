@@ -67,7 +67,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
 	int TileSize = 32;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
-	int InitialRoomSplitNum = 4;
+	int InitialRoomSplitNum = 6;
 
 	// Noise
 	TSharedPtr<FastNoiseLite> HeightNoise;
@@ -76,7 +76,7 @@ public:
 	
 	// Room properties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Room")
-	int RoomMinSize = 512;
+	int RoomMinSize = 320;
 
 	// Other properties
 	UPROPERTY()

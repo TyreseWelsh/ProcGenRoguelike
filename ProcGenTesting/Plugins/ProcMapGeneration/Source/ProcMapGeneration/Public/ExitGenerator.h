@@ -47,6 +47,6 @@ private:
 	float PathLength = 0.f;
 	float PathOffset = 0.f;
 
-	int MinPathLength = 3;
-	int MaxPathLength = 4;
+	int MinPathLength = 2;
+	int MaxPathLength = 3;
 };
