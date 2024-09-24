@@ -15,17 +15,17 @@ enum ETileType
 	Exit	UMETA(DisplayName = "Exit"),
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMouseHoverSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMouseHoverSelectedSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMouseUnHoverSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftClickSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRightClickSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnSelectSignature);
+DECLARE_MULTICAST_DELEGATE(FOnMouseHoverSignature);
+DECLARE_MULTICAST_DELEGATE(FOnMouseHoverSelectedSignature);
+DECLARE_MULTICAST_DELEGATE(FOnMouseUnHoverSignature);
+DECLARE_MULTICAST_DELEGATE(FOnLeftClickSignature);
+DECLARE_MULTICAST_DELEGATE(FOnRightClickSignature);
+DECLARE_MULTICAST_DELEGATE(FUnSelectSignature);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTileTypeToWallSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTileTypeToPathSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTileTypeToGroundSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTileTypeToExitSignature);
+DECLARE_MULTICAST_DELEGATE(FTileTypeToWallSignature);
+DECLARE_MULTICAST_DELEGATE(FTileTypeToPathSignature);
+DECLARE_MULTICAST_DELEGATE(FTileTypeToGroundSignature);
+DECLARE_MULTICAST_DELEGATE(FTileTypeToExitSignature);
 
 class UMapRoom;
 
@@ -70,7 +70,6 @@ public:
 	void TileHoverSelected();
 	void TileUnHover();
 	void TileLeftClick();
-	//void TileLeftRelease();
 	void TileRightClick();
 	void TileUnSelect();
 	
@@ -89,29 +88,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetRoomIndexY() const { return RoomIndexY; }
 
-	// Tile Interaction Delegeates
-	UPROPERTY(BlueprintAssignable)
-	FOnMouseHoverSignature HoverDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FOnMouseHoverSelectedSignature HoverSelectedDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FOnMouseUnHoverSignature UnHoverDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FOnLeftClickSignature LeftClickDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FOnRightClickSignature RightClickDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FUnSelectSignature UnSelectDelegate;
+	FOnMouseHoverSignature* GetMouseHoverDelegate() { return &HoverDelegate; }
+	FOnMouseUnHoverSignature* GetMouseUnHoverDelegate() { return &UnHoverDelegate; }
+	FOnLeftClickSignature* GetLeftClickDelegate() { return &LeftClickDelegate; }
+	FUnSelectSignature* GetUnSelectDelegate() { return &UnSelectDelegate; }
 	
-	// Tile Type Delegates
-	UPROPERTY(BlueprintAssignable)
-	FTileTypeToWallSignature TileTypeToWallDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FTileTypeToPathSignature TileTypeToPathDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FTileTypeToGroundSignature TileTypeToGroundDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FTileTypeToExitSignature TileTypeToExitDelegate;
+	FTileTypeToWallSignature* GetTileTypeToWallDelegate() { return &TileTypeToWallDelegate; }
+	FTileTypeToPathSignature* GetTileTypeToPathDelegate() { return &TileTypeToPathDelegate; }
+	FTileTypeToGroundSignature* GetTileTypeToGroundDelegate() { return &TileTypeToGroundDelegate; }
+	FTileTypeToExitSignature* GetTileTypeToExitDelegate() { return &TileTypeToExitDelegate; }
+	
+
 private:
 	void FindSurroundingTiles();
 	
@@ -131,4 +118,28 @@ private:
 	TObjectPtr<AActor> BottomTile;
 	UPROPERTY()
 	TArray<AActor*> SurroundingTiles;
+
+	// Tile Interaction Delegeates
+	//UPROPERTY(BlueprintAssignable)
+	FOnMouseHoverSignature HoverDelegate;
+	//UPROPERTY(BlueprintAssignable)
+	FOnMouseHoverSelectedSignature HoverSelectedDelegate;
+	//UPROPERTY(BlueprintAssignable)
+	FOnMouseUnHoverSignature UnHoverDelegate;
+	//UPROPERTY(BlueprintAssignable)
+	FOnLeftClickSignature LeftClickDelegate;
+	//UPROPERTY(BlueprintAssignable)
+	FOnRightClickSignature RightClickDelegate;
+	//UPROPERTY(BlueprintAssignable)
+	FUnSelectSignature UnSelectDelegate;
+	
+	// Tile Type Delegates
+	//UPROPERTY(BlueprintAssignable)
+	FTileTypeToWallSignature TileTypeToWallDelegate;
+	//UPROPERTY(BlueprintAssignable)
+	FTileTypeToPathSignature TileTypeToPathDelegate;
+	//UPROPERTY(BlueprintAssignable)
+	FTileTypeToGroundSignature TileTypeToGroundDelegate;
+	//UPROPERTY(BlueprintAssignable)
+	FTileTypeToExitSignature TileTypeToExitDelegate;
 };
