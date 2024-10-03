@@ -28,6 +28,7 @@ public:
 	void SplitHorizontally(const float SplitPercent);
 	void SplitVertically(const float SplitPercent);
 	void GenerateTiles();
+	AActor* SpawnTile(FVector TileSpawnPos, int RoomIndexX = -1, int RoomIndexY = -1);
 	void SetTileType(int IndexX, int LastIndexX, int IndexY, int LastIndexY);
 	TArray<UMapRoom*> GetLeaves(); 
 

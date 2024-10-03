@@ -59,6 +59,9 @@ void UMapGeneratorComponent::InitMap()
 	RootRoom = NewObject<UMapRoom>();
 	if(IsValid(RootRoom))
 	{
+		//FVector InitialRoomOrigin = FVector(MapOrigin.X + TileSize, MapOrigin.Y + TileSize, MapOrigin.Z);
+		//FVector2D InitialRoomSize = FVector2D(MapSizeX/* - TileSize*/, MapSizeY/* - TileSize*/);
+		//RootRoom->InitRoom(this, nullptr, InitialRoomOrigin, InitialRoomSize.X, InitialRoomSize.Y, InitialRoomSplitNum);
 		RootRoom->InitRoom(this, nullptr, MapOrigin, MapSizeX, MapSizeY, InitialRoomSplitNum);
 	}
 

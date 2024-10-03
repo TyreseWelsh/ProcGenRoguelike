@@ -17,13 +17,13 @@ ATileNode::ATileNode()
 	RootComponent = TileRoot;
 
 	Sprite = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("Sprite"));
-	Sprite->SetRelativeLocation(FVector(16.f, 16.f, 0.f));
+	//Sprite->SetRelativeLocation(FVector(16.f, 16.f, 0.f));
 	Sprite->SetRelativeRotation(FRotator(0.f, 0.f, -90.f));
 	Sprite->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Sprite->SetupAttachment(RootComponent);
 
 	TileComponent = CreateDefaultSubobject<UTileComponent>(TEXT("TileComponent"));
-	TileComponent->SetRelativeLocation(FVector(16.f, 16.f, 16.f));
+	TileComponent->SetRelativeLocation(FVector(0.f, 0.f, 16.f));
 	TileComponent->InitBoxExtent(FVector(16.f, 16.f, 16.f));
 	TileComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	TileComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
@@ -51,6 +51,28 @@ void ATileNode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ATileNode::AddToOverlayColour(FLinearColor NewColour)
+{
+	FLinearColor OverlayColour;
+	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
+	{
+		OverlayColour += NewColour;
+		OverlayColour.A = 1;
+		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
+	}
+}
+
+void ATileNode::RemoveFromOverlayColour(FLinearColor NewColour)
+{
+	FLinearColor OverlayColour;
+	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
+	{
+		OverlayColour -= NewColour;
+		OverlayColour.A = 1;
+		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
+	}
 }
 
 void ATileNode::InitWall()
@@ -91,40 +113,23 @@ void ATileNode::InitExit()
 
 void ATileNode::BindHover()
 {
-	FLinearColor NewColour;
-	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), NewColour))
-	{
-		NewColour += HoverColour;
-		NewColour.A = 1;
-		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), NewColour);
-	}
+	AddToOverlayColour(HoverColour);
 }
 
 void ATileNode::BindUnHover()
 {
-	FLinearColor NewColour;
-	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), NewColour))
-	{
-		NewColour -= HoverColour;
-		NewColour.A = 1;
-		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), NewColour);
-	}
+	RemoveFromOverlayColour(HoverColour);
 }
 
 void ATileNode::BindLeftClick()
 {
-	FLinearColor NewColour;
-	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), NewColour))
-	{
-		NewColour += SelectColour;
-		NewColour.A = 1;
-		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), NewColour);
-	}
+	AddToOverlayColour(SelectColour);
 }
 
 void ATileNode::BindUnSelect()
 {
-	DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), FLinearColor::White);
+	//DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), FLinearColor::White);
+	RemoveFromOverlayColour(SelectColour);
 }
 
 void ATileNode::CalculateHeightLevel()

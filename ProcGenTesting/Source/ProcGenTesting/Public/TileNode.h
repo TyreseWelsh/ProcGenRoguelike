@@ -36,6 +36,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void AddToOverlayColour(FLinearColor Colour);
+	void RemoveFromOverlayColour(FLinearColor Colour);
+	
 private:
 	void InitWall();
 	void InitPath();

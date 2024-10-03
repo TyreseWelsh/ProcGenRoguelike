@@ -31,7 +31,7 @@ AExitGenerator::AExitGenerator()
 void AExitGenerator::Init(int _TileSize)
 {
 	TileSize = _TileSize;
-	PathGenCollider->SetRelativeLocation(FVector(TileSize / 2, 0, 0));
+	//PathGenCollider->SetRelativeLocation(FVector(TileSize / 2, 0, 0));
 
 	PathGenCollider->SetCapsuleRadius(TileSize / 4);
 	InitPathGenCollider();
@@ -42,7 +42,7 @@ void AExitGenerator::CalculateRelativeExitTiles()
 	FVector OffsetVector = GetActorRightVector() * FVector(PathGenCollider->GetRelativeLocation().X, 0, 0);
 	
 	LeftExitTilePos = (GetActorLocation() + OffsetVector) - GetActorRightVector() * TileSize;
-	RightExitTilePos = GetActorLocation() + OffsetVector;
+	RightExitTilePos = (GetActorLocation() + OffsetVector) + GetActorRightVector() * TileSize;
 }
 
 void AExitGenerator::InitPathGenCollider()

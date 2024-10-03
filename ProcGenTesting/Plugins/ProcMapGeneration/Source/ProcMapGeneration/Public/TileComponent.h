@@ -62,6 +62,18 @@ public:
 	TObjectPtr<UMapRoom> OwningRoom;
 	TEnumAsByte<ETileType> TileType;
 
+	bool bIsWalkable = true;
+	bool bIsOccupied = false;
+	int GCost = 0;
+	int HCost = 0;
+	int FCost = 0;
+	UPROPERTY()
+	UTileComponent* ParentTile;
+	UPROPERTY()
+	TArray<UTileComponent*> SurroundingTiles;
+
+	TArray<UTileComponent*> GetSurroundingTiles() { return SurroundingTiles; }
+
 	void SetOwningRoom(UMapRoom* NewOwner);
 	void SetRoomIndexX(int NewIndex);
 	void SetRoomIndexY(int NewIndex);
@@ -116,8 +128,7 @@ private:
 	TObjectPtr<AActor> TopTile;
 	UPROPERTY()
 	TObjectPtr<AActor> BottomTile;
-	UPROPERTY()
-	TArray<AActor*> SurroundingTiles;
+
 
 	// Tile Interaction Delegeates
 	//UPROPERTY(BlueprintAssignable)

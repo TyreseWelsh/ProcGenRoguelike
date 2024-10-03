@@ -56,9 +56,16 @@ void UMapRoom::InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* Paren
 
 void UMapRoom::SplitRoom()
 {
-	float SplitPercent = FMath::RandRange(0.3, 0.7);
+	//float SplitPercent = FMath::RandRange(0.35, 0.65);
+	float num1 = 1 / (MapGenerator->InitialRoomSplitNum * 2);
+	int num2 = FMath::RandRange(1, MapGenerator->InitialRoomSplitNum);
+	if(num2 % 2 == 0)
+	{
+		num2 -= 1;
+	}
+	float SplitPercent = num1 * num2;
 	
-	if(RoomSizeY > RoomSizeX)
+	if(RoomSizeY >= RoomSizeX)
 	{
 		// Check to split horizontally
 		// Making sure both rooms produced by the split are larger than the minimum room size
@@ -108,20 +115,35 @@ void UMapRoom::SplitHorizontally(const float SplitPercent)
 	int SplitLocationY = RoomOrigin.Y + ((RoomBottom - RoomOrigin.Y) * SplitPercent);
 	SplitLocationY = (SplitPercent >= 0.5f) ? RoundToTileSizeMultiple(SplitLocationY, false) : RoundToTileSizeMultiple(SplitLocationY, true);
 	
+	FColor NewRoomColor = 	FColor::MakeRandomColor();
+	//
+	for(int i = 0; i < (RoomSizeX / TileSize); ++i)
+	{
+		FVector CurrentTilePos = FVector(RoomOrigin.X + (i * TileSize), SplitLocationY, RoomOrigin.Z);
+		if(AActor* CurrentTile = SpawnTile(CurrentTilePos))
+		{
+			if(UTileComponent* CurrenTileComponent = CurrentTile->FindComponentByClass<UTileComponent>())
+			{
+				CurrenTileComponent->SetTileTypeToWall();
+			}
+		}
+	}
+	//
+	
 	// Setup and spawn of Exit actor along split
 	int RandLocationAlongSplit;
 	if(NumSplitsRemaining == 1)
 	{
-		RandLocationAlongSplit = RoomSizeX * FMath::RandRange(0.25, 0.75);
+		RandLocationAlongSplit = RoomSizeX * FMath::RandRange(0.225, 0.775);
 	}
 	else
 	{
 		RandLocationAlongSplit = RoomSizeX *
 			(FMath::RandBool() ? FMath::RandRange(LowerMin, LowerMax) : FMath::RandRange(UpperMin, UpperMax));
 	}
-
+	
 	int ExitSpawnPosX = RoomOrigin.X + RoundToTileSizeMultiple(RandLocationAlongSplit, true);
-;
+
 	FVector ExitSpawnPos = FVector(ExitSpawnPosX, SplitLocationY, RoomOrigin.Z);
 	TObjectPtr<AExitGenerator> Exit = MapGenerator->GetWorld()->SpawnActor<AExitGenerator>(AExitGenerator::StaticClass(), ExitSpawnPos, FRotator(0, 0, 0));
 	Exit->Init(TileSize);
@@ -138,8 +160,9 @@ void UMapRoom::SplitHorizontally(const float SplitPercent)
 	RightChildRoom = NewObject<UMapRoom>();
 	if(IsValid(RightChildRoom))
 	{
-		RightChildRoom->InitRoom(MapGenerator, this, FVector(RoomOrigin.X, SplitLocationY, RoomOrigin.Z + RoomSpawnOffsetZ),
-			RoomSizeX, CalculateRightRoomSize(SplitLocationY, RoomBottom), NumSplitsRemaining - 1);
+		int RightRoomOriginY = SplitLocationY + TileSize;
+		RightChildRoom->InitRoom(MapGenerator, this, FVector(RoomOrigin.X, RightRoomOriginY, RoomOrigin.Z + RoomSpawnOffsetZ),
+			RoomSizeX, CalculateRightRoomSize(RightRoomOriginY, RoomBottom), NumSplitsRemaining - 1);
 	}
 }
 
@@ -149,19 +172,34 @@ void UMapRoom::SplitVertically(const float SplitPercent)
 	
 	int SplitLocationX = RoomOrigin.X + ((RoomRight - RoomOrigin.X) * SplitPercent);
 	SplitLocationX = (SplitPercent >= 0.5f) ? RoundToTileSizeMultiple(SplitLocationX, false) : RoundToTileSizeMultiple(SplitLocationX, true);
-
-	DrawDebugLine(MapGenerator->GetOwner()->GetWorld(), FVector(SplitLocationX, RoomOrigin.Y, RoomOrigin.Z), FVector(SplitLocationX, RoomOrigin.Y, RoomOrigin.Z + 1000.f), FColor::Green, false, 120, 0, 5.f);
 	
+	FColor NewRoomColor = 	FColor::MakeRandomColor();
+	//
+	for(int i = 0; i < (RoomSizeY / TileSize); ++i)
+	{
+		FVector CurrentTilePos = FVector(SplitLocationX, RoomOrigin.Y + (i * TileSize), RoomOrigin.Z);
+
+		if(AActor* CurrentTile = SpawnTile(CurrentTilePos))
+		{
+			if(UTileComponent* CurrenTileComponent = CurrentTile->FindComponentByClass<UTileComponent>())
+			{
+				CurrenTileComponent->SetTileTypeToWall();
+			}
+		}
+	}
+	//
+	UE_LOG(LogTemp, Warning, TEXT(""));
 	int RandLocationAlongSplit;
 	if(NumSplitsRemaining == 1)
 	{
-		RandLocationAlongSplit = RoomSizeY * FMath::RandRange(0.25, 0.75);
+		RandLocationAlongSplit = RoomSizeY * FMath::RandRange(0.225, 0.775);
 	}
 	else
 	{
 		RandLocationAlongSplit = RoomSizeY *
 			(FMath::RandBool() ? FMath::RandRange(LowerMin, LowerMax) : FMath::RandRange(UpperMin, UpperMax));
 	}
+	
 	int ExitSpawnPosY = RoomOrigin.Y + RoundToTileSizeMultiple(RandLocationAlongSplit, true);
 	
 	FVector ExitSpawnPos = FVector(SplitLocationX, ExitSpawnPosY, RoomOrigin.Z);
@@ -180,8 +218,9 @@ void UMapRoom::SplitVertically(const float SplitPercent)
 	RightChildRoom = NewObject<UMapRoom>();
 	if(IsValid(RightChildRoom))
 	{
-		RightChildRoom->InitRoom(MapGenerator, this, FVector(SplitLocationX, RoomOrigin.Y, RoomOrigin.Z + RoomSpawnOffsetZ),
-		CalculateRightRoomSize(SplitLocationX, RoomRight), RoomSizeY, NumSplitsRemaining - 1);
+		int RightRoomOriginX = SplitLocationX + TileSize;
+		RightChildRoom->InitRoom(MapGenerator, this, FVector(RightRoomOriginX, RoomOrigin.Y, RoomOrigin.Z + RoomSpawnOffsetZ),
+		CalculateRightRoomSize(RightRoomOriginX, RoomRight), RoomSizeY, NumSplitsRemaining - 1);
 	}
 }
 
@@ -189,10 +228,6 @@ void UMapRoom::GenerateTiles()
 {
 	FVector RoomStartPos = RoomOrigin;
 	FVector RoomEndPos = FVector(RoomStartPos.X + RoomSizeX, RoomStartPos.Y + RoomSizeY, RoomStartPos.Z);
-
-	/*
-	float RandZ = FMath::RandRange(-1000, 1000);
-	*/
 	
 	LastIndexX = ((RoomEndPos.X - RoomStartPos.X) / TileSize) - 1;
 	for(int i = 0; i <= LastIndexX; ++i)
@@ -204,55 +239,47 @@ void UMapRoom::GenerateTiles()
 			TileSpawnPos.X = RoomStartPos.X + i * TileSize;
 			TileSpawnPos.Y = RoomStartPos.Y + j * TileSize;
 
-			int TileMapArrayIndex = MapGenerator->CalculateMapIndexFromTilePos(TileSpawnPos);
-
-			
-			// Finding Z
-			/*float TileHeight = MapGenerator->MapTileHeights[TileMapArrayIndex];
-			if(TileHeight < -0.5)
-			{
-				TileSpawnPos.Z = 0;
-			}
-			else if(TileHeight > -0.5 && TileHeight < 0)
-			{
-				TileSpawnPos.Z = 10;
-			}
-			else if(TileHeight > 0 && TileHeight < 0.5)
-			{
-				TileSpawnPos.Z = 20;
-			}
-			else // Height > 0.5 and < 1 (max)
-			{
-				TileSpawnPos.Z = 30;
-			}*/
-			TileSpawnPos.Z = RoomStartPos.Z;
-			
-			// Spawns new tile actor if it does not exist inside the "MapTiles" array
-			if(!IsValid(MapGenerator->MapTiles[TileMapArrayIndex]))
-			{
-				if(IsValid(MapGenerator->GetWorld()))
-				{
-					TObjectPtr<AActor> CurrentTile = MapGenerator->GetWorld()->SpawnActor<AActor>(MapGenerator->TileClass, TileSpawnPos, FRotator::ZeroRotator);
-					MapGenerator->MapTiles[TileMapArrayIndex] = CurrentTile;
-				}
-			}
-			
-			// Initialises the current tile component
-			if(IsValid(MapGenerator->MapTiles[TileMapArrayIndex]))
-			{
-				MapGenerator->MapTiles[TileMapArrayIndex]->SetActorLocation(TileSpawnPos);
-				if(UTileComponent* CurrentTileComponent = MapGenerator->MapTiles[TileMapArrayIndex]->FindComponentByClass<UTileComponent>())
-				{
-					CurrentTileComponent->InitTile(this, TileSize, i, j);
-				}
-				RoomTiles.Add(MapGenerator->MapTiles[TileMapArrayIndex]);
-			}
+			RoomTiles.Add(SpawnTile(TileSpawnPos, i, j));
 		}
 	}
 	
 	RoomSplitTimerHandle.Invalidate();
 }
 
+AActor* UMapRoom::SpawnTile(FVector TileSpawnPos, int RoomIndexX, int RoomIndexY)
+{
+	int TileMapArrayIndex = MapGenerator->CalculateMapIndexFromTilePos(TileSpawnPos);
+	TObjectPtr<AActor> CurrentTile;
+	if(TileMapArrayIndex >= MapGenerator->MapTiles.Num())
+	{
+		//DrawDebugLine(MapGenerator->GetOwner()->GetWorld(), TileSpawnPos, FVector(TileSpawnPos.X, TileSpawnPos.Y, TileSpawnPos.Z + 1000.f), FColor::Red, false, 6000, 0, 10.f);
+	}
+	else
+	{
+		// Spawns new tile actor if it does not exist inside the "MapTiles" array
+		if(!IsValid(MapGenerator->MapTiles[TileMapArrayIndex]))
+		{
+			if(IsValid(MapGenerator->GetWorld()))
+			{
+				CurrentTile = MapGenerator->GetWorld()->SpawnActor<AActor>(MapGenerator->TileClass, TileSpawnPos, FRotator::ZeroRotator);
+				MapGenerator->MapTiles[TileMapArrayIndex] = CurrentTile;
+			}
+		}
+			
+		// Initialises the current tile component
+		if(IsValid(MapGenerator->MapTiles[TileMapArrayIndex]))
+		{
+			CurrentTile = MapGenerator->MapTiles[TileMapArrayIndex];
+			CurrentTile->SetActorLocation(TileSpawnPos);
+			if(UTileComponent* CurrentTileComponent = CurrentTile->FindComponentByClass<UTileComponent>())
+			{
+				CurrentTileComponent->InitTile(this, TileSize, RoomIndexX, RoomIndexY);
+			}
+		}
+	}
+	
+	return CurrentTile;
+}
 
 
 TArray<UMapRoom*> UMapRoom::GetLeaves()

@@ -26,7 +26,7 @@ void UTileComponent::InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSiz
 	
 	int BoxSize = TileSize / 2;
 	
-	SetRelativeLocation(FVector(BoxSize, BoxSize, BoxSize));
+	SetRelativeLocation(FVector(0.f, 0.f, BoxSize));
 	SetBoxExtent(FVector(BoxSize, BoxSize, BoxSize));
 	SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SetCollisionObjectType(ECC_WorldStatic);
@@ -35,7 +35,7 @@ void UTileComponent::InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSiz
 	SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
 	
-	FindSurroundingTiles();
+	//FindSurroundingTiles();
 	SetTileType();
 }
 
@@ -48,20 +48,25 @@ void UTileComponent::SetTileType()
 		SetTileTypeToWall();
 	}*/
 
-	if(RoomIndexX == 0 or RoomIndexX == OwningRoom->LastIndexX or RoomIndexY == 0 or RoomIndexY == OwningRoom->LastIndexY)
+	UMapGeneratorComponent* MapGenerator = OwningRoom->MapGenerator;
+	int MapIndex1D = MapGenerator->CalculateMapIndexFromTilePos(GetOwner()->GetActorLocation());
+	FVector2D MapIndex2D = MapGenerator->ConvertIndex1Dto2D(MapIndex1D);
+
+	//UE_LOG(LogTemp, Display, TEXT("%i"), MapGenerator->MapSizeX);
+	if(MapIndex2D.X == 0 or MapIndex2D.X * TileSize == MapGenerator->MapSizeX - TileSize or MapIndex2D.Y == 0 or MapIndex2D.Y * TileSize == MapGenerator->MapSizeY - TileSize)
 	{
 		// Set tile type as wall
 		SetTileTypeToWall();
 		return;
 	}
-	if(RoomIndexX == 1 or RoomIndexX == OwningRoom->LastIndexX - 1 or RoomIndexY == 1 or RoomIndexY == OwningRoom->LastIndexY - 1)
+	/*if(RoomIndexX == 1 or RoomIndexX == OwningRoom->LastIndexX - 1 or RoomIndexY == 1 or RoomIndexY == OwningRoom->LastIndexY - 1)
 	{
 		if(FMath::RandRange(1, 10) <= 5)
 		{
 			// Set tile type as wall
 			SetTileTypeToWall();
 		}
-	}
+	}*/
 
 	//CheckSurroundedByWalls();
 	
@@ -190,6 +195,7 @@ void UTileComponent::SetTileTypeToExit()
 	}
 }
 
+/*
 void UTileComponent::FindSurroundingTiles()
 {
 	TObjectPtr<UMapGeneratorComponent> Generator = OwningRoom->MapGenerator;
@@ -198,26 +204,6 @@ void UTileComponent::FindSurroundingTiles()
 	int LeftTileIndex = Generator->CalculateMapIndexFromTilePos(GetOwner()->GetActorLocation() - FVector(TileSize, 0, 0));
 	if(LeftTileIndex >= 0 && LeftTileIndex < Generator->MapTiles.Num())
 	{
-		/*if(AActor* OActor = Generator->MapTiles[LeftTileIndex])
-		{
-			if(UTileComponent* TComponent = OActor->FindComponentByClass<UTileComponent>())
-			{
-				LeftTile = TComponent;
-				SurroundingTiles.Add(TopTile);
-
-				LeftTile->RightTile = this;
-				LeftTile->SurroundingTiles.Add(this);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Invalid tile component (LEFT)"));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Invalid Owning actor (LEFT)"));
-		}*/
-
 		if(AActor* TileActor = Generator->MapTiles[LeftTileIndex])
 		{
 			LeftTile = TileActor;
@@ -233,26 +219,6 @@ void UTileComponent::FindSurroundingTiles()
 	int TopTileIndex = Generator->CalculateMapIndexFromTilePos(GetOwner()->GetActorLocation() - FVector(0, TileSize, 0));
 	if(TopTileIndex >= 0 && TopTileIndex < Generator->MapTiles.Num())
 	{
-		/*if(AActor* OActor = Generator->MapTiles[TopTileIndex])
-		{
-			if(UTileComponent* TComponent = OActor->FindComponentByClass<UTileComponent>())
-			{
-				TopTile = TComponent;
-				SurroundingTiles.Add(TopTile);
-
-				TopTile->BottomTile = this;
-				TopTile->SurroundingTiles.Add(this);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Invalid tile component (TOP)"));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Invalid Owning actor (TOP)"));
-		}*/
-
 		if(AActor* TileActor = Generator->MapTiles[TopTileIndex])
 		{
 			TopTile = TileActor;
@@ -290,3 +256,4 @@ void UTileComponent::CheckSurroundedByWalls()
 		//UE_LOG(LogTemp, Warning, TEXT("Surrounded by walls"));
 	}
 }
+*/
