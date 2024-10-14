@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "IsTile.h"
 #include "TileNode.generated.h"
 
-class UPaperFlipbook;
-class UPaperFlipbookComponent;
 class UTileComponent;
 
 UCLASS()
-class PROCGENTESTING_API ATileNode : public AActor
+class PROCGENTESTING_API ATileNode : public AActor, public IIsTile
 {
 	GENERATED_BODY()
 
@@ -19,7 +18,7 @@ class PROCGENTESTING_API ATileNode : public AActor
 	USceneComponent* TileRoot;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UPaperFlipbookComponent* Sprite;
+	UStaticMeshComponent* Mesh;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UTileComponent* TileComponent;
@@ -32,12 +31,22 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void BindHover();
+	virtual void BindUnHover();
+	virtual void BindLeftClick();
+	virtual void BindUnSelect();
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UTileComponent* GetTileComponent();
+	virtual UTileComponent* GetTileComponent_Implementation() override { return TileComponent; }
+	
 	void AddToOverlayColour(FLinearColor Colour);
 	void RemoveFromOverlayColour(FLinearColor Colour);
+	void EnableHighlight();
+	void DisableHighlight();
 	
 private:
 	void InitWall();
@@ -45,27 +54,25 @@ private:
 	void InitGround();
 	void InitExit();
 
-	void BindHover();
-	void BindUnHover();
-	void BindLeftClick();
-	void BindUnSelect();
+
 
 	void CalculateHeightLevel();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UMaterialInstanceDynamic* DynamicMatInstance;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UPaperFlipbook* WallFlipbook;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TArray<UPaperFlipbook*> PathFlipbooks;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TArray<UPaperFlipbook*> GroundFlipbooks;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<UPaperFlipbook*> ExitFlipbooks;
+	TArray<UPaperFlipbook*> ExitFlipbooks;*/
 	
 	TArray<float> HeightThresholds;
 	int HeightLevel;
+	bool bIsSelected = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FLinearColor HoverColour;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

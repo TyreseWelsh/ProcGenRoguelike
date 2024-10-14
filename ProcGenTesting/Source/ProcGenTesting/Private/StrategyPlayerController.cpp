@@ -5,8 +5,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "ProcMapGeneration/Public/TileComponent.h"
-#include "InputActionValue.h"
-#include "Kismet/GameplayStatics.h"
+#include "ProcMapGeneration/Public/IsTile.h"
 
 void AStrategyPlayerController::BeginPlay()
 {
@@ -47,25 +46,34 @@ void AStrategyPlayerController::Tick(float DeltaTime)
 	FVector MousePos;
 	FVector MouseDirection;
 	DeprojectMousePositionToWorld(MousePos, MouseDirection);
-
+	MousePos.Z = PlayerCam->GetActorLocation().Z;
+	
 	FHitResult HitResult;
-	FVector EndLocation = FVector(MousePos.X, MousePos.Y, PlayerCam->GetActorLocation().Z - 5000.f);
-	GetWorld()->LineTraceSingleByChannel(HitResult, MousePos, EndLocation, ECC_Visibility);
+	FVector TraceStart = FVector(MousePos.X, MousePos.Y, MousePos.Z - 100.f);
+	FVector TraceEnd = FVector(MousePos.X, MousePos.Y, MousePos.Z - 5000.f);
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceStart + MouseDirection * 5000.f, ECC_Visibility);
+	//DrawDebugLine(GetWorld(), TraceStart, TraceStart + MouseDirection * 5000.f, FColor::Cyan, false, 100, 0, 10.f);
 
+	//GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+
+	
 	if(IsValid(HitResult.GetActor()))
 	{
-		if(UTileComponent* NewTileComponent = HitResult.GetActor()->FindComponentByClass<UTileComponent>())
+		if(HitResult.GetActor()->Implements<UIsTile>())
 		{
-			if(NewTileComponent != CurrentHoveredTileComponent)
+			if(UTileComponent* NewTileComponent = IIsTile::Execute_GetTileComponent(HitResult.GetActor()))
 			{
-				// Unhovering previous hovered tile first
-				if(IsValid(CurrentHoveredTileComponent))
+				if(NewTileComponent != CurrentHoveredTileComponent)
 				{
-					CurrentHoveredTileComponent->TileUnHover();
-				}
+					// Unhovering previous hovered tile first
+					if(IsValid(CurrentHoveredTileComponent))
+					{
+						CurrentHoveredTileComponent->TileUnHover();
+					}
 
-				CurrentHoveredTileComponent = NewTileComponent;
-				CurrentHoveredTileComponent->TileHover();
+					CurrentHoveredTileComponent = NewTileComponent;
+					CurrentHoveredTileComponent->TileHover();
+				}
 			}
 		}
 	}

@@ -77,6 +77,7 @@ public:
 	void SetOwningRoom(UMapRoom* NewOwner);
 	void SetRoomIndexX(int NewIndex);
 	void SetRoomIndexY(int NewIndex);
+	void SetTeleportTarget(AActor* NewTarget);
 
 	void TileHover();
 	void TileHoverSelected();
@@ -100,6 +101,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetRoomIndexY() const { return RoomIndexY; }
 
+	UFUNCTION(BlueprintCallable)
+	AActor* GetOccupyingObject() { return OccupyingActor; }
+	void SetOccupyingActor(AActor* NewOccupyingActor);
+
 	FOnMouseHoverSignature* GetMouseHoverDelegate() { return &HoverDelegate; }
 	FOnMouseUnHoverSignature* GetMouseUnHoverDelegate() { return &UnHoverDelegate; }
 	FOnLeftClickSignature* GetLeftClickDelegate() { return &LeftClickDelegate; }
@@ -121,6 +126,9 @@ private:
 	int RoomIndexY = 0;
 
 	UPROPERTY()
+	TObjectPtr<AActor> OccupyingActor;
+
+	UPROPERTY()
 	TObjectPtr<AActor> LeftTile;
 	UPROPERTY()
 	TObjectPtr<AActor> RightTile;
@@ -128,8 +136,9 @@ private:
 	TObjectPtr<AActor> TopTile;
 	UPROPERTY()
 	TObjectPtr<AActor> BottomTile;
-
-
+	UPROPERTY()
+	TObjectPtr<AActor> TeleportTarget;
+	
 	// Tile Interaction Delegeates
 	//UPROPERTY(BlueprintAssignable)
 	FOnMouseHoverSignature HoverDelegate;
