@@ -25,14 +25,15 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile);
+	TArray<AActor*> AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile);
+	void HighlightPath(TArray<AActor*> PathToHighlight);
 	
 private:
-	void RetracePath(UTileComponent* StartNode, UTileComponent* TargetNode);
-	void HighlightPath();
+	TArray<AActor*> RetracePath(UTileComponent* StartNode, UTileComponent* TargetNode);
 	int GetDistance(UTileComponent* TileA, UTileComponent* TileB);
 	
 	TArray<UTileComponent*> OpenSet;
 	TArray<UTileComponent*> ClosedSet;
-	TArray<UTileComponent*> Path;
+	UPROPERTY()
+	TArray<AActor*> Path;
 };

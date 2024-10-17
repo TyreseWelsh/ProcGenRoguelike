@@ -69,10 +69,13 @@ public:
 	int FCost = 0;
 	UPROPERTY()
 	UTileComponent* ParentTile;
-	UPROPERTY()
-	TArray<UTileComponent*> SurroundingTiles;
+	
+	//UPROPERTY()
+	//TArray<AActor*> NeighbourTiles;
+	//TArray<AActor*> GetSurroundingTiles() { return NeighbourTiles; }
 
-	TArray<UTileComponent*> GetSurroundingTiles() { return SurroundingTiles; }
+	TArray<AActor*> FindNeighbourTiles();
+
 
 	void SetOwningRoom(UMapRoom* NewOwner);
 	void SetRoomIndexX(int NewIndex);
@@ -117,8 +120,6 @@ public:
 	
 
 private:
-	void FindSurroundingTiles();
-	
 	int TileSize = 0;
 	float TileHeight = 0.f;
 	

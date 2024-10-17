@@ -2,7 +2,11 @@
 
 
 #include "TeleportPoint.h"
+
+#include "IsTile.h"
+#include "TileComponent.h"
 #include "Components/SphereComponent.h"
+#include "TileMapFunctionLibrary.h"
 
 // Sets default values
 ATeleportPoint::ATeleportPoint()
@@ -71,7 +75,10 @@ void ATeleportPoint::TeleportObject(AActor* Object)
 {
 	if (bIsActive)
 	{
-		Object->SetActorLocation(TeleportLocation);
+		if (UTileMapFunctionLibrary::OccupyTile(Object))
+		{
+			Object->SetActorLocation(TeleportLocation);
+		}
 	}
 }
 

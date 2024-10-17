@@ -52,6 +52,34 @@ void ATileNode::Tick(float DeltaTime)
 
 }
 
+
+
+void ATileNode::AddTileColour_Implementation(FLinearColor NewColour)
+{
+	FLinearColor OverlayColour;
+	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
+	{
+		OverlayColour += NewColour;
+		OverlayColour.A = 1;
+		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
+	}
+	EnableHighlight();
+}
+
+void ATileNode::SutbractTileColour_Implementation(FLinearColor NewColour)
+{
+	FLinearColor OverlayColour;
+	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
+	{
+		OverlayColour -= NewColour;
+		OverlayColour.A = 1;
+		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
+	}
+	DisableHighlight();
+}
+
+
+
 void ATileNode::AddToOverlayColour(FLinearColor NewColour)
 {
 	FLinearColor OverlayColour;
@@ -76,14 +104,24 @@ void ATileNode::RemoveFromOverlayColour(FLinearColor NewColour)
 
 void ATileNode::EnableHighlight()
 {
-	float HighlightLevel = 0.5;
-	DynamicMatInstance->SetScalarParameterValue(FName("HighlightLevel"), HighlightLevel);
+	HighlightCounter++;
+	if (HighlightCounter > 0)
+	{
+		float HighlightLevel = 0.5;
+		DynamicMatInstance->SetScalarParameterValue(FName("HighlightLevel"), HighlightLevel);
+	}
 }
 
 void ATileNode::DisableHighlight()
 {
-	float HighlightLevel = 0;
-	DynamicMatInstance->SetScalarParameterValue(FName("HighlightLevel"), HighlightLevel);
+	HighlightCounter--;
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("%i"), HighlightCounter));
+
+	if (HighlightCounter <= 0)
+	{
+		float HighlightLevel = 0;
+		DynamicMatInstance->SetScalarParameterValue(FName("HighlightLevel"), HighlightLevel);
+	}
 }
 
 void ATileNode::InitWall()
@@ -171,8 +209,9 @@ void ATileNode::BindUnHover()
 void ATileNode::BindLeftClick()
 {
 	bIsSelected = true;
-	AddToOverlayColour(SelectColour);
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("x=%i , y=%i"), TileComponent->GetRoomIndexX(), TileComponent->GetRoomIndexY()));
+	//AddToOverlayColour(SelectColour);
+	AddTileColour_Implementation(SelectColour);
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Highcounter on click = %i"), HighlightCounter));
 	if (AActor* OccupyingObject = TileComponent->GetOccupyingObject())
 	{
 		if (OccupyingObject->Implements<UInteractable>())
@@ -187,7 +226,8 @@ void ATileNode::BindLeftClick()
 void ATileNode::BindUnSelect()
 {
 	bIsSelected = false;
-	RemoveFromOverlayColour(SelectColour);
+	//RemoveFromOverlayColour(SelectColour);
+	SubtractTileColour_Implementation(SelectColour);
 	DisableHighlight();
 }
 

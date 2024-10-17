@@ -143,6 +143,8 @@ void UTileComponent::TileUnHover()
 
 void UTileComponent::TileLeftClick()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("left click called")));
+
 	if(LeftClickDelegate.IsBound())
 	{
 		LeftClickDelegate.Broadcast();
@@ -204,6 +206,27 @@ void UTileComponent::SetTileTypeToExit()
 void UTileComponent::SetOccupyingActor(AActor* NewOccupyingActor)
 {
 	OccupyingActor = NewOccupyingActor;
+}
+
+TArray<AActor*> UTileComponent::FindNeighbourTiles()
+{
+	TArray<AActor*> NeighbourTiles;
+	FVector OwnerLocation = GetOwner()->GetActorLocation();
+	for (int x = -1; x <= 1; ++x)
+	{
+		for (int y = -1; y <= 1; ++y)
+		{
+			if (x == 0 && y == 0)
+				continue;
+
+			FVector NeighbourTilePosition = FVector(OwnerLocation.X + (TileSize * x), OwnerLocation.Y + (TileSize * y), OwnerLocation.Z);
+			if (AActor* NeighbourTile = UTileMapFunctionLibrary::GetBelowTile(NeighbourTilePosition, GetOwner()->GetWorld()))
+			{
+				NeighbourTiles.Add(NeighbourTile);
+			}
+		}
+	}
+	return NeighbourTiles;
 }
 
 /*

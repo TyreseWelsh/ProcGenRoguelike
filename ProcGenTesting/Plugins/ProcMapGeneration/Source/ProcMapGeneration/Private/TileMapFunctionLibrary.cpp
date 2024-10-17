@@ -75,14 +75,20 @@ AActor* UTileMapFunctionLibrary::GetBelowTile(FVector StartingPos, UWorld* Curre
 	return nullptr;
 }
 
-void UTileMapFunctionLibrary::OccupyTile(AActor* OccupyingActor)
+bool UTileMapFunctionLibrary::OccupyTile(AActor* OccupyingActor)
 {
 	if (AActor* Tile = GetBelowTile(OccupyingActor))
 	{
-		IIsTile::Execute_GetTileComponent(Tile)->SetOccupyingActor(OccupyingActor);
+		if (!IIsTile::Execute_GetTileComponent(Tile)->GetOccupyingObject())
+		{
+			IIsTile::Execute_GetTileComponent(Tile)->SetOccupyingActor(OccupyingActor);
+			return true;
+		}
+		return false;
 	}
 	else
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "No tile underneath");
+		return false;
 	}
 }

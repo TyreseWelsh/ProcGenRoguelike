@@ -42,6 +42,11 @@ public:
 
 	UTileComponent* GetTileComponent();
 	virtual UTileComponent* GetTileComponent_Implementation() override { return TileComponent; }
+
+	void AddTileColour(FLinearColor NewColour);
+	void AddTileColour_Implementation(FLinearColor NewColour);
+	void SutbractTileColour(FLinearColor NewColour);
+	void SutbractTileColour_Implementation(FLinearColor NewColour);
 	
 	void AddToOverlayColour(FLinearColor Colour);
 	void RemoveFromOverlayColour(FLinearColor Colour);
@@ -72,6 +77,8 @@ private:
 	
 	TArray<float> HeightThresholds;
 	int HeightLevel;
+	UPROPERTY()
+	int HighlightCounter = 0;
 	bool bIsSelected = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FLinearColor HoverColour;

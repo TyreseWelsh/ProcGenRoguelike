@@ -25,5 +25,10 @@ class PROCMAPGENERATION_API IIsTile
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	UTileComponent* GetTileComponent();       
+	UTileComponent* GetTileComponent();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void AddTileColour(FLinearColor NewColour);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void SubtractTileColour(FLinearColor NewColour);
 };

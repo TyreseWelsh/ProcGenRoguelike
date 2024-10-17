@@ -4,7 +4,6 @@
 #include "PathfindingComponent.h"
 
 #include "TileComponent.h"
-#include "MapGeneratorComponent.h"
 #include "MapRoom.h"
 #include "TileNode.h"
 
@@ -40,8 +39,20 @@ void UPathfindingComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 }
 
 // TODO: Fix up GetSurroundingTiles function to actually get surrounding tiles
-void UPathfindingComponent::AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile)
+TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile)
 {
+	// Remove path highlight from old path if any
+	for (AActor* PathTile : Path)
+	{
+		if (PathTile->Implements<UIsTile>())
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Unhighlighting tile...")));
+
+			IIsTile::Execute_SubtractTileColour(PathTile, FLinearColor::Yellow);
+		}
+	}
+	Path.Empty();
+	
 	OpenSet.Empty();
 	ClosedSet.Empty();
 	
@@ -50,7 +61,6 @@ void UPathfindingComponent::AttemptPathfinding(UTileComponent* StartTile, UTileC
 		StartTile->GCost = 0;
 		OpenSet.Add(StartTile);
 
-		UMapGeneratorComponent* MapGenerator = StartTile->OwningRoom->MapGenerator;
 		while(OpenSet.Num() > 0)
 		{
 			// Find path
@@ -69,62 +79,78 @@ void UPathfindingComponent::AttemptPathfinding(UTileComponent* StartTile, UTileC
 			if(CurrentTile == TargetTile)
 			{
 				// End pathfinding and calculate path
-				RetracePath(TargetTile, StartTile);
+				return RetracePath(TargetTile, StartTile);
 			}
 
-			for(UTileComponent* Neighbour : CurrentTile->SurroundingTiles)
+			// Add valid neighbour tiles to open set
+			for(AActor* NeighbourTile : CurrentTile->FindNeighbourTiles())
 			{
-				if(!Neighbour->bIsWalkable or ClosedSet.Contains(Neighbour))
+				if (NeighbourTile->Implements<UIsTile>())
 				{
-					continue;
-				}
-				
-				int NewNeighbourGCost = CurrentTile->GCost + GetDistance(CurrentTile, Neighbour);
-				if(NewNeighbourGCost < Neighbour->GCost or !OpenSet.Contains(Neighbour))
-				{
-					Neighbour->GCost = NewNeighbourGCost;
-					Neighbour->HCost = GetDistance(Neighbour, TargetTile);
-					Neighbour->FCost = Neighbour->GCost + Neighbour->HCost;
-					Neighbour->ParentTile = CurrentTile;
-
-					if(!OpenSet.Contains(Neighbour))
+					if (UTileComponent* NeighbourTileComponent = IIsTile::Execute_GetTileComponent(NeighbourTile))
 					{
-						OpenSet.Add(Neighbour);
+						if(!NeighbourTileComponent->bIsWalkable or ClosedSet.Contains(NeighbourTileComponent))
+						{
+							continue;
+						}
+				
+						int NewNeighbourGCost = CurrentTile->GCost + GetDistance(CurrentTile, NeighbourTileComponent);
+						if(NewNeighbourGCost < NeighbourTileComponent->GCost or !OpenSet.Contains(NeighbourTileComponent))
+						{
+							NeighbourTileComponent->GCost = NewNeighbourGCost;
+							NeighbourTileComponent->HCost = GetDistance(NeighbourTileComponent, TargetTile);
+							NeighbourTileComponent->FCost = NeighbourTileComponent->GCost + NeighbourTileComponent->HCost;
+							NeighbourTileComponent->ParentTile = CurrentTile;
+
+							if(!OpenSet.Contains(NeighbourTileComponent))
+							{
+								OpenSet.Add(NeighbourTileComponent);
+							}
+						}
 					}
 				}
 			}
 		}
+
+		// 
+		return Path;
 	}
+
+	// Invalid target tile (Either occupied or unwalkable)
+	return Path;
 }
 
-void UPathfindingComponent::RetracePath(UTileComponent* TargetNode, UTileComponent* StartNode)
+TArray<AActor*> UPathfindingComponent::RetracePath(UTileComponent* TargetNode, UTileComponent* StartNode)
 {
-	Path.Empty();
-	UTileComponent* CurrentTile = StartNode;
+	// Starting from the target tile, add tiles and their parent tile to the path array, then reverse it
+	UTileComponent* CurrentTile = TargetNode;
 
-	while(CurrentTile != TargetNode)
+	while(CurrentTile != StartNode)
 	{
-		Path.Add(CurrentTile);
+		Path.Add(CurrentTile->GetOwner());
 		CurrentTile = CurrentTile->ParentTile;
 	}
-
+	//Path.Add(StartNode->GetOwner());
 	Algo::Reverse(Path);
-	for(UTileComponent* Tile : Path)
-	{
-		HighlightPath();
-	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Found path of %i tiles!"), Path.Num()));
+	
+	return Path;
 }
 
-void UPathfindingComponent::HighlightPath()
+void UPathfindingComponent::HighlightPath(TArray<AActor*> PathToHighlight)
 {
-	for(UTileComponent* TileComp : Path)
+	for (AActor* Tile : PathToHighlight)
 	{
-		// Change colour of tile
-		if(ATileNode* Tile = Cast<ATileNode>(TileComp->GetOwner()))
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Highlighting path tile...")));
+
+		if (Tile->Implements<UIsTile>())
 		{
-			Tile->AddToOverlayColour(FLinearColor::Green);
+			IIsTile::Execute_AddTileColour(Tile, FLinearColor::Yellow);
 		}
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Attempted to highlight path tile...")));
+
 }
 
 int UPathfindingComponent::GetDistance(UTileComponent* TileA, UTileComponent* TileB)
