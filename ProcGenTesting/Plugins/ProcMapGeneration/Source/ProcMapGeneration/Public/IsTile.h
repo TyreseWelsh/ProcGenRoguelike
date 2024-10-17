@@ -29,6 +29,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void AddTileColour(FLinearColor NewColour);
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void SubtractTileColour(FLinearColor NewColour);
 };

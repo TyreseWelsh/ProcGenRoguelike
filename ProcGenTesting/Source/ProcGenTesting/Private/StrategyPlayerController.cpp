@@ -135,6 +135,8 @@ void AStrategyPlayerController::Tick(float DeltaTime)
 						CurrentHoveredTileComponent = NewTileComponent;
 						CurrentHoveredTileComponent->TileHover();
 					}
+
+					FindPathFromSelected();
 				}
 			}
 		}
@@ -158,16 +160,17 @@ void AStrategyPlayerController::PlayerLeftClick()
 
 void AStrategyPlayerController::PlayerRightClick()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Right Click...");
+	FindPathFromSelected();
+}
 
+void AStrategyPlayerController::FindPathFromSelected()
+{
 	if (IsValid(CurrentSelectedTileComponent))
 	{
 		if (PlayerCam->Implements<UHasPathfinding>())
 		{
 			if (UPathfindingComponent* PathfinderComponent = IHasPathfinding::Execute_GetPathfindingComponent(PlayerCam))
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Attempting pathfinding...")));
-
 				PathfinderComponent->HighlightPath(PathfinderComponent->AttemptPathfinding(CurrentSelectedTileComponent, CurrentHoveredTileComponent));
 			}
 			else
@@ -179,7 +182,6 @@ void AStrategyPlayerController::PlayerRightClick()
 		else
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("ERROR: Player doesnt implement pathfinding interface...")));
-
 		}
 	}
 	else

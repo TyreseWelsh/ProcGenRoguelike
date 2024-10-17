@@ -32,6 +32,8 @@ private:
 	// Input
 	void PlayerLeftClick();
 	void PlayerRightClick();
+
+	void FindPathFromSelected();
 	
 	UPROPERTY(EditDefaultsOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;

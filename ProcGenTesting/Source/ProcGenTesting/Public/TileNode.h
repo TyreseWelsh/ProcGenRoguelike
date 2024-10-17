@@ -45,8 +45,9 @@ public:
 
 	void AddTileColour(FLinearColor NewColour);
 	void AddTileColour_Implementation(FLinearColor NewColour);
-	void SutbractTileColour(FLinearColor NewColour);
-	void SutbractTileColour_Implementation(FLinearColor NewColour);
+	
+	void SubtractTileColour(FLinearColor NewColour);
+	void SubtractTileColour_Implementation(FLinearColor NewColour);
 	
 	void AddToOverlayColour(FLinearColor Colour);
 	void RemoveFromOverlayColour(FLinearColor Colour);

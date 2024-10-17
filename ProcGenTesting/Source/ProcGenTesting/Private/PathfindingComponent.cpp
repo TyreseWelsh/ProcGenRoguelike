@@ -46,8 +46,6 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 	{
 		if (PathTile->Implements<UIsTile>())
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Unhighlighting tile...")));
-
 			IIsTile::Execute_SubtractTileColour(PathTile, FLinearColor::Yellow);
 		}
 	}
@@ -94,11 +92,11 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 							continue;
 						}
 				
-						int NewNeighbourGCost = CurrentTile->GCost + GetDistance(CurrentTile, NeighbourTileComponent);
+						int NewNeighbourGCost = abs(CurrentTile->GCost + GetDistance(CurrentTile, NeighbourTileComponent));
 						if(NewNeighbourGCost < NeighbourTileComponent->GCost or !OpenSet.Contains(NeighbourTileComponent))
 						{
 							NeighbourTileComponent->GCost = NewNeighbourGCost;
-							NeighbourTileComponent->HCost = GetDistance(NeighbourTileComponent, TargetTile);
+							NeighbourTileComponent->HCost = abs(GetDistance(NeighbourTileComponent, TargetTile));
 							NeighbourTileComponent->FCost = NeighbourTileComponent->GCost + NeighbourTileComponent->HCost;
 							NeighbourTileComponent->ParentTile = CurrentTile;
 
@@ -142,15 +140,11 @@ void UPathfindingComponent::HighlightPath(TArray<AActor*> PathToHighlight)
 {
 	for (AActor* Tile : PathToHighlight)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Highlighting path tile...")));
-
 		if (Tile->Implements<UIsTile>())
 		{
 			IIsTile::Execute_AddTileColour(Tile, FLinearColor::Yellow);
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Attempted to highlight path tile...")));
-
 }
 
 int UPathfindingComponent::GetDistance(UTileComponent* TileA, UTileComponent* TileB)
@@ -160,8 +154,8 @@ int UPathfindingComponent::GetDistance(UTileComponent* TileA, UTileComponent* Ti
 
 	if(DistanceX > DistanceY)
 	{
-		return (1.4f * TileA->GetOwningRoom()->TileSize) * DistanceY + (1.0f * TileA->GetOwningRoom()->TileSize) * DistanceX - DistanceY;
+		return (14.f * TileA->GetOwningRoom()->TileSize) * DistanceY + (10.f * TileA->GetOwningRoom()->TileSize) * (DistanceX - DistanceY);
 	}
 
-	return (1.4 * TileA->GetOwningRoom()->TileSize) * DistanceX + (1.f * TileA->GetOwningRoom()->TileSize) * (DistanceY - DistanceX);
+	return (14.f * TileA->GetOwningRoom()->TileSize) * DistanceX + (10.f * TileA->GetOwningRoom()->TileSize) * (DistanceY - DistanceX);
 }

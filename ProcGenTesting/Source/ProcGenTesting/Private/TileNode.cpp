@@ -66,7 +66,7 @@ void ATileNode::AddTileColour_Implementation(FLinearColor NewColour)
 	EnableHighlight();
 }
 
-void ATileNode::SutbractTileColour_Implementation(FLinearColor NewColour)
+void ATileNode::SubtractTileColour_Implementation(FLinearColor NewColour)
 {
 	FLinearColor OverlayColour;
 	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
@@ -80,7 +80,7 @@ void ATileNode::SutbractTileColour_Implementation(FLinearColor NewColour)
 
 
 
-void ATileNode::AddToOverlayColour(FLinearColor NewColour)
+/*void ATileNode::AddToOverlayColour(FLinearColor NewColour)
 {
 	FLinearColor OverlayColour;
 	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
@@ -89,9 +89,9 @@ void ATileNode::AddToOverlayColour(FLinearColor NewColour)
 		OverlayColour.A = 1;
 		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
 	}
-}
+}*/
 
-void ATileNode::RemoveFromOverlayColour(FLinearColor NewColour)
+/*void ATileNode::RemoveFromOverlayColour(FLinearColor NewColour)
 {
 	FLinearColor OverlayColour;
 	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
@@ -100,7 +100,7 @@ void ATileNode::RemoveFromOverlayColour(FLinearColor NewColour)
 		OverlayColour.A = 1;
 		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
 	}
-}
+}*/
 
 void ATileNode::EnableHighlight()
 {
@@ -115,8 +115,6 @@ void ATileNode::EnableHighlight()
 void ATileNode::DisableHighlight()
 {
 	HighlightCounter--;
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("%i"), HighlightCounter));
-
 	if (HighlightCounter <= 0)
 	{
 		float HighlightLevel = 0;
@@ -192,18 +190,20 @@ void ATileNode::InitExit()
 
 void ATileNode::BindHover()
 {
-	AddToOverlayColour(HoverColour);
+	/*AddToOverlayColour(HoverColour);
 
-	EnableHighlight();
+	EnableHighlight();*/
+	AddTileColour_Implementation(HoverColour);
 }
 
 void ATileNode::BindUnHover()
 {
-	RemoveFromOverlayColour(HoverColour);
+	/*RemoveFromOverlayColour(HoverColour);
 	if(!bIsSelected)
 	{
 		DisableHighlight();
-	}
+	}*/
+	SubtractTileColour_Implementation(HoverColour);
 }
 
 void ATileNode::BindLeftClick()
@@ -228,7 +228,7 @@ void ATileNode::BindUnSelect()
 	bIsSelected = false;
 	//RemoveFromOverlayColour(SelectColour);
 	SubtractTileColour_Implementation(SelectColour);
-	DisableHighlight();
+	//DisableHighlight();
 }
 
 void ATileNode::CalculateHeightLevel()
