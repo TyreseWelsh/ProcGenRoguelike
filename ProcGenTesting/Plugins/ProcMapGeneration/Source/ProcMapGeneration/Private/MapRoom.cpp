@@ -12,24 +12,12 @@
 
 #include "DrawDebugHelpers.h"
 
-UMapRoom::UMapRoom()
-{
-}
-
-UMapRoom::~UMapRoom()
-{
-}
-
 void UMapRoom::InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* ParentMapRoom, FRoomData NewRoomData)
 {
 	MapGenerator = NewMapGenerator;
 	ParentRoom = ParentMapRoom;
 
 	RoomData = NewRoomData;
-	/*RoomOrigin = Origin;
-	RoomSizeX = SizeX;
-	RoomSizeY = SizeY;
-	NumSplitsRemaining = SplitsRemaining;*/
 	
 	TileSize = MapGenerator->TileSize;
 	MinRoomSize = MapGenerator->RoomMinSize;
@@ -52,7 +40,7 @@ void UMapRoom::InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* Paren
 		}
 		else
 		{
-			// Can no longer split
+			// Can no longer split room
 			GenerateTiles();
 		}	
 	}
@@ -319,22 +307,6 @@ AActor* UMapRoom::SpawnTile(FVector TileSpawnPos, int RoomIndexX, int RoomIndexY
 	
 	return CurrentTile;
 }
-
-/*void UMapRoom::ChooseTileType(FVector TilePos)
-{
-	FHitResult Hit;
-	FVector TraceEnd = FVector(TilePos.X, TilePos.Y, TilePos.Z + TileSize);
-
-	MapGenerator->GetWorld()->LineTraceSingleByChannel(Hit, TilePos, TraceEnd, ECC_Camera);
-	if (AExitGenerator* ExitGenerator = Cast<AExitGenerator>(Hit.GetActor()))
-	{
-		if (TilePos == ExitGenerator->LeftExitTilePos)
-		{
-			// ExitGenerator->SetLeftTile()
-		}
-	}
-}*/
-
 
 TArray<UMapRoom*> UMapRoom::GetLeaves()
 {

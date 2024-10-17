@@ -33,20 +33,55 @@ private:
 	void PlayerLeftClick();
 	void PlayerRightClick();
 
+	// Saves the current mouse screen position
+	void SaveInitialMousePosition();
+
+	void MoveMouse(const FInputActionValue& Value);
+
+	void EnableCameraRotation();
+	void DisabledCameraRotation();
+
+	void EnableCameraPan();
+	void DisableCameraPan();
+	
+	void CameraZoom(const FInputActionValue& Value);
+
 	void FindPathFromSelected();
 	
-	UPROPERTY(EditDefaultsOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = DefaultInput, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
-	UPROPERTY(EditDefaultsOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* LeftClickAction;
+	UPROPERTY(EditDefaultsOnly, Category = DefaultInput, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DefaultLeftClickAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* RightClickAction;
+	UPROPERTY(EditDefaultsOnly, Category = DefaultInput, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DefaultRightClickAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = CameraInput, meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* CameraMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, Category = CameraInput, meta = (AllowPrivateAccess = "true"))
+	UInputAction* CameraMouseMoveAction;
+	
+	UPROPERTY(EditDefaultsOnly, Category = CameraInput, meta = (AllowPrivateAccess = "true"))
+	UInputAction* CameraRightClickAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = CameraInput, meta = (AllowPrivateAccess = "true"))
+	UInputAction* CameraMiddleClickAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = CameraInput, meta = (AllowPrivateAccess = "true"))
+	UInputAction* CameraMiddleScrollAction;
 
 	//
+	FVector ScreenMousePosition;
+	FVector InitialScreenMousePosition;
+
+	FVector WorldMousePosition;
+	FVector WorldMouseDirection;
+	UPROPERTY()
 	APawn* PlayerCam;
+	bool bCanRotateCamera = false;
+	bool bCanPanCamera = false;
 
 	UPROPERTY()
 	UTileComponent* CurrentHoveredTileComponent;

@@ -49,8 +49,6 @@ public:
 	void SubtractTileColour(FLinearColor NewColour);
 	void SubtractTileColour_Implementation(FLinearColor NewColour);
 	
-	void AddToOverlayColour(FLinearColor Colour);
-	void RemoveFromOverlayColour(FLinearColor Colour);
 	void EnableHighlight();
 	void DisableHighlight();
 	
@@ -66,15 +64,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UMaterialInstanceDynamic* DynamicMatInstance;
-	
-	/*UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UPaperFlipbook* WallFlipbook;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<UPaperFlipbook*> PathFlipbooks;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<UPaperFlipbook*> GroundFlipbooks;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TArray<UPaperFlipbook*> ExitFlipbooks;*/
 	
 	TArray<float> HeightThresholds;
 	int HeightLevel;

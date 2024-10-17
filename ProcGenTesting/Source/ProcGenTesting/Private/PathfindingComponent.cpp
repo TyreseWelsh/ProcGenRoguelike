@@ -38,10 +38,9 @@ void UPathfindingComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	// ...
 }
 
-// TODO: Fix up GetSurroundingTiles function to actually get surrounding tiles
 TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile)
 {
-	// Remove path highlight from old path if any
+	// Remove path highlight from old path if present
 	for (AActor* PathTile : Path)
 	{
 		if (PathTile->Implements<UIsTile>())
@@ -131,7 +130,7 @@ TArray<AActor*> UPathfindingComponent::RetracePath(UTileComponent* TargetNode, U
 	//Path.Add(StartNode->GetOwner());
 	Algo::Reverse(Path);
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Found path of %i tiles!"), Path.Num()));
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Found path of %i tiles!"), Path.Num()));
 	
 	return Path;
 }

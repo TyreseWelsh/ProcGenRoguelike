@@ -17,7 +17,6 @@ ATileNode::ATileNode()
 	RootComponent = TileRoot;
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	//Mesh->SetRelativeLocation(FVector(Mesh->))
 	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Mesh->SetupAttachment(RootComponent);
 
@@ -52,8 +51,6 @@ void ATileNode::Tick(float DeltaTime)
 
 }
 
-
-
 void ATileNode::AddTileColour_Implementation(FLinearColor NewColour)
 {
 	FLinearColor OverlayColour;
@@ -78,30 +75,6 @@ void ATileNode::SubtractTileColour_Implementation(FLinearColor NewColour)
 	DisableHighlight();
 }
 
-
-
-/*void ATileNode::AddToOverlayColour(FLinearColor NewColour)
-{
-	FLinearColor OverlayColour;
-	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
-	{
-		OverlayColour += NewColour;
-		OverlayColour.A = 1;
-		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
-	}
-}*/
-
-/*void ATileNode::RemoveFromOverlayColour(FLinearColor NewColour)
-{
-	FLinearColor OverlayColour;
-	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
-	{
-		OverlayColour -= NewColour;
-		OverlayColour.A = 1;
-		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
-	}
-}*/
-
 void ATileNode::EnableHighlight()
 {
 	HighlightCounter++;
@@ -125,13 +98,10 @@ void ATileNode::DisableHighlight()
 void ATileNode::InitWall()
 {
 	// No bindings since walls are not interactable
-	//Sprite->SetFlipbook(WallFlipbook);
 }
 
 void ATileNode::InitPath()
 {
-	//Sprite->SetFlipbook(PathFlipbooks[HeightLevel]);
-
 	FLinearColor BaseColour;
 	if(DynamicMatInstance->GetVectorParameterValue(FName("BaseColour"), BaseColour))
 	{
@@ -153,8 +123,6 @@ void ATileNode::InitPath()
 
 void ATileNode::InitGround()
 {
-	//Sprite->SetFlipbook(GroundFlipbooks[HeightLevel]);
-	
 	TileComponent->GetMouseHoverDelegate()->RemoveAll(this);
 	TileComponent->GetMouseUnHoverDelegate()->RemoveAll(this);
 	TileComponent->GetLeftClickDelegate()->RemoveAll(this);
@@ -168,7 +136,6 @@ void ATileNode::InitGround()
 
 void ATileNode::InitExit()
 {
-	//Sprite->SetFlipbook(ExitFlipbooks[HeightLevel]);
 	FLinearColor BaseColour;
 	if(DynamicMatInstance->GetVectorParameterValue(FName("BaseColour"), BaseColour))
 	{
@@ -190,26 +157,17 @@ void ATileNode::InitExit()
 
 void ATileNode::BindHover()
 {
-	/*AddToOverlayColour(HoverColour);
-
-	EnableHighlight();*/
 	AddTileColour_Implementation(HoverColour);
 }
 
 void ATileNode::BindUnHover()
 {
-	/*RemoveFromOverlayColour(HoverColour);
-	if(!bIsSelected)
-	{
-		DisableHighlight();
-	}*/
 	SubtractTileColour_Implementation(HoverColour);
 }
 
 void ATileNode::BindLeftClick()
 {
 	bIsSelected = true;
-	//AddToOverlayColour(SelectColour);
 	AddTileColour_Implementation(SelectColour);
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Highcounter on click = %i"), HighlightCounter));
 	if (AActor* OccupyingObject = TileComponent->GetOccupyingObject())
@@ -226,9 +184,7 @@ void ATileNode::BindLeftClick()
 void ATileNode::BindUnSelect()
 {
 	bIsSelected = false;
-	//RemoveFromOverlayColour(SelectColour);
 	SubtractTileColour_Implementation(SelectColour);
-	//DisableHighlight();
 }
 
 void ATileNode::CalculateHeightLevel()

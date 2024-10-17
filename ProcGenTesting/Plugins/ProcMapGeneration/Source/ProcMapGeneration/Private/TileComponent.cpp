@@ -36,47 +36,12 @@ void UTileComponent::InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSiz
 	SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
 	
-	//FindSurroundingTiles();
 	SetTileType();
 }
 
 void UTileComponent::SetTileType()
 {
 	SetTileTypeToGround();
-
-	/*if(FMath::RandRange(1, 40) == 1)
-	{
-		SetTileTypeToWall();
-	}*/
-
-	/*UMapGeneratorComponent* MapGenerator = OwningRoom->MapGenerator;
-	int MapIndex1D = UTileMapFunctionLibrary::CalculateIndexFromTilePos(GetOwner()->GetActorLocation(), MapGenerator->MapOrigin, MapGenerator->MapSizeX, TileSize);
-	FVector2D MapIndex2D = UTileMapFunctionLibrary::ConvertIndex1Dto2D(MapIndex1D, MapGenerator->MapSizeX, TileSize);
-
-	//UE_LOG(LogTemp, Display, TEXT("%i"), MapGenerator->MapSizeX);
-	if(MapIndex2D.X == 0 or MapIndex2D.X * TileSize == MapGenerator->MapSizeX - TileSize or MapIndex2D.Y == 0 or MapIndex2D.Y * TileSize == MapGenerator->MapSizeY - TileSize)
-	{
-		// Set tile type as wall
-		SetTileTypeToWall();
-		return;
-	}*/
-	/*if(RoomIndexX == 1 or RoomIndexX == OwningRoom->LastIndexX - 1 or RoomIndexY == 1 or RoomIndexY == OwningRoom->LastIndexY - 1)
-	{
-		if(FMath::RandRange(1, 10) <= 5)
-		{
-			// Set tile type as wall
-			SetTileTypeToWall();
-		}
-	}*/
-
-	//CheckSurroundedByWalls();
-	
-	/*TArray<AActor*> NearbyExits;
-	GetOverlappingActors(NearbyExits, AExitGenerator::StaticClass());
-	if(NearbyExits.Num() > 0)
-	{
-		SetTileTypeToPath();
-	}*/
 }
 
 // Called when the game starts
@@ -85,7 +50,6 @@ void UTileComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
 }
 
 
@@ -143,8 +107,6 @@ void UTileComponent::TileUnHover()
 
 void UTileComponent::TileLeftClick()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("left click called")));
-
 	if(LeftClickDelegate.IsBound())
 	{
 		LeftClickDelegate.Broadcast();
@@ -229,42 +191,8 @@ TArray<AActor*> UTileComponent::FindNeighbourTiles()
 	return NeighbourTiles;
 }
 
+
 /*
-void UTileComponent::FindSurroundingTiles()
-{
-	TObjectPtr<UMapGeneratorComponent> Generator = OwningRoom->MapGenerator;
-
-	// Left tile
-	int LeftTileIndex = Generator->CalculateMapIndexFromTilePos(GetOwner()->GetActorLocation() - FVector(TileSize, 0, 0));
-	if(LeftTileIndex >= 0 && LeftTileIndex < Generator->MapTiles.Num())
-	{
-		if(AActor* TileActor = Generator->MapTiles[LeftTileIndex])
-		{
-			LeftTile = TileActor;
-			SurroundingTiles.Add(LeftTile);
-
-			TObjectPtr<UTileComponent> LeftTileComponent = LeftTile->FindComponentByClass<UTileComponent>();
-			LeftTileComponent->RightTile = GetOwner();
-			LeftTileComponent->SurroundingTiles.Add(GetOwner());
-		}
-	}
-
-	// Top tile
-	int TopTileIndex = Generator->CalculateMapIndexFromTilePos(GetOwner()->GetActorLocation() - FVector(0, TileSize, 0));
-	if(TopTileIndex >= 0 && TopTileIndex < Generator->MapTiles.Num())
-	{
-		if(AActor* TileActor = Generator->MapTiles[TopTileIndex])
-		{
-			TopTile = TileActor;
-			SurroundingTiles.Add(TopTile);
-			
-			TObjectPtr<UTileComponent> TopTileComponent = TopTile->FindComponentByClass<UTileComponent>();
-			TopTileComponent->BottomTile = GetOwner();
-			TopTileComponent->SurroundingTiles.Add(GetOwner());
-		}
-	}
-}
-
 void UTileComponent::CheckSurroundedByWalls()
 {
 	int SurroundingWallsCounter = 0;
@@ -291,3 +219,4 @@ void UTileComponent::CheckSurroundedByWalls()
 	}
 }
 */
+

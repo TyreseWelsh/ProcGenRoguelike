@@ -128,15 +128,7 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<AActor> OccupyingActor;
-
-	UPROPERTY()
-	TObjectPtr<AActor> LeftTile;
-	UPROPERTY()
-	TObjectPtr<AActor> RightTile;
-	UPROPERTY()
-	TObjectPtr<AActor> TopTile;
-	UPROPERTY()
-	TObjectPtr<AActor> BottomTile;
+	
 	UPROPERTY()
 	TObjectPtr<AActor> TeleportTarget;
 	
