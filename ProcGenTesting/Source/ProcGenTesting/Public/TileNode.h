@@ -5,12 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "IsTile.h"
+#include "Selectable.h"
 #include "TileNode.generated.h"
 
 class UTileComponent;
 
 UCLASS()
-class PROCGENTESTING_API ATileNode : public AActor, public IIsTile
+class PROCGENTESTING_API ATileNode : public AActor, public IIsTile, public ISelectable
 {
 	GENERATED_BODY()
 
@@ -31,10 +32,16 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void BindHover();
-	virtual void BindUnHover();
-	virtual void BindLeftClick();
-	virtual void BindUnSelect();
+	void OnMouseHover();
+	void OnMouseHover_Implementation();
+	void OnMouseUnHover();
+	void OnMouseUnHover_Implementation();
+	void OnMouseLeft();
+	void OnMouseLeft_Implementation();
+	void OnMouseRight();
+	void OnMouseRight_Implementation();
+	void OnMouseUnSelect();
+	void OnMouseUnSelect_Implementation();
 	
 public:	
 	// Called every frame
@@ -51,14 +58,15 @@ public:
 	
 	void EnableHighlight();
 	void DisableHighlight();
+
+	void BindSelectDelegates(bool BindHover, bool BindUnHover, bool BindLeftMouse, bool BindRightMouse, bool BindUnSelect);
 	
 private:
 	void InitWall();
 	void InitPath();
 	void InitGround();
 	void InitExit();
-
-
+	
 
 	void CalculateHeightLevel();
 

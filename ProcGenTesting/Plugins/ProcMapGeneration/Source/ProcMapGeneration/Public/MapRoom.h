@@ -25,11 +25,12 @@ struct FRoomData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int SizeY = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int BSPSplitsRemaining = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int MinPadding = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int MaxPadding = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int BSPSplitsRemaining = 0;
+	
 
 	bool bIsActive = false;
 };
@@ -44,8 +45,8 @@ class PROCMAPGENERATION_API UMapRoom : public UObject
 	GENERATED_BODY()
 
 public:
-	UMapRoom();
-	~UMapRoom();
+	/*UMapRoom();
+	~UMapRoom();*/
 
 	void InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* ParentMapRoom, FRoomData NewRoomData);
 	UFUNCTION()

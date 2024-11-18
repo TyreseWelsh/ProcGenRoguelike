@@ -3,9 +3,9 @@
 
 #include "ExitTileNode.h"
 
-void AExitTileNode::BindLeftClick()
+/*void AExitTileNode::BindLeftClick()
 {
 	Super::BindLeftClick();
 
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Calling ExitTile LeftClick override...")));
-}
+}*/

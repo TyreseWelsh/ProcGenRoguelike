@@ -96,6 +96,7 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 						{
 							NeighbourTileComponent->GCost = NewNeighbourGCost;
 							NeighbourTileComponent->HCost = abs(GetDistance(NeighbourTileComponent, TargetTile));
+
 							NeighbourTileComponent->FCost = NeighbourTileComponent->GCost + NeighbourTileComponent->HCost;
 							NeighbourTileComponent->ParentTile = CurrentTile;
 
@@ -117,6 +118,12 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 	return Path;
 }
 
+void UPathfindingComponent::HighlightTilesInRange(UTileComponent* StartTile, int Range)
+{
+	UnHighlightTiles(TilesInRange);
+	HighlightTiles(GetTilesInRange(StartTile, Range));
+}
+
 TArray<AActor*> UPathfindingComponent::RetracePath(UTileComponent* TargetNode, UTileComponent* StartNode)
 {
 	// Starting from the target tile, add tiles and their parent tile to the path array, then reverse it
@@ -135,9 +142,46 @@ TArray<AActor*> UPathfindingComponent::RetracePath(UTileComponent* TargetNode, U
 	return Path;
 }
 
-void UPathfindingComponent::HighlightPath(TArray<AActor*> PathToHighlight)
+TArray<AActor*> UPathfindingComponent::GetTilesInRange(UTileComponent* StartTile, int Range)
 {
-	for (AActor* Tile : PathToHighlight)
+	TilesInRange.Empty();
+	
+	TArray<UTileComponent*> rangeOpenSet;
+	TArray<UTileComponent*> rangeClosedSet;
+
+	rangeOpenSet.Add(StartTile);
+
+	while(rangeOpenSet.Num() > 0)
+	{		
+		UTileComponent* CurrentTileComponent = rangeOpenSet[0];
+		rangeOpenSet.Remove(CurrentTileComponent);
+		rangeClosedSet.Add(CurrentTileComponent);
+		
+		for(AActor* Tile : CurrentTileComponent->FindNeighbourTiles())
+		{
+			if(UTileComponent* NeighbourTileComponent = IIsTile::Execute_GetTileComponent(Tile))
+			{
+				if(rangeClosedSet.Contains(NeighbourTileComponent) or
+					GetDistanceX(StartTile, NeighbourTileComponent) + GetDistanceY(StartTile, NeighbourTileComponent) > Range * NeighbourTileComponent->GetOwningRoom()->TileSize)
+				{
+					continue;
+				}
+				
+				if(!rangeOpenSet.Contains(NeighbourTileComponent))
+				{
+					rangeOpenSet.Add(NeighbourTileComponent);
+					TilesInRange.AddUnique(NeighbourTileComponent->GetOwner());
+				}
+			}
+		}
+	}
+	
+	return TilesInRange;
+}
+
+void UPathfindingComponent::HighlightTiles(TArray<AActor*> TilesToHighlight)
+{
+	for (AActor* Tile : TilesToHighlight)
 	{
 		if (Tile->Implements<UIsTile>())
 		{
@@ -146,7 +190,18 @@ void UPathfindingComponent::HighlightPath(TArray<AActor*> PathToHighlight)
 	}
 }
 
-int UPathfindingComponent::GetDistance(UTileComponent* TileA, UTileComponent* TileB)
+void UPathfindingComponent::UnHighlightTiles(TArray<AActor*> TilesToUnHighlight)
+{
+	for (AActor* Tile : TilesToUnHighlight)
+	{
+		if (Tile->Implements<UIsTile>())
+		{
+			IIsTile::Execute_SubtractTileColour(Tile, FLinearColor::Yellow);
+		}
+	}
+}
+
+int UPathfindingComponent::GetDistance(UTileComponent* TileA, UTileComponent* TileB) const
 {
 	int DistanceX = abs(TileA->GetOwner()->GetActorLocation().X - TileB->GetOwner()->GetActorLocation().X);
 	int DistanceY = abs(TileA->GetOwner()->GetActorLocation().Y - TileB->GetOwner()->GetActorLocation().Y);
@@ -157,4 +212,14 @@ int UPathfindingComponent::GetDistance(UTileComponent* TileA, UTileComponent* Ti
 	}
 
 	return (14.f * TileA->GetOwningRoom()->TileSize) * DistanceX + (10.f * TileA->GetOwningRoom()->TileSize) * (DistanceY - DistanceX);
+}
+
+int UPathfindingComponent::GetDistanceX(UTileComponent* TileA, UTileComponent* TileB) const
+{
+	return abs(TileA->GetOwner()->GetActorLocation().X - TileB->GetOwner()->GetActorLocation().X);
+}
+
+int UPathfindingComponent::GetDistanceY(UTileComponent* TileA, UTileComponent* TileB) const
+{
+	return abs(TileA->GetOwner()->GetActorLocation().Y - TileB->GetOwner()->GetActorLocation().Y);
 }

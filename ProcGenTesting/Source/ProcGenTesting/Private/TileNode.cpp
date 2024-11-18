@@ -95,6 +95,34 @@ void ATileNode::DisableHighlight()
 	}
 }
 
+void ATileNode::BindSelectDelegates(bool BindHover, bool BindUnHover, bool BindLeftMouse, bool BindRightMouse, bool BindUnSelect)
+{
+	TileComponent->GetMouseHoverDelegate()->RemoveAll(this);
+	TileComponent->GetMouseUnHoverDelegate()->RemoveAll(this);
+	TileComponent->GetLeftClickDelegate()->RemoveAll(this);
+	TileComponent->GetUnSelectDelegate()->RemoveAll(this);
+
+	if(BindHover)
+	{
+		TileComponent->GetMouseHoverDelegate()->AddUObject(this, &ATileNode::OnMouseHover_Implementation);
+	}
+	if(BindUnHover)
+	{
+		TileComponent->GetMouseUnHoverDelegate()->AddUObject(this, &ATileNode::OnMouseUnHover_Implementation);
+	}
+	if(BindLeftMouse)
+	{
+		TileComponent->GetLeftClickDelegate()->AddUObject(this, &ATileNode::OnMouseLeft_Implementation);
+	}
+	if(BindRightMouse)
+	{
+	}
+	if(BindUnSelect)
+	{
+		TileComponent->GetUnSelectDelegate()->AddUObject(this, &ATileNode::OnMouseUnSelect_Implementation);
+	}
+}
+
 void ATileNode::InitWall()
 {
 	// No bindings since walls are not interactable
@@ -110,28 +138,12 @@ void ATileNode::InitPath()
 		DynamicMatInstance->SetVectorParameterValue(FName("BaseColour"), BaseColour);
 	}
 
-	TileComponent->GetMouseHoverDelegate()->RemoveAll(this);
-	TileComponent->GetMouseUnHoverDelegate()->RemoveAll(this);
-	TileComponent->GetLeftClickDelegate()->RemoveAll(this);
-	TileComponent->GetUnSelectDelegate()->RemoveAll(this);
-	
-	TileComponent->GetMouseHoverDelegate()->AddUObject(this, &ATileNode::BindHover);
-	TileComponent->GetMouseUnHoverDelegate()->AddUObject(this, &ATileNode::BindUnHover);
-	TileComponent->GetLeftClickDelegate()->AddUObject(this, &ATileNode::BindLeftClick);
-	TileComponent->GetUnSelectDelegate()->AddUObject(this, &ATileNode::BindUnSelect);
+	BindSelectDelegates(true, true, true, true, true);
 }
 
 void ATileNode::InitGround()
 {
-	TileComponent->GetMouseHoverDelegate()->RemoveAll(this);
-	TileComponent->GetMouseUnHoverDelegate()->RemoveAll(this);
-	TileComponent->GetLeftClickDelegate()->RemoveAll(this);
-	TileComponent->GetUnSelectDelegate()->RemoveAll(this);
-	
-	TileComponent->GetMouseHoverDelegate()->AddUObject(this, &ATileNode::BindHover);
-	TileComponent->GetMouseUnHoverDelegate()->AddUObject(this, &ATileNode::BindUnHover);
-	TileComponent->GetLeftClickDelegate()->AddUObject(this, &ATileNode::BindLeftClick);
-	TileComponent->GetUnSelectDelegate()->AddUObject(this, &ATileNode::BindUnSelect);
+	BindSelectDelegates(true, true, true, true, true);
 }
 
 void ATileNode::InitExit()
@@ -144,28 +156,20 @@ void ATileNode::InitExit()
 		DynamicMatInstance->SetVectorParameterValue(FName("BaseColour"), BaseColour);
 	}
 
-	TileComponent->GetMouseHoverDelegate()->RemoveAll(this);
-	TileComponent->GetMouseUnHoverDelegate()->RemoveAll(this);
-	TileComponent->GetLeftClickDelegate()->RemoveAll(this);
-	TileComponent->GetUnSelectDelegate()->RemoveAll(this);
-	
-	TileComponent->GetMouseHoverDelegate()->AddUObject(this, &ATileNode::BindHover);
-	TileComponent->GetMouseUnHoverDelegate()->AddUObject(this, &ATileNode::BindUnHover);
-	TileComponent->GetLeftClickDelegate()->AddUObject(this, &ATileNode::BindLeftClick);
-	TileComponent->GetUnSelectDelegate()->AddUObject(this, &ATileNode::BindUnSelect);
+	BindSelectDelegates(true, true, true, true, true);
 }
 
-void ATileNode::BindHover()
+void ATileNode::OnMouseHover_Implementation()
 {
 	AddTileColour_Implementation(HoverColour);
 }
 
-void ATileNode::BindUnHover()
+void ATileNode::OnMouseUnHover_Implementation()
 {
 	SubtractTileColour_Implementation(HoverColour);
 }
 
-void ATileNode::BindLeftClick()
+void ATileNode::OnMouseLeft_Implementation()
 {
 	bIsSelected = true;
 	AddTileColour_Implementation(SelectColour);
@@ -181,7 +185,11 @@ void ATileNode::BindLeftClick()
 	}
 }
 
-void ATileNode::BindUnSelect()
+void ATileNode::OnMouseRight_Implementation()
+{
+}
+
+void ATileNode::OnMouseUnSelect_Implementation()
 {
 	bIsSelected = false;
 	SubtractTileColour_Implementation(SelectColour);

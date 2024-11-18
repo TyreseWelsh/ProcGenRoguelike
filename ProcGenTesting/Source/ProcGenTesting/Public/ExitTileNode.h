@@ -17,5 +17,5 @@ class PROCGENTESTING_API AExitTileNode : public ATileNode
 public:
 
 private:
-	virtual void BindLeftClick() override;
+	//virtual void BindLeftClick() override;
 };

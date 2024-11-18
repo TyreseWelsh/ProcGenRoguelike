@@ -104,12 +104,15 @@ void AStrategyPlayerController::PlayerLeftClick()
 
 		CurrentSelectedTileComponent = CurrentHoveredTileComponent;
 		CurrentSelectedTileComponent->TileLeftClick();
+
+		FindPathFromSelected();
 	}
 }
 
 void AStrategyPlayerController::PlayerRightClick()
 {
-	FindPathFromSelected();
+	GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("Right click")));
+
 }
 
 void AStrategyPlayerController::EnableCameraRotation()
@@ -165,7 +168,7 @@ void AStrategyPlayerController::FindPathFromSelected()
 		{
 			if (UPathfindingComponent* PathfinderComponent = IHasPathfinding::Execute_GetPathfindingComponent(PlayerCam))
 			{
-				PathfinderComponent->HighlightPath(PathfinderComponent->AttemptPathfinding(CurrentSelectedTileComponent, CurrentHoveredTileComponent));
+				PathfinderComponent->HighlightTilesInRange(CurrentSelectedTileComponent, PathfinderComponent->GetMoveDistance());
 			}
 			else
 			{

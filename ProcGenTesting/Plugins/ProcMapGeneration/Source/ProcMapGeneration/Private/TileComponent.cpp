@@ -178,8 +178,25 @@ TArray<AActor*> UTileComponent::FindNeighbourTiles()
 	{
 		for (int y = -1; y <= 1; ++y)
 		{
-			if (x == 0 && y == 0)
+			// Only cardinal
+			if ((x == 0 && y == 0) or
+				(x == -1 && y == -1) or
+				(x == 1 && y == -1) or
+				(x == -1 && y == 1) or
+				(x == 1 && y == 1))
+			{
 				continue;
+			}
+
+			// Only diagonal
+			/*if ((x == 0 and y == 0) or
+				(x == 0 and y == -1) or
+				(x == 0 and y == 1) or
+				(x == -1 and y == 0) or
+				(x == 1 and y == 0))
+			{
+				continue;
+			}*/
 
 			FVector NeighbourTilePosition = FVector(OwnerLocation.X + (TileSize * x), OwnerLocation.Y + (TileSize * y), OwnerLocation.Z);
 			if (AActor* NeighbourTile = UTileMapFunctionLibrary::GetBelowTile(NeighbourTilePosition, GetOwner()->GetWorld()))
