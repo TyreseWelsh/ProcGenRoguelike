@@ -7,6 +7,14 @@
 #include "GameFramework/PlayerController.h"
 #include "StrategyPlayerController.generated.h"
 
+/*UENUM(BlueprintType)
+enum class EPlayerState : uint8
+{
+	Open			UMETA(DisplayName = "Open"),
+	StartingAction	UMETA(DisplayName = "StartingAction"),
+	Closed			UMETA(DisplayName = "Closed"),
+};*/
+
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
