@@ -6,7 +6,10 @@
 #include "MapRoom.h"
 #include "ExitGenerator.h"
 #include "TileComponent.h"
+#include "IsTile.h"
 #include "FastNoiseLite.h"
+#include "TileMapFunctionLibrary.h"
+#include "RoomContentsManager.h"
 
 
 // Sets default values for this component's properties
@@ -25,29 +28,35 @@ void UMapGeneratorComponent::InitMap()
 	RootRoom = nullptr;
 	for(AExitGenerator* Exit : AllRoomExits)
 	{
+		Exit->GetLeftTeleportPoint()->Destroy();
+		Exit->GetRightTeleportPoint()->Destroy();
 		Exit->Destroy();
 	}
 	AllRoomExits.Empty();
 	MapTileHeights.Empty();
 
-	int MapOriginX = RoundToTileSizeMultiple(GetOwner()->GetActorLocation().X, false);
-	int MapOriginY = RoundToTileSizeMultiple(GetOwner()->GetActorLocation().Y, false);
+	// NOTE: May not be need anymore
+	// Making sure the map origin values are multiples of the tile size to guarantee tile position calculations work
+	int MapOriginX = UTileMapFunctionLibrary::RoundToTileSizeMultiple(GetOwner()->GetActorLocation().X, false, TileSize);
+	int MapOriginY = UTileMapFunctionLibrary::RoundToTileSizeMultiple(GetOwner()->GetActorLocation().Y, false, TileSize);
 	MapOrigin =  FVector(MapOriginX, MapOriginY, GetOwner()->GetActorLocation().Z);
-	
-	MapSizeX = RoundToTileSizeMultiple(MapSizeX, false);
-	MapSizeY = RoundToTileSizeMultiple(MapSizeY, false);
+
+	// Rounding map size values to multiples of the tile size so that position calculations are always guaranteed
+	MapSizeX = UTileMapFunctionLibrary::RoundToTileSizeMultiple(MapSizeX, false, TileSize);
+	MapSizeY = UTileMapFunctionLibrary::RoundToTileSizeMultiple(MapSizeY, false, TileSize);
 	int NumTilesX = MapSizeX / TileSize;
 	int NumTilesY = MapSizeY / TileSize;
-	
+
+	// Initialising MapTiles array
 	MapTiles.SetNum(NumTilesX * NumTilesY);
 
-	int seed = FMath::RandRange(1338, 999999);
+	// Generating noise for Tile Height (potential feature: Will contribute to attack accuracy (high vs low ground) and maybe move distance)
+	int seed = FMath::RandRange(1338, 99999);
 	HeightNoise = MakeShared<FastNoiseLite>(seed);
 	HeightNoise->SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 	float freq = FMath::RandRange(0.04, 0.0575);
 	HeightNoise->SetSeed(seed);
 	HeightNoise->SetFrequency(freq);
-
 	HeightNoise->SetFractalType(FastNoiseLite::FractalType_DomainWarpProgressive);
 	
 	UE_LOG(LogTemp, Warning, TEXT("Seed is is : %i"), seed);
@@ -55,39 +64,33 @@ void UMapGeneratorComponent::InitMap()
 
 	MapTileHeights.SetNum(NumTilesX * NumTilesY);
 
-	
+	// Initialising first room to start BSP algorithm
 	RootRoom = NewObject<UMapRoom>();
 	if(IsValid(RootRoom))
 	{
-		//FVector InitialRoomOrigin = FVector(MapOrigin.X + TileSize, MapOrigin.Y + TileSize, MapOrigin.Z);
-		//FVector2D InitialRoomSize = FVector2D(MapSizeX/* - TileSize*/, MapSizeY/* - TileSize*/);
-		//RootRoom->InitRoom(this, nullptr, InitialRoomOrigin, InitialRoomSize.X, InitialRoomSize.Y, InitialRoomSplitNum);
-		RootRoom->InitRoom(this, nullptr, MapOrigin, MapSizeX, MapSizeY, InitialRoomSplitNum);
+		FRoomData InitialRoomData(MapOrigin, MapSizeX, MapSizeY, InitialRoomSplitNum, RoomMinPadding, RoomMaxPadding);
+		RootRoom->InitRoom(this, nullptr, InitialRoomData);
 	}
-
-	/*for(AActor* Tile : MapTiles)
-	{
-		if(UTileComponent* TComponent = Tile->FindComponentByClass<UTileComponent>())
-		{
-			TComponent->CheckSurroundedByWalls();
-		}
-	}*/
 	
 	// Set room exit tiles
 	if(AllRoomExits.Num() > 0)
 	{
 		for(AExitGenerator* Exit : AllRoomExits)
 		{
-			if(IsValid(MapTiles[CalculateMapIndexFromTilePos(Exit->LeftExitTilePos)]))
+			if(IsValid(Exit->GetLeftTeleportPoint()))
 			{
-				MapTiles[CalculateMapIndexFromTilePos(Exit->LeftExitTilePos)]->FindComponentByClass<UTileComponent>()->SetTileTypeToExit();
+				UTileMapFunctionLibrary::OccupyTile(Exit->GetLeftTeleportPoint());
 			}
-			if(IsValid(MapTiles[CalculateMapIndexFromTilePos(Exit->RightExitTilePos)]))
+
+			if(IsValid(Exit->GetRightTeleportPoint()))
 			{
-				MapTiles[CalculateMapIndexFromTilePos(Exit->RightExitTilePos)]->FindComponentByClass<UTileComponent>()->SetTileTypeToExit();
+				UTileMapFunctionLibrary::OccupyTile(Exit->GetRightTeleportPoint());
 			}
 		}
 	}
+
+	RoomContentsManager = NewObject<URoomContentsManager>(this, RoomContentsManagerClass);
+	RoomContentsManager->FindSpawnRoom(MapRooms);
 }
 
 float UMapGeneratorComponent::CalculateNodeXPos(int Index)
@@ -100,41 +103,20 @@ float UMapGeneratorComponent::CalculateNodeYPos(int Index)
 	return DistBetweenNodes * (Index / MapSizeX);
 }
 
-float UMapGeneratorComponent::RoundToTileSizeMultiple(float OldValue, bool bRoundUp)
-{
-	float CurrentValue = OldValue / TileSize;
-	CurrentValue = (bRoundUp) ? ceil(CurrentValue) : floor(CurrentValue);
-	
-	return CurrentValue * TileSize;
-}
-
-FVector2D UMapGeneratorComponent::ConvertIndex1Dto2D(int index)
-{
-	int DivisionValue = index / (MapSizeX / TileSize);
-	int Remainder = index % (MapSizeX / TileSize);
-	
-	return FVector2D(Remainder, DivisionValue);
-}
-
-int UMapGeneratorComponent::ConvertIndex2DTo1D(FVector2D Index2D)
-{
-	return Index2D.X + (Index2D.Y * (MapSizeX / TileSize));
-}
-
-int UMapGeneratorComponent::CalculateMapIndexFromTilePos(FVector TilePos)
-{
-	int x = (TilePos.X - MapOrigin.X) / TileSize;
-	int y = (TilePos.Y - MapOrigin.Y) / TileSize;
-
-	return ConvertIndex2DTo1D(FVector2D(x, y));
-}
-
 float UMapGeneratorComponent::CalculateTileHeight(int x, int y)
 {
-	int MapIndex1D = CalculateMapIndexFromTilePos(FVector(x, y, 0));
-	FVector2D MapIndex2D = ConvertIndex1Dto2D(MapIndex1D);
+	int MapIndex1D = UTileMapFunctionLibrary::CalculateIndexFromTilePos(FVector(x, y, 0), RootRoom->GetRoomData().Origin, RootRoom->GetRoomData().SizeX, TileSize);
+	FVector2D MapIndex2D = UTileMapFunctionLibrary::ConvertIndex1Dto2D(MapIndex1D, RootRoom->GetRoomData().SizeX, TileSize);
 	
 	return HeightNoise->GetNoise(MapIndex2D.X, MapIndex2D.Y);
+}
+
+void UMapGeneratorComponent::AddToMapRooms(UMapRoom* NewRoom)
+{
+	if(NewRoom)
+	{
+		MapRooms.Add(NewRoom);
+	}
 }
 
 // Called when the game starts
@@ -145,7 +127,6 @@ void UMapGeneratorComponent::BeginPlay()
 	// ...
 	
 }
-
 
 // Called every frame
 void UMapGeneratorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

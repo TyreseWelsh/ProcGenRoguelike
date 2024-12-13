@@ -4,6 +4,12 @@
 #include "StrategyPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "InputActionValue.h"
+#include "HasPathfinding.h"
+#include "PathfindingComponent.h"
+#include "TBActionBase.h"
+#include "PlayerActionOpen.h"
+#include "TileMapFunctionLibrary.h"
 #include "ProcMapGeneration/Public/TileComponent.h"
 #include "InputActionValue.h"
 #include "Kismet/GameplayStatics.h"
@@ -15,14 +21,17 @@ void AStrategyPlayerController::BeginPlay()
 	if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		Subsystem->AddMappingContext(CameraMappingContext, 1);
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "ERROR: Cant get Enhanced Input Subsystem");
 	}
 
-	/*UGameplayStatics::GetGameMode(GetWorld())->Pawn*/
 	PlayerCam = GetPawn();
+
+	UTBActionBase* DefaultAction = NewObject<UPlayerActionOpen>();
+	CurrentAction = DefaultAction;
 }
 
 void AStrategyPlayerController::SetupInputComponent()
@@ -31,8 +40,22 @@ void AStrategyPlayerController::SetupInputComponent()
 
 	if(UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		EnhancedInputComponent->BindAction(LeftClickAction, ETriggerEvent::Started, this, &AStrategyPlayerController::PlayerLeftClick);
-		EnhancedInputComponent->BindAction(RightClickAction, ETriggerEvent::Started, this, &AStrategyPlayerController::PlayerRightClick);
+		// Default action bindings
+		EnhancedInputComponent->BindAction(DefaultLeftClickAction, ETriggerEvent::Started, this, &AStrategyPlayerController::PlayerLeftClick);
+		EnhancedInputComponent->BindAction(DefaultRightClickAction, ETriggerEvent::Started, this, &AStrategyPlayerController::PlayerRightClick);
+
+		// Camera action bindings
+		EnhancedInputComponent->BindAction(CameraMouseMoveAction, ETriggerEvent::Triggered, this, &AStrategyPlayerController::MoveMouse);
+		
+		EnhancedInputComponent->BindAction(CameraRightClickAction, ETriggerEvent::Triggered, this, &AStrategyPlayerController::EnableCameraRotation);
+		EnhancedInputComponent->BindAction(CameraRightClickAction, ETriggerEvent::Completed, this, &AStrategyPlayerController::DisabledCameraRotation);
+		EnhancedInputComponent->BindAction(CameraRightClickAction, ETriggerEvent::Canceled, this, &AStrategyPlayerController::DisabledCameraRotation);
+		
+		EnhancedInputComponent->BindAction(CameraMiddleClickAction, ETriggerEvent::Triggered, this, &AStrategyPlayerController::EnableCameraPan);
+		EnhancedInputComponent->BindAction(CameraMiddleClickAction, ETriggerEvent::Completed, this, &AStrategyPlayerController::DisableCameraPan);
+		EnhancedInputComponent->BindAction(CameraMiddleClickAction, ETriggerEvent::Canceled, this, &AStrategyPlayerController::DisableCameraPan);
+		
+		EnhancedInputComponent->BindAction(CameraMiddleScrollAction, ETriggerEvent::Triggered, this, &AStrategyPlayerController::CameraZoom);
 	}
 	else
 	{
@@ -43,29 +66,24 @@ void AStrategyPlayerController::SetupInputComponent()
 void AStrategyPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	FVector MousePos;
-	FVector MouseDirection;
-	DeprojectMousePositionToWorld(MousePos, MouseDirection);
+
+	GetMousePosition(ScreenMousePosition.X, ScreenMousePosition.Y);
+	DeprojectMousePositionToWorld(WorldMousePosition, WorldMouseDirection);
 
 	FHitResult HitResult;
-	FVector EndLocation = FVector(MousePos.X, MousePos.Y, PlayerCam->GetActorLocation().Z - 5000.f);
-	GetWorld()->LineTraceSingleByChannel(HitResult, MousePos, EndLocation, ECC_Visibility);
-
-	if(IsValid(HitResult.GetActor()))
+	if(GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
 	{
-		if(UTileComponent* NewTileComponent = HitResult.GetActor()->FindComponentByClass<UTileComponent>())
+		if (AActor* HitTile = UTileMapFunctionLibrary::GetBelowTile(HitResult.Location, GetWorld()))
 		{
-			if(NewTileComponent != CurrentHoveredTileComponent)
+			if(UTileComponent* NewTileComponent = IIsTile::Execute_GetTileComponent(HitTile))
 			{
-				// Unhovering previous hovered tile first
-				if(IsValid(CurrentHoveredTileComponent))
+				if(NewTileComponent != CurrentHoveredTileComponent)
 				{
-					CurrentHoveredTileComponent->TileUnHover();
+					//
+					CurrentAction->OnHover(CurrentHoveredTileComponent, NewTileComponent);
+					
+					CurrentHoveredTileComponent = NewTileComponent;
 				}
-
-				CurrentHoveredTileComponent = NewTileComponent;
-				CurrentHoveredTileComponent->TileHover();
 			}
 		}
 	}
@@ -76,17 +94,87 @@ void AStrategyPlayerController::PlayerLeftClick()
 	// If the tile we're hovering to select is not already selected
 	if(CurrentHoveredTileComponent != CurrentSelectedTileComponent)
 	{
-		if(IsValid(CurrentSelectedTileComponent))
-		{
-			CurrentSelectedTileComponent->TileUnSelect();
-		}
-
 		CurrentSelectedTileComponent = CurrentHoveredTileComponent;
-		CurrentSelectedTileComponent->TileLeftClick();
+
+		//
+		CurrentAction->OnLeftClick(CurrentSelectedTileComponent);
 	}
 }
 
 void AStrategyPlayerController::PlayerRightClick()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Right Click...");
+	GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("Right click")));
+	CurrentAction->OnRightClick();
+}
+
+void AStrategyPlayerController::EnableCameraRotation()
+{
+	bCanRotateCamera = true;
+}
+
+void AStrategyPlayerController::DisabledCameraRotation()
+{
+	bCanRotateCamera = false;
+}
+
+void AStrategyPlayerController::MoveMouse(const FInputActionValue& Value)
+{
+	FVector2D AxisVector = Value.Get<FVector2D>();
+
+	if (bCanRotateCamera)
+	{
+		PlayerCam->AddControllerYawInput(AxisVector.X * 4);
+		PlayerCam->AddControllerPitchInput(-AxisVector.Y * 4);
+	}
+	
+	if (bCanPanCamera)
+	{
+		PlayerCam->AddActorLocalOffset(FVector(0, -AxisVector.X * 200, -AxisVector.Y * 200));
+	}
+}
+
+void AStrategyPlayerController::EnableCameraPan()
+{
+	bCanPanCamera = true;
+}
+
+void AStrategyPlayerController::DisableCameraPan()
+{
+	bCanPanCamera = false;
+}
+
+void AStrategyPlayerController::CameraZoom(const FInputActionValue& Value)
+{
+	float ScrollAxisValue = Value.Get<float>();
+
+	FVector ZoomVector = WorldMouseDirection * 500.f;
+	ZoomVector *= 0.2;
+	PlayerCam->AddActorWorldOffset(ZoomVector * ScrollAxisValue);
+}
+
+void AStrategyPlayerController::FindPathFromSelected()
+{
+	if (IsValid(CurrentSelectedTileComponent))
+	{
+		if (PlayerCam->Implements<UHasPathfinding>())
+		{
+			if (UPathfindingComponent* PathfinderComponent = IHasPathfinding::Execute_GetPathfindingComponent(PlayerCam))
+			{
+				//PathfinderComponent->HighlightTiles(PathfinderComponent->AttemptPathfinding(CurrentSelectedTileComponent, CurrentHoveredTileComponent));
+				//PathfinderComponent->HighlightTilesInRange(CurrentSelectedTileComponent, PathfinderComponent->GetMoveDistance());
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("ERROR: Couldnt get pathfinding component...")));
+			}
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("ERROR: Player doesnt implement pathfinding interface...")));
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("ERROR: Selected tile owner invalid...")));
+	}
 }

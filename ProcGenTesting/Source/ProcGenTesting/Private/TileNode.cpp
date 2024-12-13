@@ -3,8 +3,10 @@
 
 #include "TileNode.h"
 
-#include "PaperFlipbookComponent.h"
+#include "Interactable.h"
 #include "TileComponent.h"
+#include "TileColourHistory.h"
+#include "TileColour.h"
 
 // Sets default values
 ATileNode::ATileNode()
@@ -16,11 +18,9 @@ ATileNode::ATileNode()
 	TileRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = TileRoot;
 
-	Sprite = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("Sprite"));
-	//Sprite->SetRelativeLocation(FVector(16.f, 16.f, 0.f));
-	Sprite->SetRelativeRotation(FRotator(0.f, 0.f, -90.f));
-	Sprite->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Sprite->SetupAttachment(RootComponent);
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh->SetupAttachment(RootComponent);
 
 	TileComponent = CreateDefaultSubobject<UTileComponent>(TEXT("TileComponent"));
 	TileComponent->SetRelativeLocation(FVector(0.f, 0.f, 16.f));
@@ -35,8 +35,8 @@ void ATileNode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	DynamicMatInstance = UMaterialInstanceDynamic::Create(Sprite->GetMaterial(0), Sprite);
-	Sprite->SetMaterial(0, DynamicMatInstance);
+	DynamicMatInstance = UMaterialInstanceDynamic::Create(Mesh->GetMaterial(0), Mesh);
+	Mesh->SetMaterial(0, DynamicMatInstance);
 
 	TileComponent->GetTileTypeToWallDelegate()->AddUObject(this, &ATileNode::InitWall);
 	TileComponent->GetTileTypeToPathDelegate()->AddUObject(this, &ATileNode::InitPath);
@@ -44,6 +44,8 @@ void ATileNode::BeginPlay()
 	TileComponent->GetTileTypeToExitDelegate()->AddUObject(this, &ATileNode::InitExit);
 
 	CalculateHeightLevel();
+
+	ColourHistory = NewObject<UTileColourHistory>(); 
 }
 
 // Called every frame
@@ -53,83 +55,172 @@ void ATileNode::Tick(float DeltaTime)
 
 }
 
-void ATileNode::AddToOverlayColour(FLinearColor NewColour)
+void ATileNode::AddTileColour_Implementation(UTileColour* NewTileColour)
 {
-	FLinearColor OverlayColour;
+	/*FLinearColor OverlayColour;
 	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
 	{
 		OverlayColour += NewColour;
 		OverlayColour.A = 1;
 		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
-	}
-}
+	}*/
 
-void ATileNode::RemoveFromOverlayColour(FLinearColor NewColour)
-{
 	FLinearColor OverlayColour;
 	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
 	{
-		OverlayColour -= NewColour;
-		OverlayColour.A = 1;
+		OverlayColour = ColourHistory->Add(NewTileColour);
 		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
+	}
+	//UE_LOG(LogTemp, Error, TEXT("Finished adding colour..."))
+	EnableHighlight();
+}
+
+void ATileNode::SubtractTileColour_Implementation(UTileColour* NewTileColour)
+{
+	/*FLinearColor OverlayColour;
+    if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
+    {
+       	OverlayColour -= NewColour;
+       	OverlayColour.A = 1;
+       	DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
+    }*/
+
+	FLinearColor OverlayColour;
+	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
+	{
+		OverlayColour = ColourHistory->Remove(NewTileColour);
+		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
+	}
+	DisableHighlight();
+}
+
+void ATileNode::EnableHighlight()
+{
+	HighlightCounter++;
+	if (HighlightCounter > 0)
+	{
+		float HighlightLevel = 0.5;
+		DynamicMatInstance->SetScalarParameterValue(FName("HighlightLevel"), HighlightLevel);
+	}
+}
+
+void ATileNode::DisableHighlight()
+{
+	HighlightCounter--;
+	if (HighlightCounter <= 0)
+	{
+		float HighlightLevel = 0;
+		DynamicMatInstance->SetScalarParameterValue(FName("HighlightLevel"), HighlightLevel);
+	}
+}
+
+void ATileNode::BindSelectDelegates(bool BindHover, bool BindUnHover, bool BindLeftMouse, bool BindRightMouse, bool BindUnSelect)
+{
+	TileComponent->GetMouseHoverDelegate()->RemoveAll(this);
+	TileComponent->GetMouseUnHoverDelegate()->RemoveAll(this);
+	TileComponent->GetLeftClickDelegate()->RemoveAll(this);
+	TileComponent->GetUnSelectDelegate()->RemoveAll(this);
+
+	if(BindHover)
+	{
+		TileComponent->GetMouseHoverDelegate()->AddUObject(this, &ATileNode::OnMouseHover_Implementation);
+	}
+	if(BindUnHover)
+	{
+		TileComponent->GetMouseUnHoverDelegate()->AddUObject(this, &ATileNode::OnMouseUnHover_Implementation);
+	}
+	if(BindLeftMouse)
+	{
+		TileComponent->GetLeftClickDelegate()->AddUObject(this, &ATileNode::OnMouseLeft_Implementation);
+	}
+	if(BindRightMouse)
+	{
+	}
+	if(BindUnSelect)
+	{
+		TileComponent->GetUnSelectDelegate()->AddUObject(this, &ATileNode::OnMouseUnSelect_Implementation);
 	}
 }
 
 void ATileNode::InitWall()
 {
 	// No bindings since walls are not interactable
-	Sprite->SetFlipbook(WallFlipbook);
 }
 
 void ATileNode::InitPath()
 {
-	Sprite->SetFlipbook(PathFlipbooks[HeightLevel]);
-	
-	TileComponent->GetMouseHoverDelegate()->AddUObject(this, &ATileNode::BindHover);
-	TileComponent->GetMouseUnHoverDelegate()->AddUObject(this, &ATileNode::BindUnHover);
-	TileComponent->GetLeftClickDelegate()->AddUObject(this, &ATileNode::BindLeftClick);
-	TileComponent->GetUnSelectDelegate()->AddUObject(this, &ATileNode::BindUnSelect);
+	FLinearColor BaseColour;
+	if(DynamicMatInstance->GetVectorParameterValue(FName("BaseColour"), BaseColour))
+	{
+		BaseColour = FLinearColor(0.2, 0.1, 0.03, 1);
+		BaseColour.A = 1;
+		DynamicMatInstance->SetVectorParameterValue(FName("BaseColour"), BaseColour);
+	}
+
+	BindSelectDelegates(true, true, true, true, true);
 }
 
 void ATileNode::InitGround()
 {
-	Sprite->SetFlipbook(GroundFlipbooks[HeightLevel]);
-	
-	TileComponent->GetMouseHoverDelegate()->AddUObject(this, &ATileNode::BindHover);
-	TileComponent->GetMouseUnHoverDelegate()->AddUObject(this, &ATileNode::BindUnHover);
-	TileComponent->GetLeftClickDelegate()->AddUObject(this, &ATileNode::BindLeftClick);
-	TileComponent->GetUnSelectDelegate()->AddUObject(this, &ATileNode::BindUnSelect);
+	BindSelectDelegates(true, true, true, true, true);
 }
 
 void ATileNode::InitExit()
 {
-	Sprite->SetFlipbook(ExitFlipbooks[HeightLevel]);
+	FLinearColor BaseColour;
+	if(DynamicMatInstance->GetVectorParameterValue(FName("BaseColour"), BaseColour))
+	{
+		BaseColour = FLinearColor::Red;
+		BaseColour.A = 1;
+		DynamicMatInstance->SetVectorParameterValue(FName("BaseColour"), BaseColour);
+	}
 
-	TileComponent->GetMouseHoverDelegate()->AddUObject(this, &ATileNode::BindHover);
-	TileComponent->GetMouseUnHoverDelegate()->AddUObject(this, &ATileNode::BindUnHover);
-	TileComponent->GetLeftClickDelegate()->AddUObject(this, &ATileNode::BindLeftClick);
-	TileComponent->GetUnSelectDelegate()->AddUObject(this, &ATileNode::BindUnSelect);
+	BindSelectDelegates(true, true, true, true, true);
 }
 
-void ATileNode::BindHover()
+void ATileNode::OnMouseHover_Implementation()
 {
-	AddToOverlayColour(HoverColour);
+	TObjectPtr<UTileColour> NewTileColour = NewObject<UTileColour>();
+	NewTileColour->Init(HoverColour, this);
+	AddTileColour_Implementation(NewTileColour);
+
 }
 
-void ATileNode::BindUnHover()
+void ATileNode::OnMouseUnHover_Implementation()
 {
-	RemoveFromOverlayColour(HoverColour);
+	TObjectPtr<UTileColour> NewTileColour = NewObject<UTileColour>();
+	NewTileColour->Init(HoverColour, this);
+	SubtractTileColour_Implementation(NewTileColour);
 }
 
-void ATileNode::BindLeftClick()
+void ATileNode::OnMouseLeft_Implementation()
 {
-	AddToOverlayColour(SelectColour);
+	bIsSelected = true;
+	
+	UTileColour* NewTileColour = NewObject<UTileColour>();
+	NewTileColour->Init(SelectColour, this);
+	AddTileColour_Implementation(NewTileColour);
+	
+	if (AActor* OccupyingObject = TileComponent->GetOccupyingObject())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Tile selected...")));
+
+		ISelectable::Execute_OnMouseLeft(OccupyingObject);
+		//IInteractable::Execute_OnLeftClick(OccupyingObject);
+	}
 }
 
-void ATileNode::BindUnSelect()
+void ATileNode::OnMouseRight_Implementation()
 {
-	//DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), FLinearColor::White);
-	RemoveFromOverlayColour(SelectColour);
+}
+
+void ATileNode::OnMouseUnSelect_Implementation()
+{
+	bIsSelected = false;
+	
+	UTileColour* NewTileColour = NewObject<UTileColour>();
+	NewTileColour->Init(SelectColour, this);
+	SubtractTileColour_Implementation(NewTileColour);
 }
 
 void ATileNode::CalculateHeightLevel()

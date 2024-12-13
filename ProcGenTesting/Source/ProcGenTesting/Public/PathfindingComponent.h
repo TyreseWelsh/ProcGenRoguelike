@@ -25,14 +25,46 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile);
+	void Init();
+
+	TArray<AActor*> AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile);
+	void HighlightTilesInNewPath(UTileComponent* StartTile, UTileComponent* TargetTile, FLinearColor HighlightColour);
+	void HighlightTilesInRange(UTileComponent* StartTile, int Range, FLinearColor HighlightColour);
+	
+	void HighlightTiles(TArray<AActor*> TilesToHighlight, FLinearColor HighlightColour);
+	void UnHighlightTiles(TArray<AActor*> TilesToUnHighlight, FLinearColor UnHighlightColour);
+
+	TArray<AActor*> FindTilesInRange(UTileComponent* StartTile, int Range);
+	TArray<AActor*> FindValidTiles();
+	
+	int GetMoveDistance() const { return MoveDistance; }
+	TArray<AActor*> GetCurrentPath() const { return Path; }
+	TArray<AActor*> GetTilesInRange() const { return TilesInRange; }
+	TArray<AActor*> GetValidTiles() const { return ValidTiles; }
+
+protected:
+	UPROPERTY()
+	FTimerHandle HighlightPathTimerHandle;
+	FTimerDelegate HighlightPathTimerDelegate;
 	
 private:
-	void RetracePath(UTileComponent* StartNode, UTileComponent* TargetNode);
-	void HighlightPath();
-	int GetDistance(UTileComponent* TileA, UTileComponent* TileB);
+	TArray<AActor*> RetracePath(UTileComponent* StartNode, UTileComponent* TargetNode);
+	int GetDistance(UTileComponent* TileA, UTileComponent* TileB) const;
+	int GetDistanceX(UTileComponent* TileA, UTileComponent* TileB) const;
+	int GetDistanceY(UTileComponent* TileA, UTileComponent* TileB) const;
 	
 	TArray<UTileComponent*> OpenSet;
 	TArray<UTileComponent*> ClosedSet;
-	TArray<UTileComponent*> Path;
+	UPROPERTY()
+	TArray<AActor*> Path;
+	
+	//
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Pathfinding", meta=(AllowPrivateAccess=true))
+	int MoveDistance;
+	UPROPERTY()
+	TArray<AActor*> TilesInRange;
+	
+	UPROPERTY()
+	TArray<AActor*> ValidTiles;
+
 };

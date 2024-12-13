@@ -9,6 +9,8 @@
 class UMapRoom;
 class FastNoiseLite;
 class AExitGenerator;
+struct FRoomData;
+class URoomContentsManager;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROCMAPGENERATION_API UMapGeneratorComponent : public UActorComponent
@@ -26,12 +28,10 @@ public:
 	// Helper functions
 	float CalculateNodeXPos(int Index);
 	float CalculateNodeYPos(int Index);
-	float RoundToTileSizeMultiple(float OldValue, bool bRoundUp);
-	FVector2D ConvertIndex1Dto2D(int index);
-	int ConvertIndex2DTo1D(FVector2D Index2D);
-	int CalculateMapIndexFromTilePos(FVector TilePos);
 
 	float CalculateTileHeight(int x, int y);
+
+	void AddToMapRooms(UMapRoom* NewRoom);
 
 protected:
 	// Called when the game starts
@@ -56,17 +56,25 @@ public:
 	TArray<AActor*> MapTiles;										// WIP: Will be changed to store pointers to tile node class
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Map")
 	TSubclassOf<AActor> TileClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
+	TSubclassOf<URoomContentsManager> RoomContentsManagerClass;
 	UPROPERTY()
+	TObjectPtr<URoomContentsManager> RoomContentsManager;
+	
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
+	FRoomData* InitialRoomData;*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Initial Room Data")
 	FVector MapOrigin = FVector::Zero();
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Initial Room Data")
 	int MapSizeX = 3520;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Initial Room Data")
 	int MapSizeY = 3520;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Initial Room Data")
 	int DistBetweenNodes = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Initial Room Data")
 	int TileSize = 32;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Initial Room Data")
 	int InitialRoomSplitNum = 6;
 
 	// Noise
@@ -77,10 +85,14 @@ public:
 	// Room properties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Room")
 	int RoomMinSize = 320;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Room")
+	int RoomMinPadding = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Room")
+	int RoomMaxPadding = 0;
 
 	// Other properties
 	UPROPERTY()
-	TArray<UMapRoom*> LeafRooms;			
+	TArray<UMapRoom*> MapRooms;			
 	UPROPERTY()
 	TObjectPtr<UMapRoom> RootRoom;
 	UPROPERTY()

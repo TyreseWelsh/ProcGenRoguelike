@@ -3,11 +3,37 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "MapRoom.generated.h"
 
 class UMapGeneratorComponent;
 class UWorld;
+
+USTRUCT(BlueprintType)
+struct FRoomData
+{
+	GENERATED_BODY()
+
+	FRoomData() {}
+	FRoomData(FVector RoomOrigin, int RoomSizeX, int RoomSizeY, int RoomSplitsRemaining, int RoomMinPadding, int RoomMaxPadding)
+		: Origin(RoomOrigin), SizeX(RoomSizeX), SizeY(RoomSizeY), BSPSplitsRemaining(RoomSplitsRemaining), MinPadding(RoomMinPadding), MaxPadding(RoomMaxPadding)
+	{}
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector Origin = FVector::ZeroVector;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int SizeX = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int SizeY = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int BSPSplitsRemaining = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int MinPadding = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int MaxPadding = 0;
+	
+
+	bool bIsActive = false;
+};
 
 /**
  * Is not a physical object in the world.
@@ -19,17 +45,17 @@ class PROCMAPGENERATION_API UMapRoom : public UObject
 	GENERATED_BODY()
 
 public:
-	UMapRoom();
-	~UMapRoom();
+	/*UMapRoom();
+	~UMapRoom();*/
 
-	void InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* ParentMapRoom, FVector Origin, int SizeX, int SizeY, int SplitsRemaining);
+	void InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* ParentMapRoom, FRoomData NewRoomData);
 	UFUNCTION()
 	void SplitRoom();
 	void SplitHorizontally(const float SplitPercent);
 	void SplitVertically(const float SplitPercent);
 	void GenerateTiles();
 	AActor* SpawnTile(FVector TileSpawnPos, int RoomIndexX = -1, int RoomIndexY = -1);
-	void SetTileType(int IndexX, int LastIndexX, int IndexY, int LastIndexY);
+	void ChooseTileType(FVector TilePos);
 	TArray<UMapRoom*> GetLeaves(); 
 
 	// Helper functions
@@ -37,6 +63,8 @@ public:
 	int CalculateLeftRoomSize(const int SplitLocation, const int Origin);
 	int CalculateRightRoomSize(const int SplitLocation, const int RoomEnd);
 
+	FRoomData GetRoomData() { return RoomData; }
+	TArray<AActor*> GetRoomTiles() { return RoomTiles; }
 	
 	// Debug Properties - All but "RoomColour" will be set on initialisation by the assigned MapGenerator
 	bool bDebugEnabled = false;
@@ -49,12 +77,13 @@ public:
 	
 	// Main Properties
 	TObjectPtr<UMapGeneratorComponent> MapGenerator;
-	FVector RoomOrigin = FVector::Zero();
+	/*FVector RoomOrigin = FVector::Zero();
 	int RoomSizeX = 0;
 	int RoomSizeY = 0;
-	int MinRoomSize = 0;
-	int NumSplitsRemaining = 0;
+	int NumSplitsRemaining = 0;*/
 	
+	int MinRoomSize = 0;
+
 	TObjectPtr<UMapRoom> ParentRoom;
 	TObjectPtr<UMapRoom> LeftChildRoom;
 	TObjectPtr<UMapRoom> RightChildRoom;
@@ -70,4 +99,8 @@ public:
 	
 	int LastIndexX = 0;
 	int LastIndexY = 0;
+
+private:
+	//
+	FRoomData RoomData;
 };
