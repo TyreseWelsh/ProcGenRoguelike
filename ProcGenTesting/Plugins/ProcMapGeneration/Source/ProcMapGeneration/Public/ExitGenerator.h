@@ -8,6 +8,7 @@
 
 class USceneComponent;
 class UCapsuleComponent;
+class ATeleportPoint;
 
 UCLASS()
 class PROCMAPGENERATION_API AExitGenerator : public AActor
@@ -38,6 +39,12 @@ public:
 	// Public Properties
 	FVector LeftExitTilePos = FVector::ZeroVector;
 	FVector RightExitTilePos = FVector::ZeroVector;
+
+	TObjectPtr<ATeleportPoint> LeftTeleportPoint;
+	TObjectPtr<ATeleportPoint> RightTeleportPoint;
+	
+	ATeleportPoint* GetLeftTeleportPoint() { return LeftTeleportPoint; }
+	ATeleportPoint* GetRightTeleportPoint() { return RightTeleportPoint; }
 
 private:
 	void InitPathGenCollider();

@@ -11,6 +11,7 @@
 #include "PlayerActionOpen.h"
 #include "TileMapFunctionLibrary.h"
 #include "ProcMapGeneration/Public/TileComponent.h"
+#include "IsTile.h"
 #include "InputActionValue.h"
 #include "Kismet/GameplayStatics.h"
 

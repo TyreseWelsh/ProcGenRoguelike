@@ -7,6 +7,7 @@
 
 #include "Components/SceneComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "TeleportPoint.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -43,6 +44,9 @@ void AExitGenerator::CalculateRelativeExitTiles()
 	
 	LeftExitTilePos = (GetActorLocation() + OffsetVector) - GetActorRightVector() * TileSize;
 	RightExitTilePos = (GetActorLocation() + OffsetVector) + GetActorRightVector() * TileSize;
+
+	LeftTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), LeftExitTilePos, FRotator(0, 0, 0));
+	RightTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), RightExitTilePos, FRotator(0, 0, 0));
 }
 
 void AExitGenerator::InitPathGenCollider()

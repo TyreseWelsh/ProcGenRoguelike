@@ -10,6 +10,7 @@
 #include "FastNoiseLite.h"
 #include "TileMapFunctionLibrary.h"
 #include "RoomContentsManager.h"
+#include "TeleportPoint.h"
 
 
 // Sets default values for this component's properties
@@ -28,8 +29,8 @@ void UMapGeneratorComponent::InitMap()
 	RootRoom = nullptr;
 	for(AExitGenerator* Exit : AllRoomExits)
 	{
-		Exit->GetLeftTeleportPoint()->Destroy();
-		Exit->GetRightTeleportPoint()->Destroy();
+		/*Exit->GetLeftTeleportPos()->Destroy();
+		Exit->GetRightTeleportPos()->Destroy();*/
 		Exit->Destroy();
 	}
 	AllRoomExits.Empty();

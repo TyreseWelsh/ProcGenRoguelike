@@ -5,6 +5,7 @@
 #include "MapGeneratorComponent.h"
 #include "MapRoom.h"
 #include "ExitGenerator.h"
+#include "TileMapFunctionLibrary.h"
 
 // Sets default values for this component's properties
 UTileComponent::UTileComponent()
@@ -48,9 +49,9 @@ void UTileComponent::SetTileType()
 		SetTileTypeToWall();
 	}*/
 
-	UMapGeneratorComponent* MapGenerator = OwningRoom->MapGenerator;
-	int MapIndex1D = MapGenerator->CalculateMapIndexFromTilePos(GetOwner()->GetActorLocation());
-	FVector2D MapIndex2D = MapGenerator->ConvertIndex1Dto2D(MapIndex1D);
+	/*UMapGeneratorComponent* MapGenerator = OwningRoom->MapGenerator;
+	int MapIndex1D = UTileMapFunctionLibrary::CalculateIndexFromTilePos(GetOwner()->GetActorLocation());
+	FVector2D MapIndex2D = UTileMapFunctionLibrary::ConvertIndex1Dto2D(MapIndex1D);
 
 	//UE_LOG(LogTemp, Display, TEXT("%i"), MapGenerator->MapSizeX);
 	if(MapIndex2D.X == 0 or MapIndex2D.X * TileSize == MapGenerator->MapSizeX - TileSize or MapIndex2D.Y == 0 or MapIndex2D.Y * TileSize == MapGenerator->MapSizeY - TileSize)
@@ -58,7 +59,7 @@ void UTileComponent::SetTileType()
 		// Set tile type as wall
 		SetTileTypeToWall();
 		return;
-	}
+	}*/
 	/*if(RoomIndexX == 1 or RoomIndexX == OwningRoom->LastIndexX - 1 or RoomIndexY == 1 or RoomIndexY == OwningRoom->LastIndexY - 1)
 	{
 		if(FMath::RandRange(1, 10) <= 5)

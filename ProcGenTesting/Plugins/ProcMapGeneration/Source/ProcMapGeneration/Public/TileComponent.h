@@ -74,6 +74,9 @@ public:
 
 	TArray<UTileComponent*> GetSurroundingTiles() { return SurroundingTiles; }
 
+	AActor* GetOccupyingObject() { return OccupyingObject; }
+	void SetOccupyingObject(AActor* NewObject) { OccupyingObject = NewObject; }
+
 	void SetOwningRoom(UMapRoom* NewOwner);
 	void SetRoomIndexX(int NewIndex);
 	void SetRoomIndexY(int NewIndex);
@@ -120,6 +123,9 @@ private:
 	int RoomIndexX = 0;
 	int RoomIndexY = 0;
 
+	UPROPERTY()
+	TObjectPtr<AActor> OccupyingObject;
+	
 	UPROPERTY()
 	TObjectPtr<AActor> LeftTile;
 	UPROPERTY()

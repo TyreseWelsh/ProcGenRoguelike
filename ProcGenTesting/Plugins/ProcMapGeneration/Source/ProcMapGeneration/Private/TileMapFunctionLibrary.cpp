@@ -81,7 +81,7 @@ bool UTileMapFunctionLibrary::OccupyTile(AActor* OccupyingActor)
 	{
 		if (!IIsTile::Execute_GetTileComponent(Tile)->GetOccupyingObject())
 		{
-			IIsTile::Execute_GetTileComponent(Tile)->SetOccupyingActor(OccupyingActor);
+			IIsTile::Execute_GetTileComponent(Tile)->SetOccupyingObject(OccupyingActor);
 			return true;
 		}
 		return false;

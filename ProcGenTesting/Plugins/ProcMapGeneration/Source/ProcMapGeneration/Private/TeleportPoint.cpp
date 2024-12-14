@@ -60,7 +60,7 @@ void ATeleportPoint::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor
 {
 }
 
-void ATeleportPoint::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+/*void ATeleportPoint::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "overlap TELEPORT");
@@ -69,7 +69,7 @@ void ATeleportPoint::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	{
 		TeleportObject(OtherActor);
 	}
-}
+}*/
 
 void ATeleportPoint::TeleportObject(AActor* Object)
 {
