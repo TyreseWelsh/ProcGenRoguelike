@@ -49,6 +49,7 @@ public:
 	virtual void InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY);
 
 	void SetTileType();
+	void FindNeighbourTiles();
 	void CheckSurroundedByWalls();
 
 protected:
@@ -70,9 +71,9 @@ public:
 	UPROPERTY()
 	UTileComponent* ParentTile;
 	UPROPERTY()
-	TArray<UTileComponent*> SurroundingTiles;
+	TArray<UTileComponent*> NeighbourTiles;
 
-	TArray<UTileComponent*> GetSurroundingTiles() { return SurroundingTiles; }
+	TArray<UTileComponent*> GetNeighbourTiles();
 
 	AActor* GetOccupyingObject() { return OccupyingObject; }
 	void SetOccupyingObject(AActor* NewObject) { OccupyingObject = NewObject; }

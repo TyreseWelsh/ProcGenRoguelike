@@ -37,8 +37,8 @@ void ATeleportPoint::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Collider->OnComponentHit.AddDynamic(this, &ATeleportPoint::OnHit);
-	Collider->OnComponentBeginOverlap.AddDynamic(this, &ATeleportPoint::BeginOverlap);
+	//Collider->OnComponentHit.AddDynamic(this, &ATeleportPoint::OnHit);
+	//Collider->OnComponentBeginOverlap.AddDynamic(this, &ATeleportPoint::BeginOverlap);
 
 
 }

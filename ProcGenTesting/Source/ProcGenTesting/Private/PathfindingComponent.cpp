@@ -87,31 +87,25 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 			}
 
 			// Add valid neighbour tiles to open set
-			for(AActor* NeighbourTile : CurrentTile->FindNeighbourTiles())
+			for(UTileComponent* NeighbourTileComponent : CurrentTile->GetNeighbourTiles())
 			{
-				if (NeighbourTile->Implements<UIsTile>())
+				if(!NeighbourTileComponent->bIsWalkable or ClosedSet.Contains(NeighbourTileComponent))
 				{
-					if (UTileComponent* NeighbourTileComponent = IIsTile::Execute_GetTileComponent(NeighbourTile))
+					continue;
+				}
+		
+				int NewNeighbourGCost = abs(CurrentTile->GCost + GetDistance(CurrentTile, NeighbourTileComponent));
+				if(NewNeighbourGCost < NeighbourTileComponent->GCost or !OpenSet.Contains(NeighbourTileComponent))
+				{
+					NeighbourTileComponent->GCost = NewNeighbourGCost;
+					NeighbourTileComponent->HCost = abs(GetDistance(NeighbourTileComponent, TargetTile));
+
+					NeighbourTileComponent->FCost = NeighbourTileComponent->GCost + NeighbourTileComponent->HCost;
+					NeighbourTileComponent->ParentTile = CurrentTile;
+
+					if(!OpenSet.Contains(NeighbourTileComponent))
 					{
-						if(!NeighbourTileComponent->bIsWalkable or ClosedSet.Contains(NeighbourTileComponent))
-						{
-							continue;
-						}
-				
-						int NewNeighbourGCost = abs(CurrentTile->GCost + GetDistance(CurrentTile, NeighbourTileComponent));
-						if(NewNeighbourGCost < NeighbourTileComponent->GCost or !OpenSet.Contains(NeighbourTileComponent))
-						{
-							NeighbourTileComponent->GCost = NewNeighbourGCost;
-							NeighbourTileComponent->HCost = abs(GetDistance(NeighbourTileComponent, TargetTile));
-
-							NeighbourTileComponent->FCost = NeighbourTileComponent->GCost + NeighbourTileComponent->HCost;
-							NeighbourTileComponent->ParentTile = CurrentTile;
-
-							if(!OpenSet.Contains(NeighbourTileComponent))
-							{
-								OpenSet.Add(NeighbourTileComponent);
-							}
-						}
+						OpenSet.Add(NeighbourTileComponent);
 					}
 				}
 			}
@@ -176,21 +170,18 @@ TArray<AActor*> UPathfindingComponent::FindTilesInRange(UTileComponent* StartTil
 		rangeOpenSet.Remove(CurrentTileComponent);
 		rangeClosedSet.Add(CurrentTileComponent);
 		
-		for(AActor* Tile : CurrentTileComponent->FindNeighbourTiles())
+		for(UTileComponent* NeighbourTileComponent : CurrentTileComponent->GetNeighbourTiles())
 		{
-			if(UTileComponent* NeighbourTileComponent = IIsTile::Execute_GetTileComponent(Tile))
+			if(rangeClosedSet.Contains(NeighbourTileComponent) or
+				GetDistanceX(StartTile, NeighbourTileComponent) + GetDistanceY(StartTile, NeighbourTileComponent) > Range * NeighbourTileComponent->GetOwningRoom()->TileSize)
 			{
-				if(rangeClosedSet.Contains(NeighbourTileComponent) or
-					GetDistanceX(StartTile, NeighbourTileComponent) + GetDistanceY(StartTile, NeighbourTileComponent) > Range * NeighbourTileComponent->GetOwningRoom()->TileSize)
-				{
-					continue;
-				}
-				
-				if(!rangeOpenSet.Contains(NeighbourTileComponent))
-				{
-					rangeOpenSet.Add(NeighbourTileComponent);
-					TilesInRange.AddUnique(NeighbourTileComponent->GetOwner());
-				}
+				continue;
+			}
+			
+			if(!rangeOpenSet.Contains(NeighbourTileComponent))
+			{
+				rangeOpenSet.Add(NeighbourTileComponent);
+				TilesInRange.AddUnique(NeighbourTileComponent->GetOwner());
 			}
 		}
 	}
