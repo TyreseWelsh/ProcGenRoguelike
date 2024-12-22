@@ -8,6 +8,8 @@
 #include "TileColourHistory.h"
 #include "TileColour.h"
 
+#include "Selectable.h"
+
 // Sets default values
 ATileNode::ATileNode()
 {

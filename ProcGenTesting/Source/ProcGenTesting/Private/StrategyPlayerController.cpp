@@ -104,7 +104,6 @@ void AStrategyPlayerController::PlayerLeftClick()
 
 void AStrategyPlayerController::PlayerRightClick()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("Right click")));
 	CurrentAction->OnRightClick();
 }
 
