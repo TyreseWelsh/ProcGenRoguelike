@@ -6,6 +6,7 @@
 #include "TileComponent.h"
 #include "MapRoom.h"
 #include "TileNode.h"
+#include "TileColour.h"
 
 #include "Algo/Reverse.h"
 
@@ -26,7 +27,6 @@ void UPathfindingComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
 }
 
 
@@ -38,6 +38,14 @@ void UPathfindingComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	// ...
 }
 
+void UPathfindingComponent::Init()
+{
+}
+
+void UPathfindingComponent::Move()
+{
+}
+
 TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile)
 {
 	// Remove path highlight from old path if present
@@ -45,7 +53,9 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 	{
 		if (PathTile->Implements<UIsTile>())
 		{
-			IIsTile::Execute_SubtractTileColour(PathTile, FLinearColor::Yellow);
+			UTileColour* NewTileColour = NewObject<UTileColour>();
+			NewTileColour->Init(FLinearColor::Green, GetOwner());
+			IIsTile::Execute_SubtractTileColour(PathTile, NewTileColour);
 		}
 	}
 	Path.Empty();
@@ -80,31 +90,25 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 			}
 
 			// Add valid neighbour tiles to open set
-			for(AActor* NeighbourTile : CurrentTile->FindNeighbourTiles())
+			for(UTileComponent* NeighbourTileComponent : CurrentTile->GetNeighbourTiles())
 			{
-				if (NeighbourTile->Implements<UIsTile>())
+				if(!NeighbourTileComponent->bIsWalkable or ClosedSet.Contains(NeighbourTileComponent))
 				{
-					if (UTileComponent* NeighbourTileComponent = IIsTile::Execute_GetTileComponent(NeighbourTile))
+					continue;
+				}
+		
+				int NewNeighbourGCost = abs(CurrentTile->GCost + GetDistance(CurrentTile, NeighbourTileComponent));
+				if(NewNeighbourGCost < NeighbourTileComponent->GCost or !OpenSet.Contains(NeighbourTileComponent))
+				{
+					NeighbourTileComponent->GCost = NewNeighbourGCost;
+					NeighbourTileComponent->HCost = abs(GetDistance(NeighbourTileComponent, TargetTile));
+
+					NeighbourTileComponent->FCost = NeighbourTileComponent->GCost + NeighbourTileComponent->HCost;
+					NeighbourTileComponent->ParentTile = CurrentTile;
+
+					if(!OpenSet.Contains(NeighbourTileComponent))
 					{
-						if(!NeighbourTileComponent->bIsWalkable or ClosedSet.Contains(NeighbourTileComponent))
-						{
-							continue;
-						}
-				
-						int NewNeighbourGCost = abs(CurrentTile->GCost + GetDistance(CurrentTile, NeighbourTileComponent));
-						if(NewNeighbourGCost < NeighbourTileComponent->GCost or !OpenSet.Contains(NeighbourTileComponent))
-						{
-							NeighbourTileComponent->GCost = NewNeighbourGCost;
-							NeighbourTileComponent->HCost = abs(GetDistance(NeighbourTileComponent, TargetTile));
-
-							NeighbourTileComponent->FCost = NeighbourTileComponent->GCost + NeighbourTileComponent->HCost;
-							NeighbourTileComponent->ParentTile = CurrentTile;
-
-							if(!OpenSet.Contains(NeighbourTileComponent))
-							{
-								OpenSet.Add(NeighbourTileComponent);
-							}
-						}
+						OpenSet.Add(NeighbourTileComponent);
 					}
 				}
 			}
@@ -118,11 +122,23 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 	return Path;
 }
 
-void UPathfindingComponent::HighlightTilesInRange(UTileComponent* StartTile, int Range)
+void UPathfindingComponent::HighlightTilesInNewPath(UTileComponent* StartTile, UTileComponent* TargetTile, FLinearColor HighlightColour)
 {
-	UnHighlightTiles(TilesInRange);
-	HighlightTiles(GetTilesInRange(StartTile, Range));
+	//UnHighlightTiles(Path);
+	AttemptPathfinding(StartTile, TargetTile);
+	if(Path.Num() > 0)
+	{
+		HighlightTiles(Path, HighlightColour);
+	}
 }
+
+void UPathfindingComponent::HighlightTilesInRange(UTileComponent* StartTile, int Range, FLinearColor HighlightColour)
+{
+	UnHighlightTiles(TilesInRange, HighlightColour);
+	HighlightTiles(FindTilesInRange(StartTile, Range), HighlightColour);
+}
+
+
 
 TArray<AActor*> UPathfindingComponent::RetracePath(UTileComponent* TargetNode, UTileComponent* StartNode)
 {
@@ -142,7 +158,7 @@ TArray<AActor*> UPathfindingComponent::RetracePath(UTileComponent* TargetNode, U
 	return Path;
 }
 
-TArray<AActor*> UPathfindingComponent::GetTilesInRange(UTileComponent* StartTile, int Range)
+TArray<AActor*> UPathfindingComponent::FindTilesInRange(UTileComponent* StartTile, int Range)
 {
 	TilesInRange.Empty();
 	
@@ -157,21 +173,18 @@ TArray<AActor*> UPathfindingComponent::GetTilesInRange(UTileComponent* StartTile
 		rangeOpenSet.Remove(CurrentTileComponent);
 		rangeClosedSet.Add(CurrentTileComponent);
 		
-		for(AActor* Tile : CurrentTileComponent->FindNeighbourTiles())
+		for(UTileComponent* NeighbourTileComponent : CurrentTileComponent->GetNeighbourTiles())
 		{
-			if(UTileComponent* NeighbourTileComponent = IIsTile::Execute_GetTileComponent(Tile))
+			if(rangeClosedSet.Contains(NeighbourTileComponent) or
+				GetDistanceX(StartTile, NeighbourTileComponent) + GetDistanceY(StartTile, NeighbourTileComponent) > Range * NeighbourTileComponent->GetOwningRoom()->TileSize)
 			{
-				if(rangeClosedSet.Contains(NeighbourTileComponent) or
-					GetDistanceX(StartTile, NeighbourTileComponent) + GetDistanceY(StartTile, NeighbourTileComponent) > Range * NeighbourTileComponent->GetOwningRoom()->TileSize)
-				{
-					continue;
-				}
-				
-				if(!rangeOpenSet.Contains(NeighbourTileComponent))
-				{
-					rangeOpenSet.Add(NeighbourTileComponent);
-					TilesInRange.AddUnique(NeighbourTileComponent->GetOwner());
-				}
+				continue;
+			}
+			
+			if(!rangeOpenSet.Contains(NeighbourTileComponent))
+			{
+				rangeOpenSet.Add(NeighbourTileComponent);
+				TilesInRange.AddUnique(NeighbourTileComponent->GetOwner());
 			}
 		}
 	}
@@ -179,24 +192,45 @@ TArray<AActor*> UPathfindingComponent::GetTilesInRange(UTileComponent* StartTile
 	return TilesInRange;
 }
 
-void UPathfindingComponent::HighlightTiles(TArray<AActor*> TilesToHighlight)
+TArray<AActor*> UPathfindingComponent::FindValidTiles()
+{
+	ValidTiles.Empty();
+	if(Path.Num() > 0
+		&& TilesInRange.Num() > 0)
+	{
+		for(AActor* Tile : Path)
+		{
+			if(TilesInRange.Contains(Tile))
+			{
+				ValidTiles.Add(Tile);
+			}
+		}
+	}
+	return ValidTiles;
+}
+
+void UPathfindingComponent::HighlightTiles(TArray<AActor*> TilesToHighlight, FLinearColor HighlightColour)
 {
 	for (AActor* Tile : TilesToHighlight)
 	{
 		if (Tile->Implements<UIsTile>())
 		{
-			IIsTile::Execute_AddTileColour(Tile, FLinearColor::Yellow);
+			UTileColour* NewTileColour = NewObject<UTileColour>();
+			NewTileColour->Init(HighlightColour, GetOwner());
+			IIsTile::Execute_AddTileColour(Tile, NewTileColour);
 		}
 	}
 }
 
-void UPathfindingComponent::UnHighlightTiles(TArray<AActor*> TilesToUnHighlight)
+void UPathfindingComponent::UnHighlightTiles(TArray<AActor*> TilesToUnHighlight, FLinearColor UnHighlightColour)
 {
 	for (AActor* Tile : TilesToUnHighlight)
 	{
 		if (Tile->Implements<UIsTile>())
 		{
-			IIsTile::Execute_SubtractTileColour(Tile, FLinearColor::Yellow);
+			UTileColour* NewTileColour = NewObject<UTileColour>();
+			NewTileColour->Init(UnHighlightColour, GetOwner());
+			IIsTile::Execute_SubtractTileColour(Tile, NewTileColour);
 		}
 	}
 }

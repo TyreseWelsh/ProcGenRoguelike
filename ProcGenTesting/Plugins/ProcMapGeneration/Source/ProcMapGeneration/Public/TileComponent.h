@@ -49,6 +49,7 @@ public:
 	virtual void InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY);
 
 	void SetTileType();
+	void FindNeighbourTiles();
 	void CheckSurroundedByWalls();
 
 protected:
@@ -69,18 +70,17 @@ public:
 	int FCost = 0;
 	UPROPERTY()
 	UTileComponent* ParentTile;
-	
-	//UPROPERTY()
-	//TArray<AActor*> NeighbourTiles;
-	//TArray<AActor*> GetSurroundingTiles() { return NeighbourTiles; }
+	UPROPERTY()
+	TArray<UTileComponent*> NeighbourTiles;
 
-	TArray<AActor*> FindNeighbourTiles();
+	TArray<UTileComponent*> GetNeighbourTiles();
 
+	AActor* GetOccupyingObject() { return OccupyingObject; }
+	void SetOccupyingObject(AActor* NewObject) { OccupyingObject = NewObject; }
 
 	void SetOwningRoom(UMapRoom* NewOwner);
 	void SetRoomIndexX(int NewIndex);
 	void SetRoomIndexY(int NewIndex);
-	void SetTeleportTarget(AActor* NewTarget);
 
 	void TileHover();
 	void TileHoverSelected();
@@ -104,10 +104,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetRoomIndexY() const { return RoomIndexY; }
 
-	UFUNCTION(BlueprintCallable)
-	AActor* GetOccupyingObject() { return OccupyingActor; }
-	void SetOccupyingActor(AActor* NewOccupyingActor);
-
 	FOnMouseHoverSignature* GetMouseHoverDelegate() { return &HoverDelegate; }
 	FOnMouseUnHoverSignature* GetMouseUnHoverDelegate() { return &UnHoverDelegate; }
 	FOnLeftClickSignature* GetLeftClickDelegate() { return &LeftClickDelegate; }
@@ -120,6 +116,8 @@ public:
 	
 
 private:
+	void FindSurroundingTiles();
+	
 	int TileSize = 0;
 	float TileHeight = 0.f;
 	
@@ -127,11 +125,18 @@ private:
 	int RoomIndexY = 0;
 
 	UPROPERTY()
-	TObjectPtr<AActor> OccupyingActor;
+	TObjectPtr<AActor> OccupyingObject;
 	
 	UPROPERTY()
-	TObjectPtr<AActor> TeleportTarget;
-	
+	TObjectPtr<AActor> LeftTile;
+	UPROPERTY()
+	TObjectPtr<AActor> RightTile;
+	UPROPERTY()
+	TObjectPtr<AActor> TopTile;
+	UPROPERTY()
+	TObjectPtr<AActor> BottomTile;
+
+
 	// Tile Interaction Delegeates
 	//UPROPERTY(BlueprintAssignable)
 	FOnMouseHoverSignature HoverDelegate;

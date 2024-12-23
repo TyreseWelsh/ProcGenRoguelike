@@ -11,7 +11,8 @@
 class UCapsuleComponent;
 class UStaticMeshComponent;
 class UArrowComponent;
-class UPathfindingComponent;
+class UPlayerPathfindingComponent;
+class UUnitInfoBar;
 
 UCLASS()
 class PROCGENTESTING_API ATBPlayerCharacter : public AActor, public IHasPathfinding, public ISelectable
@@ -19,14 +20,16 @@ class PROCGENTESTING_API ATBPlayerCharacter : public AActor, public IHasPathfind
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* Origin;	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCapsuleComponent* MainCollider;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* TempMesh;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UArrowComponent* FrontFacingArrow;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UPathfindingComponent* PathfindingComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPlayerPathfindingComponent* PathfindingComponent;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -40,6 +43,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void Init();
+	
 	UPathfindingComponent* GetPathfindingComponent() const;
 	UPathfindingComponent* GetPathfindingComponent_Implementation() const;
 
@@ -56,5 +61,12 @@ public:
 	void OnMouseUnSelect_Implementation();
 
 private:
+	void DisplayInfo();
+	
 	bool bCanBeSelected;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "User Interface", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> InfoWidgetClass;
+	UUnitInfoBar* UnitInfoWidget;
+	
 };

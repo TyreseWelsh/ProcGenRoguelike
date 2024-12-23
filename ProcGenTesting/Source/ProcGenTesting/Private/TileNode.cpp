@@ -5,6 +5,10 @@
 
 #include "Interactable.h"
 #include "TileComponent.h"
+#include "TileColourHistory.h"
+#include "TileColour.h"
+
+#include "Selectable.h"
 
 // Sets default values
 ATileNode::ATileNode()
@@ -42,6 +46,8 @@ void ATileNode::BeginPlay()
 	TileComponent->GetTileTypeToExitDelegate()->AddUObject(this, &ATileNode::InitExit);
 
 	CalculateHeightLevel();
+
+	ColourHistory = NewObject<UTileColourHistory>(); 
 }
 
 // Called every frame
@@ -51,25 +57,40 @@ void ATileNode::Tick(float DeltaTime)
 
 }
 
-void ATileNode::AddTileColour_Implementation(FLinearColor NewColour)
+void ATileNode::AddTileColour_Implementation(UTileColour* NewTileColour)
 {
-	FLinearColor OverlayColour;
+	/*FLinearColor OverlayColour;
 	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
 	{
 		OverlayColour += NewColour;
 		OverlayColour.A = 1;
 		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
-	}
-	EnableHighlight();
-}
+	}*/
 
-void ATileNode::SubtractTileColour_Implementation(FLinearColor NewColour)
-{
 	FLinearColor OverlayColour;
 	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
 	{
-		OverlayColour -= NewColour;
-		OverlayColour.A = 1;
+		OverlayColour = ColourHistory->Add(NewTileColour);
+		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
+	}
+	//UE_LOG(LogTemp, Error, TEXT("Finished adding colour..."))
+	EnableHighlight();
+}
+
+void ATileNode::SubtractTileColour_Implementation(UTileColour* NewTileColour)
+{
+	/*FLinearColor OverlayColour;
+    if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
+    {
+       	OverlayColour -= NewColour;
+       	OverlayColour.A = 1;
+       	DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
+    }*/
+
+	FLinearColor OverlayColour;
+	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
+	{
+		OverlayColour = ColourHistory->Remove(NewTileColour);
 		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
 	}
 	DisableHighlight();
@@ -161,27 +182,33 @@ void ATileNode::InitExit()
 
 void ATileNode::OnMouseHover_Implementation()
 {
-	AddTileColour_Implementation(HoverColour);
+	TObjectPtr<UTileColour> NewTileColour = NewObject<UTileColour>();
+	NewTileColour->Init(HoverColour, this);
+	AddTileColour_Implementation(NewTileColour);
+
 }
 
 void ATileNode::OnMouseUnHover_Implementation()
 {
-	SubtractTileColour_Implementation(HoverColour);
+	TObjectPtr<UTileColour> NewTileColour = NewObject<UTileColour>();
+	NewTileColour->Init(HoverColour, this);
+	SubtractTileColour_Implementation(NewTileColour);
 }
 
 void ATileNode::OnMouseLeft_Implementation()
 {
 	bIsSelected = true;
-	AddTileColour_Implementation(SelectColour);
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Highcounter on click = %i"), HighlightCounter));
+	
+	UTileColour* NewTileColour = NewObject<UTileColour>();
+	NewTileColour->Init(SelectColour, this);
+	AddTileColour_Implementation(NewTileColour);
+	
 	if (AActor* OccupyingObject = TileComponent->GetOccupyingObject())
 	{
-		if (OccupyingObject->Implements<UInteractable>())
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("INTERACTING")));
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Tile selected...")));
 
-			IInteractable::Execute_OnLeftClick(OccupyingObject);
-		}
+		ISelectable::Execute_OnMouseLeft(OccupyingObject);
+		//IInteractable::Execute_OnLeftClick(OccupyingObject);
 	}
 }
 
@@ -192,7 +219,10 @@ void ATileNode::OnMouseRight_Implementation()
 void ATileNode::OnMouseUnSelect_Implementation()
 {
 	bIsSelected = false;
-	SubtractTileColour_Implementation(SelectColour);
+	
+	UTileColour* NewTileColour = NewObject<UTileColour>();
+	NewTileColour->Init(SelectColour, this);
+	SubtractTileColour_Implementation(NewTileColour);
 }
 
 void ATileNode::CalculateHeightLevel()

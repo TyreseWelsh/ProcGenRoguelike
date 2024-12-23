@@ -54,6 +54,12 @@ public:
 	FVector RightTeleporterPos = FVector::ZeroVector;
 
 
+	TObjectPtr<ATeleportPoint> LeftTeleportPoint;
+	TObjectPtr<ATeleportPoint> RightTeleportPoint;
+	
+	ATeleportPoint* GetLeftTeleportPoint() { return LeftTeleportPoint; }
+	ATeleportPoint* GetRightTeleportPoint() { return RightTeleportPoint; }
+
 private:
 	void InitPathGenCollider();
 	

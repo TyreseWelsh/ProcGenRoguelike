@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "HasActionStates.h"
 #include "GameFramework/PlayerController.h"
 #include "StrategyPlayerController.generated.h"
 
@@ -11,12 +12,13 @@ class UInputAction;
 struct FInputActionValue;
 
 class UTileComponent;
+class UTBActionBase;
 
 /**
  * 
  */
 UCLASS()
-class PROCGENTESTING_API AStrategyPlayerController : public APlayerController
+class PROCGENTESTING_API AStrategyPlayerController : public APlayerController, public IHasActionStates
 {
 	GENERATED_BODY()
 
@@ -26,7 +28,16 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	
 public:
-	
+	UFUNCTION()
+	void SetCurrentAction(UTBActionBase* NewAction);
+	UFUNCTION()
+	UTBActionBase* GetCurrentAction() const { return CurrentAction; }
+	UFUNCTION()
+	UTileComponent* GetCurrentHoveredTileComponent() const { return CurrentHoveredTileComponent; }
+	UFUNCTION()
+	UTileComponent* GetCurrentSelectedTileComponent() const { return CurrentSelectedTileComponent; }
+
+	void EndAction_Implementation();
 	
 private:
 	// Input
@@ -72,6 +83,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = CameraInput, meta = (AllowPrivateAccess = "true"))
 	UInputAction* CameraMiddleScrollAction;
 
+	//EPlayerState CurrentPlayerState = EPlayerState::Open;
+	UPROPERTY()
+	TObjectPtr<UTBActionBase> CurrentAction;
 	//
 	FVector ScreenMousePosition;
 	FVector InitialScreenMousePosition;

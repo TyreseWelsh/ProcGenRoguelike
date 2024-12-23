@@ -10,6 +10,7 @@ class UMapRoom;
 class FastNoiseLite;
 class AExitGenerator;
 struct FRoomData;
+class URoomContentsManager;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROCMAPGENERATION_API UMapGeneratorComponent : public UActorComponent
@@ -27,12 +28,10 @@ public:
 	// Helper functions
 	float CalculateNodeXPos(int Index);
 	float CalculateNodeYPos(int Index);
-	/*float RoundToTileSizeMultiple(float OldValue, bool bRoundUp);
-	FVector2D ConvertIndex1Dto2D(int index);
-	int ConvertIndex2DTo1D(FVector2D Index2D);
-	int CalculateMapIndexFromTilePos(FVector TilePos);*/
 
 	float CalculateTileHeight(int x, int y);
+
+	void AddToMapRooms(UMapRoom* NewRoom);
 
 protected:
 	// Called when the game starts
@@ -58,6 +57,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Map")
 	TSubclassOf<AActor> TileClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
+	TSubclassOf<URoomContentsManager> RoomContentsManagerClass;
+	UPROPERTY()
+	TObjectPtr<URoomContentsManager> RoomContentsManager;
+	
 	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
 	FRoomData* InitialRoomData;*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Initial Room Data")
@@ -88,7 +92,7 @@ public:
 
 	// Other properties
 	UPROPERTY()
-	TArray<UMapRoom*> LeafRooms;			
+	TArray<UMapRoom*> MapRooms;			
 	UPROPERTY()
 	TObjectPtr<UMapRoom> RootRoom;
 	UPROPERTY()

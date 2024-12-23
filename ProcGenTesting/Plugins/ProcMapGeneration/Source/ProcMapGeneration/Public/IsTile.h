@@ -7,6 +7,7 @@
 #include "IsTile.generated.h"
 
 class UTileComponent;
+class UTileColour;
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -28,8 +29,8 @@ public:
 	UTileComponent* GetTileComponent();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void AddTileColour(FLinearColor NewColour);
+	void AddTileColour(UTileColour* NewColour);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void SubtractTileColour(FLinearColor NewColour);
+	void SubtractTileColour(UTileColour* NewColour);
 };

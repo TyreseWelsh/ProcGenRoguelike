@@ -64,6 +64,7 @@ public:
 	int CalculateRightRoomSize(const int SplitLocation, const int RoomEnd);
 
 	FRoomData GetRoomData() { return RoomData; }
+	TArray<AActor*> GetRoomTiles() { return RoomTiles; }
 	
 	// Debug Properties - All but "RoomColour" will be set on initialisation by the assigned MapGenerator
 	bool bDebugEnabled = false;

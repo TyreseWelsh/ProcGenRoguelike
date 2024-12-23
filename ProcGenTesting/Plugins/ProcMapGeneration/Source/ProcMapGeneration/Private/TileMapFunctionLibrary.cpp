@@ -81,14 +81,9 @@ bool UTileMapFunctionLibrary::OccupyTile(AActor* OccupyingActor)
 	{
 		if (!IIsTile::Execute_GetTileComponent(Tile)->GetOccupyingObject())
 		{
-			IIsTile::Execute_GetTileComponent(Tile)->SetOccupyingActor(OccupyingActor);
+			IIsTile::Execute_GetTileComponent(Tile)->SetOccupyingObject(OccupyingActor);
 			return true;
 		}
-		return false;
 	}
-	else
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "No tile underneath");
-		return false;
-	}
+	return false;
 }

@@ -9,6 +9,8 @@
 #include "IsTile.h"
 #include "FastNoiseLite.h"
 #include "TileMapFunctionLibrary.h"
+#include "RoomContentsManager.h"
+#include "TeleportPoint.h"
 
 
 // Sets default values for this component's properties
@@ -27,8 +29,8 @@ void UMapGeneratorComponent::InitMap()
 	RootRoom = nullptr;
 	for(AExitGenerator* Exit : AllRoomExits)
 	{
-		Exit->GetLeftTeleportPoint()->Destroy();
-		Exit->GetRightTeleportPoint()->Destroy();
+		/*Exit->GetLeftTeleportPos()->Destroy();
+		Exit->GetRightTeleportPos()->Destroy();*/
 		Exit->Destroy();
 	}
 	AllRoomExits.Empty();
@@ -87,6 +89,9 @@ void UMapGeneratorComponent::InitMap()
 			}
 		}
 	}
+
+	RoomContentsManager = NewObject<URoomContentsManager>(this, RoomContentsManagerClass);
+	RoomContentsManager->FindSpawnRoom(MapRooms);
 }
 
 float UMapGeneratorComponent::CalculateNodeXPos(int Index)
@@ -105,6 +110,14 @@ float UMapGeneratorComponent::CalculateTileHeight(int x, int y)
 	FVector2D MapIndex2D = UTileMapFunctionLibrary::ConvertIndex1Dto2D(MapIndex1D, RootRoom->GetRoomData().SizeX, TileSize);
 	
 	return HeightNoise->GetNoise(MapIndex2D.X, MapIndex2D.Y);
+}
+
+void UMapGeneratorComponent::AddToMapRooms(UMapRoom* NewRoom)
+{
+	if(NewRoom)
+	{
+		MapRooms.Add(NewRoom);
+	}
 }
 
 // Called when the game starts

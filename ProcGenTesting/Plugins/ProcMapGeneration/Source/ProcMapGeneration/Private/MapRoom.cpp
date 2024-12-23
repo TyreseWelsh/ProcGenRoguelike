@@ -41,6 +41,7 @@ void UMapRoom::InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* Paren
 		else
 		{
 			// Can no longer split room
+			MapGenerator->AddToMapRooms(this);
 			GenerateTiles();
 		}	
 	}
@@ -72,6 +73,7 @@ void UMapRoom::SplitRoom()
 		SplitPercent = 0.5f;
 		if(MinRoomSize > (SplitPercent * RoomData.SizeY))
 		{
+			MapGenerator->AddToMapRooms(this);
 			GenerateTiles();
 			return;
 		}
@@ -92,6 +94,7 @@ void UMapRoom::SplitRoom()
 		SplitPercent = 0.5f;
 		if(MinRoomSize > (SplitPercent * RoomData.SizeX))
 		{
+			MapGenerator->AddToMapRooms(this);
 			GenerateTiles();
 			return;
 		}

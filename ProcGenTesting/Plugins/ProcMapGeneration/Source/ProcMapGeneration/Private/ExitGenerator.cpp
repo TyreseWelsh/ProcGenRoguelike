@@ -8,6 +8,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "TeleportPoint.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AExitGenerator::AExitGenerator()
@@ -24,32 +25,28 @@ AExitGenerator::AExitGenerator()
 	PathGenCollider->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
 	PathGenCollider->SetCollisionResponseToAllChannels(ECR_Ignore);
 	PathGenCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECR_Overlap);
-	PathGenCollider->SetHiddenInGame(true);
+	PathGenCollider->SetHiddenInGame(false);
 	PathGenCollider->SetupAttachment(Origin);
-
-	
 }
 
 void AExitGenerator::Init(int _TileSize)
 {
 	TileSize = _TileSize;
+	//PathGenCollider->SetRelativeLocation(FVector(TileSize / 2, 0, 0));
 
 	PathGenCollider->SetCapsuleRadius(TileSize / 4);
-	//InitPathGenCollider();
-	CalculateRelativeExits();
+	InitPathGenCollider();
 }
 
-void AExitGenerator::CalculateRelativeExits()
+void AExitGenerator::CalculateRelativeExitTiles()
 {
 	FVector OffsetVector = GetActorRightVector() * FVector(PathGenCollider->GetRelativeLocation().X, 0, 0);
 	
-	LeftTeleporterPos = (GetActorLocation() + OffsetVector) - GetActorRightVector() * TileSize;
-	LeftTeleporterPos.Z += TileSize * 2;
-	RightTeleporterPos = (GetActorLocation() + OffsetVector) + GetActorRightVector() * TileSize;
-	RightTeleporterPos.Z += TileSize * 2;
+	LeftExitTilePos = (GetActorLocation() + OffsetVector) - GetActorRightVector() * TileSize;
+	RightExitTilePos = (GetActorLocation() + OffsetVector) + GetActorRightVector() * TileSize;
 
-	LeftTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), LeftTeleporterPos, FRotator::ZeroRotator);
-	RightTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), RightTeleporterPos, FRotator::ZeroRotator);
+	LeftTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), LeftExitTilePos, FRotator(0, 0, 0));
+	RightTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), RightExitTilePos, FRotator(0, 0, 0));
 }
 
 void AExitGenerator::InitPathGenCollider()
@@ -62,7 +59,7 @@ void AExitGenerator::InitPathGenCollider()
 	int NewYPos = (PathOffset * TileSize) * FMath::RandRange(-1, 1);
 	PathGenCollider->AddRelativeLocation(FVector(0, NewYPos, 0));
 
-	CalculateRelativeExits();
+	CalculateRelativeExitTiles();
 }
 
 // Called when the game starts or when spawned

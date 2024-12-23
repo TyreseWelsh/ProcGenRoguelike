@@ -7,9 +7,13 @@
 #include "InputActionValue.h"
 #include "HasPathfinding.h"
 #include "PathfindingComponent.h"
+#include "TBActionBase.h"
+#include "PlayerActionOpen.h"
 #include "TileMapFunctionLibrary.h"
 #include "ProcMapGeneration/Public/TileComponent.h"
-#include "ProcMapGeneration/Public/IsTile.h"
+#include "IsTile.h"
+#include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 
 void AStrategyPlayerController::BeginPlay()
 {
@@ -22,10 +26,13 @@ void AStrategyPlayerController::BeginPlay()
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "ERROR: Cant get Enhanced Input Subsystem");
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "ERROR: Cant get Enhanced Input Subsystem");
 	}
 
 	PlayerCam = GetPawn();
+
+	UTBActionBase* DefaultAction = NewObject<UPlayerActionOpen>();
+	SetCurrentAction(DefaultAction);
 }
 
 void AStrategyPlayerController::SetupInputComponent()
@@ -69,27 +76,33 @@ void AStrategyPlayerController::Tick(float DeltaTime)
 	{
 		if (AActor* HitTile = UTileMapFunctionLibrary::GetBelowTile(HitResult.Location, GetWorld()))
 		{
-			if(HitTile->Implements<UIsTile>())
+			if(UTileComponent* NewTileComponent = IIsTile::Execute_GetTileComponent(HitTile))
 			{
-				if(UTileComponent* NewTileComponent = IIsTile::Execute_GetTileComponent(HitTile))
+				if(NewTileComponent != CurrentHoveredTileComponent)
 				{
-					if(NewTileComponent != CurrentHoveredTileComponent)
-					{
-						// Unhovering previous hovered tile first
-						if(IsValid(CurrentHoveredTileComponent))
-						{
-							CurrentHoveredTileComponent->TileUnHover();
-						}
-
-						CurrentHoveredTileComponent = NewTileComponent;
-						CurrentHoveredTileComponent->TileHover();
-					}
-
-					FindPathFromSelected();
+					//
+					CurrentAction->OnHover(CurrentHoveredTileComponent, NewTileComponent);
+					
+					CurrentHoveredTileComponent = NewTileComponent;
 				}
 			}
 		}
 	}
+}
+
+void AStrategyPlayerController::SetCurrentAction(UTBActionBase* NewAction)
+{
+	CurrentAction = NewAction;
+	CurrentAction->GetActionEndDelegate()->BindUObject(this, &AStrategyPlayerController::EndAction_Implementation);
+}
+
+void AStrategyPlayerController::EndAction_Implementation()
+{
+	/*CurrentAction->End();
+	CurrentAction->GetActionEndDelegate()->Unbind();*/
+	
+	UTBActionBase* DefaultAction = NewObject<UPlayerActionOpen>();
+	SetCurrentAction(DefaultAction);
 }
 
 void AStrategyPlayerController::PlayerLeftClick()
@@ -97,22 +110,16 @@ void AStrategyPlayerController::PlayerLeftClick()
 	// If the tile we're hovering to select is not already selected
 	if(CurrentHoveredTileComponent != CurrentSelectedTileComponent)
 	{
-		if(IsValid(CurrentSelectedTileComponent))
-		{
-			CurrentSelectedTileComponent->TileUnSelect();
-		}
-
 		CurrentSelectedTileComponent = CurrentHoveredTileComponent;
-		CurrentSelectedTileComponent->TileLeftClick();
 
-		FindPathFromSelected();
+		//
+		CurrentAction->OnLeftClick(CurrentSelectedTileComponent);
 	}
 }
 
 void AStrategyPlayerController::PlayerRightClick()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("Right click")));
-
+	CurrentAction->OnRightClick();
 }
 
 void AStrategyPlayerController::EnableCameraRotation()
@@ -168,12 +175,12 @@ void AStrategyPlayerController::FindPathFromSelected()
 		{
 			if (UPathfindingComponent* PathfinderComponent = IHasPathfinding::Execute_GetPathfindingComponent(PlayerCam))
 			{
-				PathfinderComponent->HighlightTilesInRange(CurrentSelectedTileComponent, PathfinderComponent->GetMoveDistance());
+				//PathfinderComponent->HighlightTiles(PathfinderComponent->AttemptPathfinding(CurrentSelectedTileComponent, CurrentHoveredTileComponent));
+				//PathfinderComponent->HighlightTilesInRange(CurrentSelectedTileComponent, PathfinderComponent->GetMoveDistance());
 			}
 			else
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("ERROR: Couldnt get pathfinding component...")));
-
 			}
 		}
 		else

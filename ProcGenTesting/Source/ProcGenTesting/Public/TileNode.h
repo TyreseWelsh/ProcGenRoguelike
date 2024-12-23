@@ -9,6 +9,8 @@
 #include "TileNode.generated.h"
 
 class UTileComponent;
+class UTileColourHistory;
+class UTileColour;
 
 UCLASS()
 class PROCGENTESTING_API ATileNode : public AActor, public IIsTile, public ISelectable
@@ -50,11 +52,11 @@ public:
 	UTileComponent* GetTileComponent();
 	virtual UTileComponent* GetTileComponent_Implementation() override { return TileComponent; }
 
-	void AddTileColour(FLinearColor NewColour);
-	void AddTileColour_Implementation(FLinearColor NewColour);
+	void AddTileColour(UTileColour* NewColour);
+	void AddTileColour_Implementation(UTileColour* NewTileColour);
 	
-	void SubtractTileColour(FLinearColor NewColour);
-	void SubtractTileColour_Implementation(FLinearColor NewColour);
+	void SubtractTileColour(UTileColour* NewColour);
+	void SubtractTileColour_Implementation(UTileColour* NewTileColour);
 	
 	void EnableHighlight();
 	void DisableHighlight();
@@ -78,6 +80,9 @@ private:
 	UPROPERTY()
 	int HighlightCounter = 0;
 	bool bIsSelected = false;
+
+	UPROPERTY()
+	UTileColourHistory* ColourHistory;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FLinearColor HoverColour;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

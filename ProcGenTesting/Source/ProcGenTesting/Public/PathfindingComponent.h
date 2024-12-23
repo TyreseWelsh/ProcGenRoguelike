@@ -6,6 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "PathfindingComponent.generated.h"
 
+DECLARE_DELEGATE(FOnMovementEndSignature);
+
+
 class UTileComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -25,14 +28,45 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	TArray<AActor*> AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile);
-	void HighlightTilesInRange(UTileComponent* StartTile, int Range);
-	
-	void HighlightTiles(TArray<AActor*> TilesToHighlight);
-	void UnHighlightTiles(TArray<AActor*> TilesToUnHighlight);
+	void Init();
+	UFUNCTION()
+	virtual void Move();
 
-	TArray<AActor*> GetTilesInRange(UTileComponent* StartTile, int Range);
-	int GetMoveDistance() { return MoveDistance; }
+	TArray<AActor*> AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile);
+	void HighlightTilesInNewPath(UTileComponent* StartTile, UTileComponent* TargetTile, FLinearColor HighlightColour);
+	void HighlightTilesInRange(UTileComponent* StartTile, int Range, FLinearColor HighlightColour);
+	
+	void HighlightTiles(TArray<AActor*> TilesToHighlight, FLinearColor HighlightColour);
+	void UnHighlightTiles(TArray<AActor*> TilesToUnHighlight, FLinearColor UnHighlightColour);
+
+	TArray<AActor*> FindTilesInRange(UTileComponent* StartTile, int Range);
+	TArray<AActor*> FindValidTiles();
+	
+	int GetMoveDistance() const { return MoveDistance; }
+	TArray<AActor*> GetCurrentPath() const { return Path; }
+	TArray<AActor*> GetTilesInRange() const { return TilesInRange; }
+	TArray<AActor*> GetValidTiles() const { return ValidTiles; }
+
+	FOnMovementEndSignature* GetMovementEndDelegate() { return &MovementEndDelegate; }
+	
+protected:
+	UPROPERTY()
+	FTimerHandle HighlightPathTimerHandle;
+	FTimerDelegate HighlightPathTimerDelegate;
+	
+	UPROPERTY()
+	TArray<AActor*> Path;
+
+	FOnMovementEndSignature MovementEndDelegate;
+	
+	//
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Pathfinding", meta=(AllowPrivateAccess=true))
+	int MoveDistance;
+	UPROPERTY()
+	TArray<AActor*> TilesInRange;
+	
+	UPROPERTY()
+	TArray<AActor*> ValidTiles;
 	
 private:
 	TArray<AActor*> RetracePath(UTileComponent* StartNode, UTileComponent* TargetNode);
@@ -42,12 +76,6 @@ private:
 	
 	TArray<UTileComponent*> OpenSet;
 	TArray<UTileComponent*> ClosedSet;
-	UPROPERTY()
-	TArray<AActor*> Path;
-	
-	//
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	int MoveDistance;
-	UPROPERTY()
-	TArray<AActor*> TilesInRange;
+
+
 };

@@ -8,7 +8,7 @@ public class ProcGenTesting : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Paper2D", "PaperZD", "ProcMapGeneration" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Paper2D", "PaperZD", "ProcMapGeneration", "UMG", "TyresesUI" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
