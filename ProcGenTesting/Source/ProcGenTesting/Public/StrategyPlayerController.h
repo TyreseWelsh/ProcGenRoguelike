@@ -29,13 +29,15 @@ protected:
 	
 public:
 	UFUNCTION()
-	void SetCurrentAction(UTBActionBase* NewAction) { CurrentAction = NewAction; }
+	void SetCurrentAction(UTBActionBase* NewAction);
 	UFUNCTION()
 	UTBActionBase* GetCurrentAction() const { return CurrentAction; }
 	UFUNCTION()
 	UTileComponent* GetCurrentHoveredTileComponent() const { return CurrentHoveredTileComponent; }
 	UFUNCTION()
 	UTileComponent* GetCurrentSelectedTileComponent() const { return CurrentSelectedTileComponent; }
+
+	void EndAction_Implementation();
 	
 private:
 	// Input

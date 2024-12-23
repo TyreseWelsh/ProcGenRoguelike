@@ -7,6 +7,10 @@ void UTBActionBase::Init(AActor* NewUnit)
 {
 }
 
+void UTBActionBase::End()
+{
+}
+
 void UTBActionBase::OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile)
 {
 }

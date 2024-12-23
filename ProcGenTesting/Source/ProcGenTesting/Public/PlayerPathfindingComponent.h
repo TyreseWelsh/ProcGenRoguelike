@@ -18,15 +18,27 @@ public:
 	//
 	UFUNCTION()
 	void FindMovementTiles();
+	UFUNCTION()
 	void StartMove();
+	
+	virtual void Move() override;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
+	void MoveToNextTile();
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Pathfinding", meta = (AllowPrivateAccess = "true"))
 	FLinearColor MoveableColour;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Pathfinding", meta = (AllowPrivateAccess = "true"))
 	FLinearColor UnMoveableColour;
+
+	UPROPERTY()
+	FTimerHandle MoveTimerHandle;
+	FTimerDelegate MoveTimerDelegate;
+
+	int TargetIndex = 0;
 };

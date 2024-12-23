@@ -40,7 +40,10 @@ void UPathfindingComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UPathfindingComponent::Init()
 {
+}
 
+void UPathfindingComponent::Move()
+{
 }
 
 TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile)

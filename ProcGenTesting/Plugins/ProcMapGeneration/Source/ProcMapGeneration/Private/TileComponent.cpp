@@ -96,11 +96,13 @@ void UTileComponent::FindNeighbourTiles()
 			}
 
 			FVector NeighbourTilePos = FVector(GetOwner()->GetActorLocation().X + (x * TileSize), GetOwner()->GetActorLocation().Y + (y * TileSize), GetOwner()->GetActorLocation().Z);
-
-			AActor* NeighbourTile = UTileMapFunctionLibrary::GetBelowTile(NeighbourTilePos, GetOwner()->GetWorld());
-			if(UTileComponent* NeighbourTileComponent = IIsTile::Execute_GetTileComponent(NeighbourTile))
+			
+			if(AActor* NeighbourTile = UTileMapFunctionLibrary::GetBelowTile(NeighbourTilePos, GetOwner()->GetWorld()))
 			{
-				NeighbourTiles.AddUnique(NeighbourTileComponent);
+				if(UTileComponent* NeighbourTileComponent = IIsTile::Execute_GetTileComponent(NeighbourTile))
+				{
+					NeighbourTiles.AddUnique(NeighbourTileComponent);
+				}
 			}
 		}
 	}

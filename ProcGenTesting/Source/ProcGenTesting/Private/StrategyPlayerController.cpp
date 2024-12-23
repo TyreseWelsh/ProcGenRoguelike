@@ -32,7 +32,7 @@ void AStrategyPlayerController::BeginPlay()
 	PlayerCam = GetPawn();
 
 	UTBActionBase* DefaultAction = NewObject<UPlayerActionOpen>();
-	CurrentAction = DefaultAction;
+	SetCurrentAction(DefaultAction);
 }
 
 void AStrategyPlayerController::SetupInputComponent()
@@ -88,6 +88,21 @@ void AStrategyPlayerController::Tick(float DeltaTime)
 			}
 		}
 	}
+}
+
+void AStrategyPlayerController::SetCurrentAction(UTBActionBase* NewAction)
+{
+	CurrentAction = NewAction;
+	CurrentAction->GetActionEndDelegate()->BindUObject(this, &AStrategyPlayerController::EndAction_Implementation);
+}
+
+void AStrategyPlayerController::EndAction_Implementation()
+{
+	/*CurrentAction->End();
+	CurrentAction->GetActionEndDelegate()->Unbind();*/
+	
+	UTBActionBase* DefaultAction = NewObject<UPlayerActionOpen>();
+	SetCurrentAction(DefaultAction);
 }
 
 void AStrategyPlayerController::PlayerLeftClick()

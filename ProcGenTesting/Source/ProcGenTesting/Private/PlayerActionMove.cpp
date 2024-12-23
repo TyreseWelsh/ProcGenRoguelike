@@ -21,6 +21,18 @@ void UPlayerActionMove::Init(AActor* NewUnit)
 	StartMove();
 }
 
+void UPlayerActionMove::End()
+{
+	UnitPathfindingComponent->UnHighlightTiles(UnitPathfindingComponent->GetValidTiles(), FLinearColor::Green);
+	bPlanningMove = true;
+
+	if(ActionEndDelegate.IsBound())
+	{
+		ActionEndDelegate.Execute();
+	}
+	ActionEndDelegate.Unbind();
+}
+
 void UPlayerActionMove::OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile)
 {
 	if(bPlanningMove)
@@ -81,17 +93,20 @@ void UPlayerActionMove::StartMove()
 	IsValid(UnitStartingTile))
 	{
 		UnitPathfindingComponent->HighlightTilesInRange(UnitStartingTile, UnitPathfindingComponent->GetMoveDistance(), FLinearColor::Blue);
-		//MovingUnit->GetWorld()->GetTimerManager().SetTimer(PlanMoveTimerHandle, PlanMoveTimerDelegate, 0.05f, true);
 	}
 }
 
 void UPlayerActionMove::EndMove(UTileComponent* SelectedTile)
 {
 	bPlanningMove = false;
-	UnitPathfindingComponent->UnHighlightTiles(UnitPathfindingComponent->GetTilesInRange(), FLinearColor::Blue);
-	
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString(TEXT("Unit Moving...")));
-	// Call unit PathfindingComponent Move function
+	if(IsValid(UnitPathfindingComponent))
+	{
+		UnitPathfindingComponent->UnHighlightTiles(UnitPathfindingComponent->GetTilesInRange(), FLinearColor::Blue);
+		
+		// Call unit PathfindingComponent Move function
+		UnitPathfindingComponent->GetMovementEndDelegate()->BindUObject(this, &UPlayerActionMove::End);
+		UnitPathfindingComponent->Move();
+	}
 }
 
 void UPlayerActionMove::CancelMove()

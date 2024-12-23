@@ -6,6 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "PathfindingComponent.generated.h"
 
+DECLARE_DELEGATE(FOnMovementEndSignature);
+
+
 class UTileComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -26,6 +29,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Init();
+	UFUNCTION()
+	virtual void Move();
 
 	TArray<AActor*> AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile);
 	void HighlightTilesInNewPath(UTileComponent* StartTile, UTileComponent* TargetTile, FLinearColor HighlightColour);
@@ -42,21 +47,17 @@ public:
 	TArray<AActor*> GetTilesInRange() const { return TilesInRange; }
 	TArray<AActor*> GetValidTiles() const { return ValidTiles; }
 
+	FOnMovementEndSignature* GetMovementEndDelegate() { return &MovementEndDelegate; }
+	
 protected:
 	UPROPERTY()
 	FTimerHandle HighlightPathTimerHandle;
 	FTimerDelegate HighlightPathTimerDelegate;
 	
-private:
-	TArray<AActor*> RetracePath(UTileComponent* StartNode, UTileComponent* TargetNode);
-	int GetDistance(UTileComponent* TileA, UTileComponent* TileB) const;
-	int GetDistanceX(UTileComponent* TileA, UTileComponent* TileB) const;
-	int GetDistanceY(UTileComponent* TileA, UTileComponent* TileB) const;
-	
-	TArray<UTileComponent*> OpenSet;
-	TArray<UTileComponent*> ClosedSet;
 	UPROPERTY()
 	TArray<AActor*> Path;
+
+	FOnMovementEndSignature MovementEndDelegate;
 	
 	//
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Pathfinding", meta=(AllowPrivateAccess=true))
@@ -66,5 +67,15 @@ private:
 	
 	UPROPERTY()
 	TArray<AActor*> ValidTiles;
+	
+private:
+	TArray<AActor*> RetracePath(UTileComponent* StartNode, UTileComponent* TargetNode);
+	int GetDistance(UTileComponent* TileA, UTileComponent* TileB) const;
+	int GetDistanceX(UTileComponent* TileA, UTileComponent* TileB) const;
+	int GetDistanceY(UTileComponent* TileA, UTileComponent* TileB) const;
+	
+	TArray<UTileComponent*> OpenSet;
+	TArray<UTileComponent*> ClosedSet;
+
 
 };

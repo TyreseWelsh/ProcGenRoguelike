@@ -10,6 +10,10 @@ void UPlayerActionOpen::Init(AActor* NewUnit)
 	Super::Init(NewUnit);
 }
 
+void UPlayerActionOpen::End()
+{
+}
+
 void UPlayerActionOpen::OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile)
 {
 	Super::OnHover(CurrentHoveredTile, NewHoveredTile);

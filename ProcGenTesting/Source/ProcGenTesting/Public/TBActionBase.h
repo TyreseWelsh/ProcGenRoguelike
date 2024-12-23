@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "TBActionBase.generated.h"
 
+DECLARE_DELEGATE(FOnActionEndSignature);
+
 class AActor;
 class UTileComponent;
 
@@ -18,7 +20,14 @@ class PROCGENTESTING_API UTBActionBase : public UObject
 
 public:
 	virtual void Init(AActor* NewUnit);
+	UFUNCTION()
+	virtual void End();
 	virtual void OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile);
 	virtual void OnLeftClick(UTileComponent* SelectedTile);
 	virtual void OnRightClick();
+
+	FOnActionEndSignature* GetActionEndDelegate() { return &ActionEndDelegate; }
+	
+protected:
+	FOnActionEndSignature ActionEndDelegate;
 };

@@ -19,6 +19,7 @@ class PROCGENTESTING_API UPlayerActionOpen : public UTBActionBase
 
 public:
 	virtual void Init(AActor* NewUnit) override;
+	virtual void End();
 	virtual void OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile) override;
 	virtual void OnLeftClick(UTileComponent* SelectedTile) override;
 	virtual void OnRightClick() override;
