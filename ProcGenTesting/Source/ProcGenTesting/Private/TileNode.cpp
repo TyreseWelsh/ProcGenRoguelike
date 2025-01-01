@@ -88,22 +88,24 @@ void ATileNode::SubtractTileColour_Implementation(UTileColour* NewTileColour)
 	FLinearColor OverlayColour;
 	if(ColourHistory->Remove(NewTileColour, OverlayColour))
 	{
+		HighlightCounter--;
 		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Red, FString::Printf(TEXT("Unihighlight Tile")));
 
-		//DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), FLinearColor::White);
 		DisableHighlight();
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Purple, FString::Printf(TEXT("Finished subtracting color")));
+
 }
 
 // ERROR: PROBLEM OF SOME TILES NOT HIGHLIGHTING
 void ATileNode::EnableHighlight()
 {
 	HighlightCounter++;
-	//GEngine->AddOnScreenDebugMessage(-1, 1000.f, FColor::Yellow, FString::Printf(TEXT("%s is highlighted - %i"), *GetName(), HighlightCounter));
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("%s is highlighted - %i"), *GetName(), HighlightCounter));
 
 	/*if (HighlightCounter > 0)
 	{*/
@@ -115,11 +117,11 @@ void ATileNode::EnableHighlight()
 void ATileNode::DisableHighlight()
 {
 	HighlightCounter--;
-	GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("%s's HighlightCounter = %i"), *GetName(), HighlightCounter));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("%s's HighlightCounter = %i"), *GetName(), HighlightCounter));
 
 	if (HighlightCounter <= 0)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("%s is unhighlighted - %i"), *GetName(), HighlightCounter));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("%s is unhighlighted - %i"), *GetName(), HighlightCounter));
 
 		HighlightCounter = 0;
 		float HighlightLevel = 0;
@@ -201,6 +203,8 @@ void ATileNode::OnMouseHover_Implementation()
 
 void ATileNode::OnMouseUnHover_Implementation()
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Black, FString::Printf(TEXT("UNHOVER")));
+
 	TObjectPtr<UTileColour> NewTileColour = NewObject<UTileColour>();
 	NewTileColour->Init(HoverColour, this);
 	SubtractTileColour_Implementation(NewTileColour);
