@@ -33,4 +33,6 @@ public:
 	static AActor* GetBelowTile(FVector StartingPos, UWorld* CurrentWorld);
 	UFUNCTION(BlueprintCallable)
 	static bool OccupyTile(AActor* OccupyingActor);
+	UFUNCTION(BlueprintCallable)
+	static bool UnOccupyTile(AActor* UnOccupyingActor);
 };

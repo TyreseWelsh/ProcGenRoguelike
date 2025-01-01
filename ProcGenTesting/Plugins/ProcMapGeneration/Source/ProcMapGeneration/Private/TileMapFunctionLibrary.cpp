@@ -87,3 +87,16 @@ bool UTileMapFunctionLibrary::OccupyTile(AActor* OccupyingActor)
 	}
 	return false;
 }
+
+bool UTileMapFunctionLibrary::UnOccupyTile(AActor* UnOccupyingActor)
+{
+	if (AActor* Tile = GetBelowTile(UnOccupyingActor))
+	{
+		if (IIsTile::Execute_GetTileComponent(Tile)->GetOccupyingObject())
+		{
+			IIsTile::Execute_GetTileComponent(Tile)->SetOccupyingObject(nullptr);
+			return true;
+		}
+	}
+	return false;
+}

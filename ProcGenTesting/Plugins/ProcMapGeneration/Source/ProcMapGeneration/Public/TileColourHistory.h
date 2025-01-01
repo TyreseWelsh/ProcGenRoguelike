@@ -17,11 +17,11 @@ class PROCMAPGENERATION_API UTileColourHistory : public UObject
 	GENERATED_BODY()
 
 public:
-	FLinearColor Add(UTileColour* NewColour);
-	FLinearColor Remove(UTileColour* NewColour);
+	bool Add(UTileColour* NewColour, FLinearColor& OutColour);
+	bool Remove(UTileColour* NewColour, FLinearColor& OutColour);
 	
 private:
-	FLinearColor EvaluateColour();
+	bool EvaluateColour(FLinearColor& OutColour);
 
 	//UPROPERTY()
 	TArray<UTileColour*> ColourHistory;

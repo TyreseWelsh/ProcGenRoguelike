@@ -55,7 +55,7 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 		{
 			UTileColour* NewTileColour = NewObject<UTileColour>();
 			NewTileColour->Init(FLinearColor::Green, GetOwner());
-			IIsTile::Execute_SubtractTileColour(PathTile, NewTileColour);
+			IIsTile::Execute_SubtractTileColour(PathTile, NewTileColour);		// Here is disabling the highlight
 		}
 	}
 	Path.Empty();
@@ -147,13 +147,13 @@ TArray<AActor*> UPathfindingComponent::RetracePath(UTileComponent* TargetNode, U
 
 	while(CurrentTile != StartNode)
 	{
-		Path.Add(CurrentTile->GetOwner());
+		Path.AddUnique(CurrentTile->GetOwner());
 		CurrentTile = CurrentTile->ParentTile;
 	}
 	//Path.Add(StartNode->GetOwner());
 	Algo::Reverse(Path);
 
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Found path of %i tiles!"), Path.Num()));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Found path of %i tiles!"), Path.Num()));
 	
 	return Path;
 }
@@ -188,7 +188,9 @@ TArray<AActor*> UPathfindingComponent::FindTilesInRange(UTileComponent* StartTil
 			}
 		}
 	}
-	
+
+	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, FString::Printf(TEXT("%i Tiles in range"), TilesInRange.Num()));
+
 	return TilesInRange;
 }
 
@@ -202,7 +204,7 @@ TArray<AActor*> UPathfindingComponent::FindValidTiles()
 		{
 			if(TilesInRange.Contains(Tile))
 			{
-				ValidTiles.Add(Tile);
+				ValidTiles.AddUnique(Tile);
 			}
 		}
 	}
@@ -231,6 +233,11 @@ void UPathfindingComponent::UnHighlightTiles(TArray<AActor*> TilesToUnHighlight,
 			UTileColour* NewTileColour = NewObject<UTileColour>();
 			NewTileColour->Init(UnHighlightColour, GetOwner());
 			IIsTile::Execute_SubtractTileColour(Tile, NewTileColour);
+		}
+		else
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Red, FString::Printf(TEXT("NOT A TILE")));
+
 		}
 	}
 }

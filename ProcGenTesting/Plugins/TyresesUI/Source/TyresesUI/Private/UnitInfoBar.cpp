@@ -2,3 +2,8 @@
 
 
 #include "UnitInfoBar.h"
+
+void UUnitInfoBar::Init(AActor* NewOwner)
+{
+	Owner = NewOwner;
+}

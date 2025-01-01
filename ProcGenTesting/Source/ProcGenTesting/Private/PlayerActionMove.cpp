@@ -23,14 +23,23 @@ void UPlayerActionMove::Init(AActor* NewUnit)
 
 void UPlayerActionMove::End()
 {
-	UnitPathfindingComponent->UnHighlightTiles(UnitPathfindingComponent->GetValidTiles(), FLinearColor::Green);
-	bPlanningMove = true;
-
-	if(ActionEndDelegate.IsBound())
+	if(UTileMapFunctionLibrary::OccupyTile(UnitPathfindingComponent->GetOwner()))
 	{
-		ActionEndDelegate.Execute();
+		UnitPathfindingComponent->UnHighlightTiles(UnitPathfindingComponent->GetValidTiles(), FLinearColor::Green);
+		UnitPathfindingComponent->GetCurrentPath().Empty();
+		bPlanningMove = true;
+
+		if(ActionEndDelegate.IsBound())
+		{
+			ActionEndDelegate.Broadcast();
+		}
+		ActionEndDelegate.RemoveAll(this);
 	}
-	ActionEndDelegate.Unbind();
+	else
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString(TEXT("MNOOOOO...")));
+
+	}
 }
 
 void UPlayerActionMove::OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile)
@@ -38,7 +47,8 @@ void UPlayerActionMove::OnHover(UTileComponent* CurrentHoveredTile, UTileCompone
 	if(bPlanningMove)
 	{
 		if(IsValid(UnitStartingTile) &&
-			IsValid(UnitPathfindingComponent))
+			IsValid(UnitPathfindingComponent)
+			&& CurrentHoveredTile != NewHoveredTile)
 		{
 			UnitPathfindingComponent->AttemptPathfinding(UnitStartingTile, NewHoveredTile);
 			UnitPathfindingComponent->HighlightTiles(UnitPathfindingComponent->FindValidTiles(), FLinearColor::Green);

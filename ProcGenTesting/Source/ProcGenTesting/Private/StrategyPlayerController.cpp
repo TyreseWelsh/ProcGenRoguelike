@@ -78,13 +78,13 @@ void AStrategyPlayerController::Tick(float DeltaTime)
 		{
 			if(UTileComponent* NewTileComponent = IIsTile::Execute_GetTileComponent(HitTile))
 			{
-				if(NewTileComponent != CurrentHoveredTileComponent)
-				{
+				/*if(NewTileComponent != CurrentHoveredTileComponent)
+				{*/
 					//
 					CurrentAction->OnHover(CurrentHoveredTileComponent, NewTileComponent);
 					
 					CurrentHoveredTileComponent = NewTileComponent;
-				}
+				//}
 			}
 		}
 	}
@@ -93,14 +93,13 @@ void AStrategyPlayerController::Tick(float DeltaTime)
 void AStrategyPlayerController::SetCurrentAction(UTBActionBase* NewAction)
 {
 	CurrentAction = NewAction;
-	CurrentAction->GetActionEndDelegate()->BindUObject(this, &AStrategyPlayerController::EndAction_Implementation);
+	CurrentAction->GetActionEndDelegate()->AddUObject(this, &AStrategyPlayerController::EndAction_Implementation);
 }
 
 void AStrategyPlayerController::EndAction_Implementation()
 {
-	/*CurrentAction->End();
-	CurrentAction->GetActionEndDelegate()->Unbind();*/
-	
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, FString::Printf(TEXT("Ended action - set default action")));
+
 	UTBActionBase* DefaultAction = NewObject<UPlayerActionOpen>();
 	SetCurrentAction(DefaultAction);
 }
@@ -110,6 +109,11 @@ void AStrategyPlayerController::PlayerLeftClick()
 	// If the tile we're hovering to select is not already selected
 	if(CurrentHoveredTileComponent != CurrentSelectedTileComponent)
 	{
+		if(IsValid(CurrentSelectedTileComponent))
+		{
+			CurrentSelectedTileComponent->TileUnSelect();
+		}
+		
 		CurrentSelectedTileComponent = CurrentHoveredTileComponent;
 
 		//

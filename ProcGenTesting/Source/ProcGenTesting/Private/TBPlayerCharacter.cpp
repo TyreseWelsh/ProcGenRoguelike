@@ -101,6 +101,7 @@ void ATBPlayerCharacter::DisplayInfo()
 		UnitInfoWidget = CreateWidget<UUnitInfoBar>(GetWorld(), InfoWidgetClass);
 		if(UnitInfoWidget)
 		{
+			UnitInfoWidget->Init(this);
 			UnitInfoWidget->AddToViewport();
 		}
 	}

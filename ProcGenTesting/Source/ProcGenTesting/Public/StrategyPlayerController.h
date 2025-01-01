@@ -98,7 +98,7 @@ private:
 	bool bCanPanCamera = false;
 
 	UPROPERTY()
-	UTileComponent* CurrentHoveredTileComponent;
+	TObjectPtr<UTileComponent> CurrentHoveredTileComponent;
 	UPROPERTY()
-	UTileComponent* CurrentSelectedTileComponent;
+	TObjectPtr<UTileComponent> CurrentSelectedTileComponent;
 };

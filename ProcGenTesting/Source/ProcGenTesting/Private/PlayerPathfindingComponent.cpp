@@ -41,19 +41,16 @@ void UPlayerPathfindingComponent::MoveToNextTile()
 	if(FVector::Distance(GetOwner()->GetActorLocation(), TargetLocation) < 2.f)
 	{
 		GetOwner()->SetActorLocation(TargetLocation);
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString(TEXT("Reached...")));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString(TEXT("Reached...")));
 
 		if(TargetIndex + 1 < ValidTiles.Num())
 		{
 			TargetIndex++;
-			//FVector NewTargetLocation = ValidTiles[TargetIndex]->GetActorLocation();
-			//NewTargetLocation.Z = TargetLocation.Z;
-			//MoveToNextTile(NewTargetLocation, TargetTileIndex + 1);
 		}
 		else
 		{
 			// End movement
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString(TEXT("End Movement...")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString(TEXT("End Movement...")));
 			MovementEndDelegate.ExecuteIfBound();
 			GetOwner()->GetWorldTimerManager().ClearTimer(MoveTimerHandle);
 		}
@@ -76,6 +73,7 @@ void UPlayerPathfindingComponent::StartMove()
 {
 	if(!ValidTiles.IsEmpty())
 	{
+		UTileMapFunctionLibrary::UnOccupyTile(GetOwner());
 		MoveToNextTile();
 	}
 }
@@ -84,6 +82,7 @@ void UPlayerPathfindingComponent::Move()
 {
 	if(!ValidTiles.IsEmpty())
 	{
+		TargetIndex = 0;
 		GetOwner()->GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, MoveTimerDelegate, 0.02f, true);
 		
 		/*AActor* TargetTile = ValidTiles.Top();

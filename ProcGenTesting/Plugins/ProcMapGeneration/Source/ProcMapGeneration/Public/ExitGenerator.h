@@ -41,21 +41,13 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
-	//
-	ATeleportPoint* GetLeftTeleportPoint() { return LeftTeleportPoint; }
-	ATeleportPoint* GetRightTeleportPoint() { return RightTeleportPoint; }
-	
-	AActor* GetLeftTile() { return LeftTile; }
-	AActor* GetRightTile() { return RightTile; }
-	
+
 	// Public Properties
 	FVector LeftTeleporterPos = FVector::ZeroVector;
 	FVector RightTeleporterPos = FVector::ZeroVector;
-
-
-	TObjectPtr<ATeleportPoint> LeftTeleportPoint;
-	TObjectPtr<ATeleportPoint> RightTeleportPoint;
+	
+	AActor* GetLeftTile() { return LeftTile; }
+	AActor* GetRightTile() { return RightTile; }
 	
 	ATeleportPoint* GetLeftTeleportPoint() { return LeftTeleportPoint; }
 	ATeleportPoint* GetRightTeleportPoint() { return RightTeleportPoint; }

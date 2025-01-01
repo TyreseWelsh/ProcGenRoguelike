@@ -16,5 +16,16 @@ class PROCGENTESTING_API UMoveActionButton : public UActionButton
 
 public:
 	UFUNCTION(BlueprintCallable)
+	void Init(AActor* NewOwner);
+	UFUNCTION(BlueprintCallable)
 	void OnButtonPress();
+
+	UFUNCTION()
+	void EnableButton();
+	UFUNCTION()
+	void DisableButton();
+
+private:
+	bool bEnabled = true;
+	TObjectPtr<AActor> Owner;
 };

@@ -128,10 +128,10 @@ void UTileComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 TArray<UTileComponent*> UTileComponent::GetNeighbourTiles()
 {
-	if(NeighbourTiles.Num() > 0)
+	/*if(NeighbourTiles.Num() > 0)
 	{
 		return NeighbourTiles;
-	}
+	}*/
 
 	FindNeighbourTiles();
 	return NeighbourTiles;
@@ -162,10 +162,10 @@ void UTileComponent::TileHover()
 
 void UTileComponent::TileHoverSelected()
 {
-	if(HoverSelectedDelegate.IsBound())
+	/*if(HoverSelectedDelegate.IsBound())
 	{
 		HoverSelectedDelegate.Broadcast();
-	}
+	}*/
 }
 
 void UTileComponent::TileUnHover()

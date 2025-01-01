@@ -62,55 +62,66 @@ void ATileNode::AddTileColour_Implementation(UTileColour* NewTileColour)
 	/*FLinearColor OverlayColour;
 	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
 	{
-		OverlayColour += NewColour;
-		OverlayColour.A = 1;
-		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
-	}*/
-
-	FLinearColor OverlayColour;
-	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
-	{
 		OverlayColour = ColourHistory->Add(NewTileColour);
 		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
 	}
-	//UE_LOG(LogTemp, Error, TEXT("Finished adding colour..."))
-	EnableHighlight();
+	EnableHighlight();*/
+
+	FLinearColor OverlayColour;
+	if(ColourHistory->Add(NewTileColour, OverlayColour))
+	{
+		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
+		EnableHighlight();
+	}
 }
 
 void ATileNode::SubtractTileColour_Implementation(UTileColour* NewTileColour)
 {
 	/*FLinearColor OverlayColour;
-    if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
-    {
-       	OverlayColour -= NewColour;
-       	OverlayColour.A = 1;
-       	DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
-    }*/
-
-	FLinearColor OverlayColour;
 	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
 	{
 		OverlayColour = ColourHistory->Remove(NewTileColour);
 		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
 	}
-	DisableHighlight();
+	DisableHighlight();*/
+
+	FLinearColor OverlayColour;
+	if(ColourHistory->Remove(NewTileColour, OverlayColour))
+	{
+		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Red, FString::Printf(TEXT("Unihighlight Tile")));
+
+		//DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), FLinearColor::White);
+		DisableHighlight();
+	}
 }
 
+// ERROR: PROBLEM OF SOME TILES NOT HIGHLIGHTING
 void ATileNode::EnableHighlight()
 {
 	HighlightCounter++;
-	if (HighlightCounter > 0)
-	{
+	//GEngine->AddOnScreenDebugMessage(-1, 1000.f, FColor::Yellow, FString::Printf(TEXT("%s is highlighted - %i"), *GetName(), HighlightCounter));
+
+	/*if (HighlightCounter > 0)
+	{*/
 		float HighlightLevel = 0.5;
 		DynamicMatInstance->SetScalarParameterValue(FName("HighlightLevel"), HighlightLevel);
-	}
+	//}
 }
 
 void ATileNode::DisableHighlight()
 {
 	HighlightCounter--;
+	GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("%s's HighlightCounter = %i"), *GetName(), HighlightCounter));
+
 	if (HighlightCounter <= 0)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("%s is unhighlighted - %i"), *GetName(), HighlightCounter));
+
+		HighlightCounter = 0;
 		float HighlightLevel = 0;
 		DynamicMatInstance->SetScalarParameterValue(FName("HighlightLevel"), HighlightLevel);
 	}
@@ -202,10 +213,12 @@ void ATileNode::OnMouseLeft_Implementation()
 	UTileColour* NewTileColour = NewObject<UTileColour>();
 	NewTileColour->Init(SelectColour, this);
 	AddTileColour_Implementation(NewTileColour);
-	
+
+
+	//
 	if (AActor* OccupyingObject = TileComponent->GetOccupyingObject())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Tile selected...")));
+		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Tile selected...")));
 
 		ISelectable::Execute_OnMouseLeft(OccupyingObject);
 		//IInteractable::Execute_OnLeftClick(OccupyingObject);
@@ -219,7 +232,8 @@ void ATileNode::OnMouseRight_Implementation()
 void ATileNode::OnMouseUnSelect_Implementation()
 {
 	bIsSelected = false;
-	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, FString::Printf(TEXT("Tile UNSELECTED...")));
+
 	UTileColour* NewTileColour = NewObject<UTileColour>();
 	NewTileColour->Init(SelectColour, this);
 	SubtractTileColour_Implementation(NewTileColour);

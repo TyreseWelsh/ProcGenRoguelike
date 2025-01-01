@@ -141,7 +141,7 @@ private:
 	//UPROPERTY(BlueprintAssignable)
 	FOnMouseHoverSignature HoverDelegate;
 	//UPROPERTY(BlueprintAssignable)
-	FOnMouseHoverSelectedSignature HoverSelectedDelegate;
+	//FOnMouseHoverSelectedSignature HoverSelectedDelegate;
 	//UPROPERTY(BlueprintAssignable)
 	FOnMouseUnHoverSignature UnHoverDelegate;
 	//UPROPERTY(BlueprintAssignable)

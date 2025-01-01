@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "TBActionBase.generated.h"
 
-DECLARE_DELEGATE(FOnActionEndSignature);
+DECLARE_MULTICAST_DELEGATE(FOnActionEndSignature);
 
 class AActor;
 class UTileComponent;
