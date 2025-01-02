@@ -44,10 +44,10 @@ void UPlayerActionMove::End()
 
 void UPlayerActionMove::OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile)
 {
-	if(bPlanningMove)
+	if(bPlanningMove && bCanHover)
 	{
-		if(IsValid(UnitStartingTile) &&
-			IsValid(UnitPathfindingComponent)
+		if(IsValid(UnitStartingTile)
+			&& IsValid(UnitPathfindingComponent)
 			&& CurrentHoveredTile != NewHoveredTile)
 		{
 			UnitPathfindingComponent->AttemptPathfinding(UnitStartingTile, NewHoveredTile);

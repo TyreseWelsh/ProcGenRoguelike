@@ -26,8 +26,13 @@ public:
 	virtual void OnLeftClick(UTileComponent* SelectedTile);
 	virtual void OnRightClick();
 
+	virtual void DisableHover(UTileComponent* CurrentHoveredTile);
+	virtual void EnableHover();
+
 	FOnActionEndSignature* GetActionEndDelegate() { return &ActionEndDelegate; }
 	
 protected:
+	bool bCanHover = true;
+	
 	FOnActionEndSignature ActionEndDelegate;
 };

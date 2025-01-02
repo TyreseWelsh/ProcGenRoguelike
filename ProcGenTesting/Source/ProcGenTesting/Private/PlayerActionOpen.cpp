@@ -23,11 +23,13 @@ void UPlayerActionOpen::OnHover(UTileComponent* CurrentHoveredTile, UTileCompone
 		// Unhovering previous hovered tile first
 		if(CurrentHoveredTile != nullptr)
 		{
-
 			CurrentHoveredTile->TileUnHover();
 		}
-		
-		NewHoveredTile->TileHover();
+
+		if(bCanHover)
+		{
+			NewHoveredTile->TileHover();
+		}
 	}
 }
 

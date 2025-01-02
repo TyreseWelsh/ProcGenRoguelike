@@ -5,11 +5,13 @@
 
 #include "IsTile.h"
 #include "PlayerPathfindingComponent.h"
+#include "StrategyPlayerController.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "TileMapFunctionLibrary.h"
 #include "UnitInfoBar.h"
 #include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ATBPlayerCharacter::ATBPlayerCharacter()
@@ -102,6 +104,11 @@ void ATBPlayerCharacter::DisplayInfo()
 		if(UnitInfoWidget)
 		{
 			UnitInfoWidget->Init(this);
+			if(AStrategyPlayerController* StrategyController = Cast<AStrategyPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
+			{
+				UnitInfoWidget->GetOnHoveredDelegate()->AddDynamic(StrategyController, &AStrategyPlayerController::DisableHovering);
+				UnitInfoWidget->GetOnUnHoveredDelegate()->AddDynamic(StrategyController, &AStrategyPlayerController::EnableHovering);
+			}
 			UnitInfoWidget->AddToViewport();
 		}
 	}

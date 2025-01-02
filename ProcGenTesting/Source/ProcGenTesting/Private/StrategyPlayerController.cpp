@@ -12,8 +12,7 @@
 #include "TileMapFunctionLibrary.h"
 #include "ProcMapGeneration/Public/TileComponent.h"
 #include "IsTile.h"
-#include "InputActionValue.h"
-#include "Kismet/GameplayStatics.h"
+#include "TileColour.h"
 
 void AStrategyPlayerController::BeginPlay()
 {
@@ -84,6 +83,19 @@ void AStrategyPlayerController::Tick(float DeltaTime)
 			}
 		}
 	}
+}
+
+void AStrategyPlayerController::DisableHovering()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, FString::Printf(TEXT("DISABLE HOVER")));
+	
+	CurrentAction->DisableHover(CurrentHoveredTileComponent);
+	CurrentHoveredTileComponent = nullptr;
+}
+
+void AStrategyPlayerController::EnableHovering()
+{
+	CurrentAction->EnableHover();
 }
 
 void AStrategyPlayerController::SetCurrentAction(UTBActionBase* NewAction)

@@ -29,6 +29,11 @@ protected:
 	
 public:
 	UFUNCTION()
+	void DisableHovering();
+	UFUNCTION()
+	void EnableHovering();
+	
+	UFUNCTION()
 	void SetCurrentAction(UTBActionBase* NewAction);
 	UFUNCTION()
 	UTBActionBase* GetCurrentAction() const { return CurrentAction; }
