@@ -10,30 +10,32 @@ void UPlayerActionOpen::Init(AActor* NewUnit)
 	Super::Init(NewUnit);
 }
 
+void UPlayerActionOpen::End()
+{
+}
+
 void UPlayerActionOpen::OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile)
 {
 	Super::OnHover(CurrentHoveredTile, NewHoveredTile);
 
-	if(NewHoveredTile != CurrentHoveredTile)
+	if(CurrentHoveredTile != NewHoveredTile)
 	{
 		// Unhovering previous hovered tile first
-		if(IsValid(CurrentHoveredTile))
+		if(CurrentHoveredTile != nullptr)
 		{
 			CurrentHoveredTile->TileUnHover();
 		}
 
-		NewHoveredTile->TileHover();
+		if(bCanHover)
+		{
+			NewHoveredTile->TileHover();
+		}
 	}
 }
 
 void UPlayerActionOpen::OnLeftClick(UTileComponent* SelectedTile)
 {
 	Super::OnLeftClick(SelectedTile);
-
-	if(IsValid(SelectedTile))
-	{
-		SelectedTile->TileUnSelect();
-	}
 
 	SelectedTile->TileLeftClick();
 }

@@ -13,20 +13,38 @@
 #include "TileMapFunctionLibrary.h"
 
 void UPlayerActionMove::Init(AActor* NewUnit)
-{
-	//PlanMoveTimerDelegate.BindUFunction(this, "FindMovementTiles");
-
-	
+{	
 	SetMovingUnit(NewUnit);
 	StartMove();
 }
 
+void UPlayerActionMove::End()
+{
+	if(UTileMapFunctionLibrary::OccupyTile(UnitPathfindingComponent->GetOwner()))
+	{
+		UnitPathfindingComponent->UnHighlightTiles(UnitPathfindingComponent->GetValidTiles(), FLinearColor::Green);
+		UnitPathfindingComponent->GetCurrentPath().Empty();
+		bPlanningMove = true;
+
+		if(ActionEndDelegate.IsBound())
+		{
+			ActionEndDelegate.Broadcast();
+		}
+		ActionEndDelegate.RemoveAll(this);
+	}
+	else
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString(TEXT("MNOOOOO...")));
+	}
+}
+
 void UPlayerActionMove::OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile)
 {
-	if(bPlanningMove)
+	if(bPlanningMove && bCanHover)
 	{
-		if(IsValid(UnitStartingTile) &&
-			IsValid(UnitPathfindingComponent))
+		if(IsValid(UnitStartingTile)
+			&& IsValid(UnitPathfindingComponent)
+			&& CurrentHoveredTile != NewHoveredTile)
 		{
 			UnitPathfindingComponent->AttemptPathfinding(UnitStartingTile, NewHoveredTile);
 			UnitPathfindingComponent->HighlightTiles(UnitPathfindingComponent->FindValidTiles(), FLinearColor::Green);
@@ -81,17 +99,20 @@ void UPlayerActionMove::StartMove()
 	IsValid(UnitStartingTile))
 	{
 		UnitPathfindingComponent->HighlightTilesInRange(UnitStartingTile, UnitPathfindingComponent->GetMoveDistance(), FLinearColor::Blue);
-		//MovingUnit->GetWorld()->GetTimerManager().SetTimer(PlanMoveTimerHandle, PlanMoveTimerDelegate, 0.05f, true);
 	}
 }
 
 void UPlayerActionMove::EndMove(UTileComponent* SelectedTile)
 {
 	bPlanningMove = false;
-	UnitPathfindingComponent->UnHighlightTiles(UnitPathfindingComponent->GetTilesInRange(), FLinearColor::Blue);
-	
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString(TEXT("Unit Moving...")));
-	// Call unit PathfindingComponent Move function
+	if(IsValid(UnitPathfindingComponent))
+	{
+		UnitPathfindingComponent->UnHighlightTiles(UnitPathfindingComponent->GetTilesInRange(), FLinearColor::Blue);
+		
+		// Call unit PathfindingComponent Move function
+		UnitPathfindingComponent->GetMovementEndDelegate()->BindUObject(this, &UPlayerActionMove::End);
+		UnitPathfindingComponent->Move();
+	}
 }
 
 void UPlayerActionMove::CancelMove()

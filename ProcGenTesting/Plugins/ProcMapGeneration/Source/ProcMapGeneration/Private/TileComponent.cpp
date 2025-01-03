@@ -5,6 +5,8 @@
 #include "MapGeneratorComponent.h"
 #include "MapRoom.h"
 #include "ExitGenerator.h"
+#include "IsTile.h"
+#include "TileMapFunctionLibrary.h"
 
 // Sets default values for this component's properties
 UTileComponent::UTileComponent()
@@ -48,9 +50,9 @@ void UTileComponent::SetTileType()
 		SetTileTypeToWall();
 	}*/
 
-	UMapGeneratorComponent* MapGenerator = OwningRoom->MapGenerator;
-	int MapIndex1D = MapGenerator->CalculateMapIndexFromTilePos(GetOwner()->GetActorLocation());
-	FVector2D MapIndex2D = MapGenerator->ConvertIndex1Dto2D(MapIndex1D);
+	/*UMapGeneratorComponent* MapGenerator = OwningRoom->MapGenerator;
+	int MapIndex1D = UTileMapFunctionLibrary::CalculateIndexFromTilePos(GetOwner()->GetActorLocation());
+	FVector2D MapIndex2D = UTileMapFunctionLibrary::ConvertIndex1Dto2D(MapIndex1D);
 
 	//UE_LOG(LogTemp, Display, TEXT("%i"), MapGenerator->MapSizeX);
 	if(MapIndex2D.X == 0 or MapIndex2D.X * TileSize == MapGenerator->MapSizeX - TileSize or MapIndex2D.Y == 0 or MapIndex2D.Y * TileSize == MapGenerator->MapSizeY - TileSize)
@@ -58,7 +60,7 @@ void UTileComponent::SetTileType()
 		// Set tile type as wall
 		SetTileTypeToWall();
 		return;
-	}
+	}*/
 	/*if(RoomIndexX == 1 or RoomIndexX == OwningRoom->LastIndexX - 1 or RoomIndexY == 1 or RoomIndexY == OwningRoom->LastIndexY - 1)
 	{
 		if(FMath::RandRange(1, 10) <= 5)
@@ -78,6 +80,34 @@ void UTileComponent::SetTileType()
 	}
 }
 
+void UTileComponent::FindNeighbourTiles()
+{
+	for(int x = -1; x <= 1; ++x)
+	{
+		for(int y = -1; y <= 1; ++y)
+		{
+			if(x == 0 && y == 0 
+				or x == -1 && y == -1 
+				or x == 1 && y == -1 
+				or x == -1 && y == 1 
+				or x == 1 && y == 1)
+			{
+				continue;
+			}
+
+			FVector NeighbourTilePos = FVector(GetOwner()->GetActorLocation().X + (x * TileSize), GetOwner()->GetActorLocation().Y + (y * TileSize), GetOwner()->GetActorLocation().Z);
+			
+			if(AActor* NeighbourTile = UTileMapFunctionLibrary::GetBelowTile(NeighbourTilePos, GetOwner()->GetWorld()))
+			{
+				if(UTileComponent* NeighbourTileComponent = IIsTile::Execute_GetTileComponent(NeighbourTile))
+				{
+					NeighbourTiles.AddUnique(NeighbourTileComponent);
+				}
+			}
+		}
+	}
+}
+
 // Called when the game starts
 void UTileComponent::BeginPlay()
 {
@@ -94,6 +124,17 @@ void UTileComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+TArray<UTileComponent*> UTileComponent::GetNeighbourTiles()
+{
+	/*if(NeighbourTiles.Num() > 0)
+	{
+		return NeighbourTiles;
+	}*/
+
+	FindNeighbourTiles();
+	return NeighbourTiles;
 }
 
 void UTileComponent::SetOwningRoom(UMapRoom* NewOwner)
@@ -121,10 +162,10 @@ void UTileComponent::TileHover()
 
 void UTileComponent::TileHoverSelected()
 {
-	if(HoverSelectedDelegate.IsBound())
+	/*if(HoverSelectedDelegate.IsBound())
 	{
 		HoverSelectedDelegate.Broadcast();
-	}
+	}*/
 }
 
 void UTileComponent::TileUnHover()

@@ -33,4 +33,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void SubtractTileColour(UTileColour* NewColour);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	FLinearColor GetHoverColour();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	FLinearColor GetSelectColour();
 };

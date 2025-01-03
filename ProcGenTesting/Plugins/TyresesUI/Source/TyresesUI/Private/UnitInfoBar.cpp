@@ -2,3 +2,24 @@
 
 
 #include "UnitInfoBar.h"
+
+void UUnitInfoBar::Init(AActor* NewOwner)
+{
+	Owner = NewOwner;
+}
+
+void UUnitInfoBar::BroadcastOnHovered()
+{
+	if(OnHoveredDelegate.IsBound())
+	{
+		OnHoveredDelegate.Broadcast();
+	}
+}
+
+void UUnitInfoBar::BroadcastOnUnHovered()
+{
+	if(OnUnHoveredDelegate.IsBound())
+	{
+		OnUnHoveredDelegate.Broadcast();
+	}
+}

@@ -40,7 +40,10 @@ void UPathfindingComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UPathfindingComponent::Init()
 {
+}
 
+void UPathfindingComponent::Move()
+{
 }
 
 TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile)
@@ -52,7 +55,7 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 		{
 			UTileColour* NewTileColour = NewObject<UTileColour>();
 			NewTileColour->Init(FLinearColor::Green, GetOwner());
-			IIsTile::Execute_SubtractTileColour(PathTile, NewTileColour);
+			IIsTile::Execute_SubtractTileColour(PathTile, NewTileColour);		// Here is disabling the highlight
 		}
 	}
 	Path.Empty();
@@ -87,31 +90,25 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 			}
 
 			// Add valid neighbour tiles to open set
-			for(AActor* NeighbourTile : CurrentTile->FindNeighbourTiles())
+			for(UTileComponent* NeighbourTileComponent : CurrentTile->GetNeighbourTiles())
 			{
-				if (NeighbourTile->Implements<UIsTile>())
+				if(!NeighbourTileComponent->bIsWalkable or ClosedSet.Contains(NeighbourTileComponent))
 				{
-					if (UTileComponent* NeighbourTileComponent = IIsTile::Execute_GetTileComponent(NeighbourTile))
+					continue;
+				}
+		
+				int NewNeighbourGCost = abs(CurrentTile->GCost + GetDistance(CurrentTile, NeighbourTileComponent));
+				if(NewNeighbourGCost < NeighbourTileComponent->GCost or !OpenSet.Contains(NeighbourTileComponent))
+				{
+					NeighbourTileComponent->GCost = NewNeighbourGCost;
+					NeighbourTileComponent->HCost = abs(GetDistance(NeighbourTileComponent, TargetTile));
+
+					NeighbourTileComponent->FCost = NeighbourTileComponent->GCost + NeighbourTileComponent->HCost;
+					NeighbourTileComponent->ParentTile = CurrentTile;
+
+					if(!OpenSet.Contains(NeighbourTileComponent))
 					{
-						if(!NeighbourTileComponent->bIsWalkable or ClosedSet.Contains(NeighbourTileComponent))
-						{
-							continue;
-						}
-				
-						int NewNeighbourGCost = abs(CurrentTile->GCost + GetDistance(CurrentTile, NeighbourTileComponent));
-						if(NewNeighbourGCost < NeighbourTileComponent->GCost or !OpenSet.Contains(NeighbourTileComponent))
-						{
-							NeighbourTileComponent->GCost = NewNeighbourGCost;
-							NeighbourTileComponent->HCost = abs(GetDistance(NeighbourTileComponent, TargetTile));
-
-							NeighbourTileComponent->FCost = NeighbourTileComponent->GCost + NeighbourTileComponent->HCost;
-							NeighbourTileComponent->ParentTile = CurrentTile;
-
-							if(!OpenSet.Contains(NeighbourTileComponent))
-							{
-								OpenSet.Add(NeighbourTileComponent);
-							}
-						}
+						OpenSet.Add(NeighbourTileComponent);
 					}
 				}
 			}
@@ -127,7 +124,6 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 
 void UPathfindingComponent::HighlightTilesInNewPath(UTileComponent* StartTile, UTileComponent* TargetTile, FLinearColor HighlightColour)
 {
-	//UnHighlightTiles(Path);
 	AttemptPathfinding(StartTile, TargetTile);
 	if(Path.Num() > 0)
 	{
@@ -150,13 +146,10 @@ TArray<AActor*> UPathfindingComponent::RetracePath(UTileComponent* TargetNode, U
 
 	while(CurrentTile != StartNode)
 	{
-		Path.Add(CurrentTile->GetOwner());
+		Path.AddUnique(CurrentTile->GetOwner());
 		CurrentTile = CurrentTile->ParentTile;
 	}
-	//Path.Add(StartNode->GetOwner());
 	Algo::Reverse(Path);
-
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Found path of %i tiles!"), Path.Num()));
 	
 	return Path;
 }
@@ -176,21 +169,18 @@ TArray<AActor*> UPathfindingComponent::FindTilesInRange(UTileComponent* StartTil
 		rangeOpenSet.Remove(CurrentTileComponent);
 		rangeClosedSet.Add(CurrentTileComponent);
 		
-		for(AActor* Tile : CurrentTileComponent->FindNeighbourTiles())
+		for(UTileComponent* NeighbourTileComponent : CurrentTileComponent->GetNeighbourTiles())
 		{
-			if(UTileComponent* NeighbourTileComponent = IIsTile::Execute_GetTileComponent(Tile))
+			if(rangeClosedSet.Contains(NeighbourTileComponent) or
+				GetDistanceX(StartTile, NeighbourTileComponent) + GetDistanceY(StartTile, NeighbourTileComponent) > Range * NeighbourTileComponent->GetOwningRoom()->TileSize)
 			{
-				if(rangeClosedSet.Contains(NeighbourTileComponent) or
-					GetDistanceX(StartTile, NeighbourTileComponent) + GetDistanceY(StartTile, NeighbourTileComponent) > Range * NeighbourTileComponent->GetOwningRoom()->TileSize)
-				{
-					continue;
-				}
-				
-				if(!rangeOpenSet.Contains(NeighbourTileComponent))
-				{
-					rangeOpenSet.Add(NeighbourTileComponent);
-					TilesInRange.AddUnique(NeighbourTileComponent->GetOwner());
-				}
+				continue;
+			}
+			
+			if(!rangeOpenSet.Contains(NeighbourTileComponent))
+			{
+				rangeOpenSet.Add(NeighbourTileComponent);
+				TilesInRange.AddUnique(NeighbourTileComponent->GetOwner());
 			}
 		}
 	}
@@ -208,7 +198,7 @@ TArray<AActor*> UPathfindingComponent::FindValidTiles()
 		{
 			if(TilesInRange.Contains(Tile))
 			{
-				ValidTiles.Add(Tile);
+				ValidTiles.AddUnique(Tile);
 			}
 		}
 	}
@@ -237,6 +227,10 @@ void UPathfindingComponent::UnHighlightTiles(TArray<AActor*> TilesToUnHighlight,
 			UTileColour* NewTileColour = NewObject<UTileColour>();
 			NewTileColour->Init(UnHighlightColour, GetOwner());
 			IIsTile::Execute_SubtractTileColour(Tile, NewTileColour);
+		}
+		else
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Red, FString::Printf(TEXT("NOT A TILE")));
 		}
 	}
 }

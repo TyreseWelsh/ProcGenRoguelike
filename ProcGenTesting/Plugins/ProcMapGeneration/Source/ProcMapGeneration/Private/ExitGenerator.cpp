@@ -7,6 +7,7 @@
 
 #include "Components/SceneComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "TeleportPoint.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -37,12 +38,15 @@ void AExitGenerator::Init(int _TileSize)
 	InitPathGenCollider();
 }
 
-void AExitGenerator::CalculateRelativeExitTiles()
+void AExitGenerator::CalculateRelativeExits()
 {
 	FVector OffsetVector = GetActorRightVector() * FVector(PathGenCollider->GetRelativeLocation().X, 0, 0);
 	
-	LeftExitTilePos = (GetActorLocation() + OffsetVector) - GetActorRightVector() * TileSize;
-	RightExitTilePos = (GetActorLocation() + OffsetVector) + GetActorRightVector() * TileSize;
+	LeftTeleporterPos = (GetActorLocation() + OffsetVector) - GetActorRightVector() * TileSize;
+	RightTeleporterPos = (GetActorLocation() + OffsetVector) + GetActorRightVector() * TileSize;
+
+	LeftTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), LeftTeleporterPos, FRotator(0, 0, 0));
+	RightTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), RightTeleporterPos, FRotator(0, 0, 0));
 }
 
 void AExitGenerator::InitPathGenCollider()
@@ -55,7 +59,7 @@ void AExitGenerator::InitPathGenCollider()
 	int NewYPos = (PathOffset * TileSize) * FMath::RandRange(-1, 1);
 	PathGenCollider->AddRelativeLocation(FVector(0, NewYPos, 0));
 
-	CalculateRelativeExitTiles();
+	CalculateRelativeExits();
 }
 
 // Called when the game starts or when spawned

@@ -8,15 +8,36 @@
 #include "TileComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+void UMoveActionButton::Init(AActor* NewOwner)
+{
+	Owner = NewOwner;
+}
+
 void UMoveActionButton::OnButtonPress()
 {
-	if(AStrategyPlayerController* StrategyController = Cast<AStrategyPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
+	if(bEnabled && IsValid(Owner))
 	{
-		TObjectPtr<UPlayerActionMove> NewMoveAction = NewObject<UPlayerActionMove>(); 
-		StrategyController->SetCurrentAction(NewMoveAction);
-		if(StrategyController->GetCurrentAction())
+		if(AStrategyPlayerController* StrategyController = Cast<AStrategyPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
 		{
-			StrategyController->GetCurrentAction()->Init(StrategyController->GetCurrentSelectedTileComponent()->GetOccupyingObject());
+			TObjectPtr<UPlayerActionMove> NewMoveAction = NewObject<UPlayerActionMove>(); 
+			StrategyController->SetCurrentAction(NewMoveAction);
+			if(StrategyController->GetCurrentAction())
+			{
+				StrategyController->GetCurrentAction()->GetActionEndDelegate()->AddUObject(this, &UMoveActionButton::EnableButton);
+				DisableButton();
+				
+				StrategyController->GetCurrentAction()->Init(Owner);
+			}
 		}
 	}
+}
+
+void UMoveActionButton::EnableButton()
+{
+	bEnabled = true;
+}
+
+void UMoveActionButton::DisableButton()
+{
+	bEnabled = false;
 }

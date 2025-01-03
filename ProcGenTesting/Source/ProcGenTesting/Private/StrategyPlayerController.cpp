@@ -11,8 +11,8 @@
 #include "PlayerActionOpen.h"
 #include "TileMapFunctionLibrary.h"
 #include "ProcMapGeneration/Public/TileComponent.h"
-#include "InputActionValue.h"
-#include "Kismet/GameplayStatics.h"
+#include "IsTile.h"
+#include "TileColour.h"
 
 void AStrategyPlayerController::BeginPlay()
 {
@@ -31,7 +31,7 @@ void AStrategyPlayerController::BeginPlay()
 	PlayerCam = GetPawn();
 
 	UTBActionBase* DefaultAction = NewObject<UPlayerActionOpen>();
-	CurrentAction = DefaultAction;
+	SetCurrentAction(DefaultAction);
 }
 
 void AStrategyPlayerController::SetupInputComponent()
@@ -77,16 +77,35 @@ void AStrategyPlayerController::Tick(float DeltaTime)
 		{
 			if(UTileComponent* NewTileComponent = IIsTile::Execute_GetTileComponent(HitTile))
 			{
-				if(NewTileComponent != CurrentHoveredTileComponent)
-				{
-					//
-					CurrentAction->OnHover(CurrentHoveredTileComponent, NewTileComponent);
-					
-					CurrentHoveredTileComponent = NewTileComponent;
-				}
+				CurrentAction->OnHover(CurrentHoveredTileComponent, NewTileComponent);
+				
+				CurrentHoveredTileComponent = NewTileComponent;
 			}
 		}
 	}
+}
+
+void AStrategyPlayerController::DisableHovering()
+{	
+	CurrentAction->DisableHover(CurrentHoveredTileComponent);
+	CurrentHoveredTileComponent = nullptr;
+}
+
+void AStrategyPlayerController::EnableHovering()
+{
+	CurrentAction->EnableHover();
+}
+
+void AStrategyPlayerController::SetCurrentAction(UTBActionBase* NewAction)
+{
+	CurrentAction = NewAction;
+	CurrentAction->GetActionEndDelegate()->AddUObject(this, &AStrategyPlayerController::EndAction_Implementation);
+}
+
+void AStrategyPlayerController::EndAction_Implementation()
+{
+	UTBActionBase* DefaultAction = NewObject<UPlayerActionOpen>();
+	SetCurrentAction(DefaultAction);
 }
 
 void AStrategyPlayerController::PlayerLeftClick()
@@ -94,6 +113,11 @@ void AStrategyPlayerController::PlayerLeftClick()
 	// If the tile we're hovering to select is not already selected
 	if(CurrentHoveredTileComponent != CurrentSelectedTileComponent)
 	{
+		if(IsValid(CurrentSelectedTileComponent))
+		{
+			CurrentSelectedTileComponent->TileUnSelect();
+		}
+		
 		CurrentSelectedTileComponent = CurrentHoveredTileComponent;
 
 		//
@@ -103,7 +127,6 @@ void AStrategyPlayerController::PlayerLeftClick()
 
 void AStrategyPlayerController::PlayerRightClick()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("Right click")));
 	CurrentAction->OnRightClick();
 }
 
@@ -150,31 +173,4 @@ void AStrategyPlayerController::CameraZoom(const FInputActionValue& Value)
 	FVector ZoomVector = WorldMouseDirection * 500.f;
 	ZoomVector *= 0.2;
 	PlayerCam->AddActorWorldOffset(ZoomVector * ScrollAxisValue);
-}
-
-void AStrategyPlayerController::FindPathFromSelected()
-{
-	if (IsValid(CurrentSelectedTileComponent))
-	{
-		if (PlayerCam->Implements<UHasPathfinding>())
-		{
-			if (UPathfindingComponent* PathfinderComponent = IHasPathfinding::Execute_GetPathfindingComponent(PlayerCam))
-			{
-				//PathfinderComponent->HighlightTiles(PathfinderComponent->AttemptPathfinding(CurrentSelectedTileComponent, CurrentHoveredTileComponent));
-				//PathfinderComponent->HighlightTilesInRange(CurrentSelectedTileComponent, PathfinderComponent->GetMoveDistance());
-			}
-			else
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("ERROR: Couldnt get pathfinding component...")));
-			}
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("ERROR: Player doesnt implement pathfinding interface...")));
-		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("ERROR: Selected tile owner invalid...")));
-	}
 }

@@ -17,11 +17,11 @@ class PROCMAPGENERATION_API UTileColour : public UObject
 	GENERATED_BODY()
 
 public:
-	bool operator==(const UTileColour& other) const
+	/*bool operator==(const UTileColour& other) const
 	{
 		return (this->Owner == other.Owner)
 			&& (this->Colour == other.Colour);
-	}
+	}*/
 
 	void Init(FLinearColor NewColour, AActor* NewOwner)
 	{

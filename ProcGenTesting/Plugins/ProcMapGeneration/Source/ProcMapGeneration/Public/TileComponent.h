@@ -49,6 +49,7 @@ public:
 	virtual void InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY);
 
 	void SetTileType();
+	void FindNeighbourTiles();
 	void CheckSurroundedByWalls();
 
 protected:
@@ -70,9 +71,12 @@ public:
 	UPROPERTY()
 	UTileComponent* ParentTile;
 	UPROPERTY()
-	TArray<UTileComponent*> SurroundingTiles;
+	TArray<UTileComponent*> NeighbourTiles;
 
-	TArray<UTileComponent*> GetSurroundingTiles() { return SurroundingTiles; }
+	TArray<UTileComponent*> GetNeighbourTiles();
+
+	AActor* GetOccupyingObject() { return OccupyingObject; }
+	void SetOccupyingObject(AActor* NewObject) { OccupyingObject = NewObject; }
 
 	void SetOwningRoom(UMapRoom* NewOwner);
 	void SetRoomIndexX(int NewIndex);
@@ -121,6 +125,9 @@ private:
 	int RoomIndexY = 0;
 
 	UPROPERTY()
+	TObjectPtr<AActor> OccupyingObject;
+	
+	UPROPERTY()
 	TObjectPtr<AActor> LeftTile;
 	UPROPERTY()
 	TObjectPtr<AActor> RightTile;
@@ -131,26 +138,15 @@ private:
 
 
 	// Tile Interaction Delegeates
-	//UPROPERTY(BlueprintAssignable)
 	FOnMouseHoverSignature HoverDelegate;
-	//UPROPERTY(BlueprintAssignable)
-	FOnMouseHoverSelectedSignature HoverSelectedDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FOnMouseUnHoverSignature UnHoverDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FOnLeftClickSignature LeftClickDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FOnRightClickSignature RightClickDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FUnSelectSignature UnSelectDelegate;
 	
 	// Tile Type Delegates
-	//UPROPERTY(BlueprintAssignable)
 	FTileTypeToWallSignature TileTypeToWallDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FTileTypeToPathSignature TileTypeToPathDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FTileTypeToGroundSignature TileTypeToGroundDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FTileTypeToExitSignature TileTypeToExitDelegate;
 };

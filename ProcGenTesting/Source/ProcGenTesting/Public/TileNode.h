@@ -60,7 +60,12 @@ public:
 	
 	void EnableHighlight();
 	void DisableHighlight();
-
+	
+	FLinearColor GetHoverColour();
+	FLinearColor GetHoverColour_Implementation() const { return HoverColour; }
+	FLinearColor GetSelectColour();
+	FLinearColor GetSelectColour_Implementation() const { return SelectColour; }
+	
 	void BindSelectDelegates(bool BindHover, bool BindUnHover, bool BindLeftMouse, bool BindRightMouse, bool BindUnSelect);
 	
 private:
