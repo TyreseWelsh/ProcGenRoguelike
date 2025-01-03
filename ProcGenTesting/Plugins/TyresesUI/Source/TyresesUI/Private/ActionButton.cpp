@@ -5,5 +5,4 @@
 
 void UActionButton::OnButtonClicked(FString ClickedActionName)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("%s Action Used!"), *ClickedActionName));
 }

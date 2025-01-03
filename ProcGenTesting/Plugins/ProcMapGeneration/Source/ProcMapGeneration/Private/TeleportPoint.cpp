@@ -52,7 +52,6 @@ void ATeleportPoint::Tick(float DeltaTime)
 
 void ATeleportPoint::OnLeftClick_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "TELEPORT");
 }
 
 void ATeleportPoint::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,

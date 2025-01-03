@@ -138,26 +138,15 @@ private:
 
 
 	// Tile Interaction Delegeates
-	//UPROPERTY(BlueprintAssignable)
 	FOnMouseHoverSignature HoverDelegate;
-	//UPROPERTY(BlueprintAssignable)
-	//FOnMouseHoverSelectedSignature HoverSelectedDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FOnMouseUnHoverSignature UnHoverDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FOnLeftClickSignature LeftClickDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FOnRightClickSignature RightClickDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FUnSelectSignature UnSelectDelegate;
 	
 	// Tile Type Delegates
-	//UPROPERTY(BlueprintAssignable)
 	FTileTypeToWallSignature TileTypeToWallDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FTileTypeToPathSignature TileTypeToPathDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FTileTypeToGroundSignature TileTypeToGroundDelegate;
-	//UPROPERTY(BlueprintAssignable)
 	FTileTypeToExitSignature TileTypeToExitDelegate;
 };

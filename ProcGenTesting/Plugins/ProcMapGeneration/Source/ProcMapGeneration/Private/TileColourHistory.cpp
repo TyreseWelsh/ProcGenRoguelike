@@ -39,13 +39,9 @@ bool UTileColourHistory::EvaluateColour(FLinearColor& OutColour)
 {
 	if(ColourHistory.Num() > 0)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("New Colour : %s"), *ColourHistory[ColourHistory.Num() - 1]->GetColour().ToString())
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, FString::Printf(TEXT("New Colour : %s"), *ColourHistory[ColourHistory.Num() - 1]->GetColour().ToString()));
-
 		OutColour = ColourHistory[ColourHistory.Num() - 1]->GetColour();
 		return true;
 	}
 
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, FString::Printf(TEXT("No colours in history")));
 	return false;
 }

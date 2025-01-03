@@ -59,14 +59,6 @@ void ATileNode::Tick(float DeltaTime)
 
 void ATileNode::AddTileColour_Implementation(UTileColour* NewTileColour)
 {
-	/*FLinearColor OverlayColour;
-	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
-	{
-		OverlayColour = ColourHistory->Add(NewTileColour);
-		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
-	}
-	EnableHighlight();*/
-
 	FLinearColor OverlayColour;
 	if(ColourHistory->Add(NewTileColour, OverlayColour))
 	{
@@ -77,14 +69,6 @@ void ATileNode::AddTileColour_Implementation(UTileColour* NewTileColour)
 
 void ATileNode::SubtractTileColour_Implementation(UTileColour* NewTileColour)
 {
-	/*FLinearColor OverlayColour;
-	if(DynamicMatInstance->GetVectorParameterValue(FName("OverlayColour"), OverlayColour))
-	{
-		OverlayColour = ColourHistory->Remove(NewTileColour);
-		DynamicMatInstance->SetVectorParameterValue(FName("OverlayColour"), OverlayColour);
-	}
-	DisableHighlight();*/
-
 	FLinearColor OverlayColour;
 	if(ColourHistory->Remove(NewTileColour, OverlayColour))
 	{
@@ -93,36 +77,24 @@ void ATileNode::SubtractTileColour_Implementation(UTileColour* NewTileColour)
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Red, FString::Printf(TEXT("Unihighlight Tile")));
-
 		DisableHighlight();
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Purple, FString::Printf(TEXT("Finished subtracting color")));
-
 }
 
 // ERROR: PROBLEM OF SOME TILES NOT HIGHLIGHTING
 void ATileNode::EnableHighlight()
 {
 	HighlightCounter++;
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("%s is highlighted - %i"), *GetName(), HighlightCounter));
-
-	/*if (HighlightCounter > 0)
-	{*/
-		float HighlightLevel = 0.5;
-		DynamicMatInstance->SetScalarParameterValue(FName("HighlightLevel"), HighlightLevel);
-	//}
+	float HighlightLevel = 0.5;
+	DynamicMatInstance->SetScalarParameterValue(FName("HighlightLevel"), HighlightLevel);
 }
 
 void ATileNode::DisableHighlight()
 {
 	HighlightCounter--;
-	//GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("%s's HighlightCounter = %i"), *GetName(), HighlightCounter));
 
 	if (HighlightCounter <= 0)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("%s is unhighlighted - %i"), *GetName(), HighlightCounter));
-
 		HighlightCounter = 0;
 		float HighlightLevel = 0;
 		DynamicMatInstance->SetScalarParameterValue(FName("HighlightLevel"), HighlightLevel);
@@ -198,13 +170,10 @@ void ATileNode::OnMouseHover_Implementation()
 	TObjectPtr<UTileColour> NewTileColour = NewObject<UTileColour>();
 	NewTileColour->Init(HoverColour, this);
 	AddTileColour_Implementation(NewTileColour);
-
 }
 
 void ATileNode::OnMouseUnHover_Implementation()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Black, FString::Printf(TEXT("UNHOVER")));
-
 	TObjectPtr<UTileColour> NewTileColour = NewObject<UTileColour>();
 	NewTileColour->Init(HoverColour, this);
 	SubtractTileColour_Implementation(NewTileColour);
@@ -222,10 +191,7 @@ void ATileNode::OnMouseLeft_Implementation()
 	//
 	if (AActor* OccupyingObject = TileComponent->GetOccupyingObject())
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Tile selected...")));
-
 		ISelectable::Execute_OnMouseLeft(OccupyingObject);
-		//IInteractable::Execute_OnLeftClick(OccupyingObject);
 	}
 }
 
@@ -236,7 +202,6 @@ void ATileNode::OnMouseRight_Implementation()
 void ATileNode::OnMouseUnSelect_Implementation()
 {
 	bIsSelected = false;
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, FString::Printf(TEXT("Tile UNSELECTED...")));
 
 	UTileColour* NewTileColour = NewObject<UTileColour>();
 	NewTileColour->Init(SelectColour, this);

@@ -35,11 +35,9 @@ void UMoveActionButton::OnButtonPress()
 void UMoveActionButton::EnableButton()
 {
 	bEnabled = true;
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString(TEXT("Move button enabled...")));
 }
 
 void UMoveActionButton::DisableButton()
 {
 	bEnabled = false;
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString(TEXT("Move button disabled...")));
 }

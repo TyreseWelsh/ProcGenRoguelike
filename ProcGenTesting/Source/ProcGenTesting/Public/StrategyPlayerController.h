@@ -48,10 +48,7 @@ private:
 	// Input
 	void PlayerLeftClick();
 	void PlayerRightClick();
-
-	// Saves the current mouse screen position
-	void SaveInitialMousePosition();
-
+	
 	void MoveMouse(const FInputActionValue& Value);
 
 	void EnableCameraRotation();
@@ -62,7 +59,6 @@ private:
 	
 	void CameraZoom(const FInputActionValue& Value);
 
-	void FindPathFromSelected();
 	
 	UPROPERTY(EditDefaultsOnly, Category = DefaultInput, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;

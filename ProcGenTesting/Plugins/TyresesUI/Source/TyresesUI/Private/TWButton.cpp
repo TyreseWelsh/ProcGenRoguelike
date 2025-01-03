@@ -2,11 +2,3 @@
 
 
 #include "TWButton.h"
-
-void UTWButton::BroadcastButtonHovered() const
-{
-	if(OnButtonHoverDelegate.IsBound())
-	{
-		OnButtonHoverDelegate.Broadcast();
-	}
-}

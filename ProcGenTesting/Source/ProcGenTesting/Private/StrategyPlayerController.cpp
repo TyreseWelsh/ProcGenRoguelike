@@ -86,9 +86,7 @@ void AStrategyPlayerController::Tick(float DeltaTime)
 }
 
 void AStrategyPlayerController::DisableHovering()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, FString::Printf(TEXT("DISABLE HOVER")));
-	
+{	
 	CurrentAction->DisableHover(CurrentHoveredTileComponent);
 	CurrentHoveredTileComponent = nullptr;
 }
@@ -106,8 +104,6 @@ void AStrategyPlayerController::SetCurrentAction(UTBActionBase* NewAction)
 
 void AStrategyPlayerController::EndAction_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, FString::Printf(TEXT("Ended action - set default action")));
-
 	UTBActionBase* DefaultAction = NewObject<UPlayerActionOpen>();
 	SetCurrentAction(DefaultAction);
 }
@@ -177,31 +173,4 @@ void AStrategyPlayerController::CameraZoom(const FInputActionValue& Value)
 	FVector ZoomVector = WorldMouseDirection * 500.f;
 	ZoomVector *= 0.2;
 	PlayerCam->AddActorWorldOffset(ZoomVector * ScrollAxisValue);
-}
-
-void AStrategyPlayerController::FindPathFromSelected()
-{
-	if (IsValid(CurrentSelectedTileComponent))
-	{
-		if (PlayerCam->Implements<UHasPathfinding>())
-		{
-			if (UPathfindingComponent* PathfinderComponent = IHasPathfinding::Execute_GetPathfindingComponent(PlayerCam))
-			{
-				//PathfinderComponent->HighlightTiles(PathfinderComponent->AttemptPathfinding(CurrentSelectedTileComponent, CurrentHoveredTileComponent));
-				//PathfinderComponent->HighlightTilesInRange(CurrentSelectedTileComponent, PathfinderComponent->GetMoveDistance());
-			}
-			else
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("ERROR: Couldnt get pathfinding component...")));
-			}
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("ERROR: Player doesnt implement pathfinding interface...")));
-		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, FString::Printf(TEXT("ERROR: Selected tile owner invalid...")));
-	}
 }

@@ -66,32 +66,23 @@ UPathfindingComponent* ATBPlayerCharacter::GetPathfindingComponent_Implementatio
 
 void ATBPlayerCharacter::OnMouseHover_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Character OnHover")));
 }
 
 void ATBPlayerCharacter::OnMouseUnHover_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Character OnUnHover")));
 }
 
 void ATBPlayerCharacter::OnMouseLeft_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Character OnMouseLeft")));
-
-	//PathfindingComponent->StartMove();
-
 	DisplayInfo();
 }
 
 void ATBPlayerCharacter::OnMouseRight_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Character OnMouseRight")));
 }
 
 void ATBPlayerCharacter::OnMouseUnSelect_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, FString::Printf(TEXT("Character OnUnSelect")));
-
 	PathfindingComponent->UnHighlightTiles(PathfindingComponent->GetTilesInRange(), FLinearColor::Blue);
 }
 

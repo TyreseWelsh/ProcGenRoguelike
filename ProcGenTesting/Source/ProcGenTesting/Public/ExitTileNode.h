@@ -13,9 +13,4 @@ UCLASS()
 class PROCGENTESTING_API AExitTileNode : public ATileNode
 {
 	GENERATED_BODY()
-
-public:
-
-private:
-	//virtual void BindLeftClick() override;
 };

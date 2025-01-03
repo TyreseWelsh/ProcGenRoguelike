@@ -124,7 +124,6 @@ TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartT
 
 void UPathfindingComponent::HighlightTilesInNewPath(UTileComponent* StartTile, UTileComponent* TargetTile, FLinearColor HighlightColour)
 {
-	//UnHighlightTiles(Path);
 	AttemptPathfinding(StartTile, TargetTile);
 	if(Path.Num() > 0)
 	{
@@ -150,10 +149,7 @@ TArray<AActor*> UPathfindingComponent::RetracePath(UTileComponent* TargetNode, U
 		Path.AddUnique(CurrentTile->GetOwner());
 		CurrentTile = CurrentTile->ParentTile;
 	}
-	//Path.Add(StartNode->GetOwner());
 	Algo::Reverse(Path);
-
-	//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Found path of %i tiles!"), Path.Num()));
 	
 	return Path;
 }
@@ -188,9 +184,7 @@ TArray<AActor*> UPathfindingComponent::FindTilesInRange(UTileComponent* StartTil
 			}
 		}
 	}
-
-	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, FString::Printf(TEXT("%i Tiles in range"), TilesInRange.Num()));
-
+	
 	return TilesInRange;
 }
 
@@ -237,7 +231,6 @@ void UPathfindingComponent::UnHighlightTiles(TArray<AActor*> TilesToUnHighlight,
 		else
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Red, FString::Printf(TEXT("NOT A TILE")));
-
 		}
 	}
 }

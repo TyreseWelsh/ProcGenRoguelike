@@ -13,10 +13,7 @@
 #include "TileMapFunctionLibrary.h"
 
 void UPlayerActionMove::Init(AActor* NewUnit)
-{
-	//PlanMoveTimerDelegate.BindUFunction(this, "FindMovementTiles");
-
-	
+{	
 	SetMovingUnit(NewUnit);
 	StartMove();
 }
@@ -38,7 +35,6 @@ void UPlayerActionMove::End()
 	else
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString(TEXT("MNOOOOO...")));
-
 	}
 }
 

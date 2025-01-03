@@ -12,8 +12,6 @@ URoomContentsManager::URoomContentsManager()
 
 void URoomContentsManager::FindSpawnRoom(TArray<UMapRoom*> MapRooms)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 20.f, FColor::Green, FString::Printf(TEXT("Finding spawn room")));
-
 	// Loop through rooms, choosing one as the start room to spawn the player, and start from there
 	int RandNum = FMath::RandRange(0, MapRooms.Num() - 1);
 	UMapRoom* SpawnRoom = MapRooms[0];
