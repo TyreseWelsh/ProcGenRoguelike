@@ -47,24 +47,29 @@ public:
 	TArray<AActor*> GetTilesInRange() const { return TilesInRange; }
 	TArray<AActor*> GetValidTiles() const { return ValidTiles; }
 
+	FTimerHandle GetMoveTimer() const { return MoveTimerHandle; }
+
 	FOnMovementEndSignature* GetMovementEndDelegate() { return &MovementEndDelegate; }
 	
 protected:
 	UPROPERTY()
 	FTimerHandle HighlightPathTimerHandle;
 	FTimerDelegate HighlightPathTimerDelegate;
+
+	UPROPERTY()
+	FTimerHandle MoveTimerHandle;
+	FTimerDelegate MoveTimerDelegate;
+
+	FOnMovementEndSignature MovementEndDelegate;
 	
 	UPROPERTY()
 	TArray<AActor*> Path;
-
-	FOnMovementEndSignature MovementEndDelegate;
 	
 	//
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Pathfinding", meta=(AllowPrivateAccess=true))
 	int MoveDistance;
 	UPROPERTY()
 	TArray<AActor*> TilesInRange;
-	
 	UPROPERTY()
 	TArray<AActor*> ValidTiles;
 	

@@ -36,9 +36,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Pathfinding", meta = (AllowPrivateAccess = "true"))
 	FLinearColor UnMoveableColour;
 
-	UPROPERTY()
-	FTimerHandle MoveTimerHandle;
-	FTimerDelegate MoveTimerDelegate;
+
 
 	int TargetIndex = 0;
 };

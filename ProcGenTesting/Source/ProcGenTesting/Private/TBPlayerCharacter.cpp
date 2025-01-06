@@ -26,6 +26,7 @@ ATBPlayerCharacter::ATBPlayerCharacter()
 	MainCollider->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 	MainCollider->SetCollisionResponseToAllChannels(ECR_Overlap);
 	MainCollider->SetRelativeLocation(FVector(0, 0, 45));
+	MainCollider->bHiddenInGame = false;
 	MainCollider->SetupAttachment(Origin);
 	
 	TempMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TempMesh"));

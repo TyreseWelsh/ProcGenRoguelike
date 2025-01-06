@@ -3,10 +3,9 @@
 
 #include "TeleportPoint.h"
 
-#include "IsTile.h"
-#include "TileComponent.h"
 #include "Components/SphereComponent.h"
 #include "TileMapFunctionLibrary.h"
+// Need to move pathfinding component to Plugin to get and cancel their move timer
 
 // Sets default values
 ATeleportPoint::ATeleportPoint()
@@ -18,11 +17,12 @@ ATeleportPoint::ATeleportPoint()
 	RootComponent = Origin;
 
 	Collider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
-	Collider->InitSphereRadius(25.f);
-	Collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Collider->InitSphereRadius(10.f);
+	Collider->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 	Collider->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
 	Collider->SetCollisionResponseToAllChannels(ECR_Overlap);
 	Collider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECR_Block);
+	Collider->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECR_Ignore);
 	Collider->bHiddenInGame = false;
 	Collider->SetupAttachment(Origin);
 
@@ -37,10 +37,7 @@ void ATeleportPoint::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//Collider->OnComponentHit.AddDynamic(this, &ATeleportPoint::OnHit);
-	//Collider->OnComponentBeginOverlap.AddDynamic(this, &ATeleportPoint::BeginOverlap);
-
-
+	Collider->OnComponentBeginOverlap.AddDynamic(this, &ATeleportPoint::BeginOverlap);
 }
 
 // Called every frame
@@ -54,30 +51,29 @@ void ATeleportPoint::OnLeftClick_Implementation()
 {
 }
 
-void ATeleportPoint::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-                           FVector NormalImpulse, const FHitResult& Hit)
-{
-}
-
-/*void ATeleportPoint::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+void ATeleportPoint::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "overlap TELEPORT");
-
 	if (bIsActive)
 	{
-		TeleportObject(OtherActor);
+		//TeleportObject(OtherActor);
 	}
-}*/
+}
 
 void ATeleportPoint::TeleportObject(AActor* Object)
 {
 	if (bIsActive)
 	{
-		if (UTileMapFunctionLibrary::OccupyTile(Object))
-		{
-			Object->SetActorLocation(TeleportLocation);
-		}
+		// If tile to teleport to is not blocked
+		/*if (UTileMapFunctionLibrary::OccupyTile(Object))
+		{*/
+		// Get IHasPathfinding interface and call virtual EndMovement function
+			TeleportLocation.Z = Object->GetActorLocation().Z;
+			if(Object->SetActorLocation(TeleportLocation))
+			{
+				UTileMapFunctionLibrary::OccupyTile(Object);
+			}
+		//}
 	}
 }
 

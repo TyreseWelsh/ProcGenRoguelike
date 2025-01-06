@@ -32,7 +32,6 @@ AExitGenerator::AExitGenerator()
 void AExitGenerator::Init(int _TileSize)
 {
 	TileSize = _TileSize;
-	//PathGenCollider->SetRelativeLocation(FVector(TileSize / 2, 0, 0));
 
 	PathGenCollider->SetCapsuleRadius(TileSize / 4);
 	InitPathGenCollider();
@@ -43,10 +42,15 @@ void AExitGenerator::CalculateRelativeExits()
 	FVector OffsetVector = GetActorRightVector() * FVector(PathGenCollider->GetRelativeLocation().X, 0, 0);
 	
 	LeftTeleporterPos = (GetActorLocation() + OffsetVector) - GetActorRightVector() * TileSize;
+	LeftTeleporterPos.Z = TileSize;
 	RightTeleporterPos = (GetActorLocation() + OffsetVector) + GetActorRightVector() * TileSize;
+	RightTeleporterPos.Z = TileSize;
 
 	LeftTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), LeftTeleporterPos, FRotator(0, 0, 0));
 	RightTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), RightTeleporterPos, FRotator(0, 0, 0));
+
+	LeftTeleportPoint->SetTeleportLocation(RightTeleporterPos);
+	RightTeleportPoint->SetTeleportLocation(LeftTeleporterPos);
 }
 
 void AExitGenerator::InitPathGenCollider()
