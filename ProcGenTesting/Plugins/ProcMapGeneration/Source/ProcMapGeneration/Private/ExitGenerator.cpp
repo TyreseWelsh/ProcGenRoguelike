@@ -5,6 +5,7 @@
 
 #include <string>
 
+#include "MaterialHLSLTree.h"
 #include "Components/SceneComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "TeleportPoint.h"
@@ -49,7 +50,9 @@ void AExitGenerator::CalculateRelativeExits()
 	LeftTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), LeftTeleporterPos, FRotator(0, 0, 0));
 	RightTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), RightTeleporterPos, FRotator(0, 0, 0));
 
+	LeftTeleportPoint->SetOwningGenerator(this);
 	LeftTeleportPoint->SetTeleportLocation(RightTeleporterPos);
+	RightTeleportPoint->SetOwningGenerator(this);
 	RightTeleportPoint->SetTeleportLocation(LeftTeleporterPos);
 }
 
@@ -78,5 +81,17 @@ void AExitGenerator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AExitGenerator::ToggleExits(bool bEnabled)
+{
+	if (LeftTeleportPoint)
+	{
+		LeftTeleportPoint->SetIsActive(bEnabled);
+	}
+	if (RightTeleportPoint)
+	{
+		RightTeleportPoint->SetIsActive(bEnabled);
+	}
 }
 

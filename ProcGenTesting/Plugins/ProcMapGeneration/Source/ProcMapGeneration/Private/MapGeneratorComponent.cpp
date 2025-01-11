@@ -78,7 +78,7 @@ void UMapGeneratorComponent::InitMap()
 	{
 		for(AExitGenerator* Exit : AllRoomExits)
 		{
-			if(IsValid(Exit->GetLeftTeleportPoint()))
+			/*if(IsValid(Exit->GetLeftTeleportPoint()))
 			{
 				UTileMapFunctionLibrary::OccupyTile(Exit->GetLeftTeleportPoint());
 			}
@@ -86,7 +86,7 @@ void UMapGeneratorComponent::InitMap()
 			if(IsValid(Exit->GetRightTeleportPoint()))
 			{
 				UTileMapFunctionLibrary::OccupyTile(Exit->GetRightTeleportPoint());
-			}
+			}*/
 		}
 	}
 

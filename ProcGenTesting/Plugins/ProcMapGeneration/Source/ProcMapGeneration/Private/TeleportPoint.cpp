@@ -3,9 +3,10 @@
 
 #include "TeleportPoint.h"
 
+#include "ExitGenerator.h"
+#include "HasPathfinding.h"
+#include "PathfindingComponent.h"
 #include "Components/SphereComponent.h"
-#include "TileMapFunctionLibrary.h"
-// Need to move pathfinding component to Plugin to get and cancel their move timer
 
 // Sets default values
 ATeleportPoint::ATeleportPoint()
@@ -54,26 +55,37 @@ void ATeleportPoint::OnLeftClick_Implementation()
 void ATeleportPoint::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (bIsActive)
-	{
-		//TeleportObject(OtherActor);
-	}
+	TeleportObject(OtherActor);
 }
 
 void ATeleportPoint::TeleportObject(AActor* Object)
 {
 	if (bIsActive)
 	{
-		// If tile to teleport to is not blocked
-		/*if (UTileMapFunctionLibrary::OccupyTile(Object))
-		{*/
-		// Get IHasPathfinding interface and call virtual EndMovement function
-			TeleportLocation.Z = Object->GetActorLocation().Z;
-			if(Object->SetActorLocation(TeleportLocation))
+		if(Object->Implements<UHasPathfinding>())
+		{
+			if(IsValid(OwningGenerator))
 			{
-				UTileMapFunctionLibrary::OccupyTile(Object);
+				OwningGenerator->ToggleExits(false);
+
+				if(UPathfindingComponent* ObjPathfindingComponent = IHasPathfinding::Execute_GetPathfindingComponent(Object))
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "TELEPORT YO AAA");
+
+					TeleportLocation.Z = Object->GetActorLocation().Z;
+					Object->SetActorLocation(TeleportLocation);
+					GEngine->AddOnScreenDebugMessage(-1, 200.f, FColor::Green, FString::Printf(TEXT("%f %f %f"), TeleportLocation.X, TeleportLocation.Y, TeleportLocation.Z));
+
+					// TODO: Current fix: need to instead call the current action's (move action) End function because currently it is not being called after teleporting
+					//		 meaning that even though movement has stopped, we are not reverting back to an open action state
+					//		 However, this is only a very specific fix and is not very generic if I want to use the teleport points for anything else (which is intended)
+					//		 I probably need to separate this code into a derived exit teleporter class where this "TeleportObject" function is virtual so it can be overidden
+					//		 Then this code will be for the player specifically
+					//		 Will need to be extended with relevant room changing functionality such as moving all player units to this position and what not but its a start 
+					ObjPathfindingComponent->EndMove();
+				}
 			}
-		//}
+		}
 	}
 }
 

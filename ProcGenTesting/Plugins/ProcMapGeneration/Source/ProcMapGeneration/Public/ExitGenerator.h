@@ -42,13 +42,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Public Properties
-	FVector LeftTeleporterPos = FVector::ZeroVector;
-	FVector RightTeleporterPos = FVector::ZeroVector;
+	void ToggleExits(bool bEnabled);
 	
-	AActor* GetLeftTile() { return LeftTile; }
-	AActor* GetRightTile() { return RightTile; }
-	
+	// Public Properties	
 	ATeleportPoint* GetLeftTeleportPoint() { return LeftTeleportPoint; }
 	ATeleportPoint* GetRightTeleportPoint() { return RightTeleportPoint; }
 
@@ -68,9 +64,7 @@ private:
 	TObjectPtr<ATeleportPoint> LeftTeleportPoint;
 	UPROPERTY()
 	TObjectPtr<ATeleportPoint> RightTeleportPoint;
-	
-	UPROPERTY()
-	TObjectPtr<AActor> LeftTile;
-	UPROPERTY()
-	TObjectPtr<AActor> RightTile;
+
+	FVector LeftTeleporterPos = FVector::ZeroVector;
+	FVector RightTeleporterPos = FVector::ZeroVector;
 };

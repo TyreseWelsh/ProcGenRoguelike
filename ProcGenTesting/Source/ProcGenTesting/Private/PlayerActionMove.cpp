@@ -15,27 +15,7 @@
 void UPlayerActionMove::Init(AActor* NewUnit)
 {	
 	SetMovingUnit(NewUnit);
-	StartMove();
-}
-
-void UPlayerActionMove::End()
-{
-	if(UTileMapFunctionLibrary::OccupyTile(UnitPathfindingComponent->GetOwner()))
-	{
-		UnitPathfindingComponent->UnHighlightTiles(UnitPathfindingComponent->GetValidTiles(), FLinearColor::Green);
-		UnitPathfindingComponent->GetCurrentPath().Empty();
-		bPlanningMove = true;
-
-		if(ActionEndDelegate.IsBound())
-		{
-			ActionEndDelegate.Broadcast();
-		}
-		ActionEndDelegate.RemoveAll(this);
-	}
-	else
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString(TEXT("MNOOOOO...")));
-	}
+	StartPlanningMovement();
 }
 
 void UPlayerActionMove::OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile)
@@ -56,7 +36,7 @@ void UPlayerActionMove::OnLeftClick(UTileComponent* SelectedTile)
 {
 	if(bPlanningMove)
 	{
-		EndMove(SelectedTile);
+		StartMove(SelectedTile);
 	}
 }
 
@@ -92,7 +72,8 @@ void UPlayerActionMove::SetStartingTile()
 	}
 }
 
-void UPlayerActionMove::StartMove()
+// Called when move action clicked
+void UPlayerActionMove::StartPlanningMovement()
 {
 	if(IsValid(MovingUnit) &&
 	IsValid(UnitPathfindingComponent) &&
@@ -102,7 +83,8 @@ void UPlayerActionMove::StartMove()
 	}
 }
 
-void UPlayerActionMove::EndMove(UTileComponent* SelectedTile)
+// Called when a valid tile to move to is selected
+void UPlayerActionMove::StartMove(UTileComponent* SelectedTile)
 {
 	bPlanningMove = false;
 	if(IsValid(UnitPathfindingComponent))
@@ -117,6 +99,17 @@ void UPlayerActionMove::EndMove(UTileComponent* SelectedTile)
 
 void UPlayerActionMove::CancelMove()
 {
+}
+
+void UPlayerActionMove::End()
+{
+	//
+	bPlanningMove = true;
+	if(ActionEndDelegate.IsBound())
+	{
+		ActionEndDelegate.Broadcast();
+	}
+	ActionEndDelegate.RemoveAll(this);
 }
 
 void UPlayerActionMove::FindMovementTiles()

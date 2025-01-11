@@ -21,7 +21,6 @@ class PROCGENTESTING_API UPlayerActionMove : public UTBActionBase
 
 public:
 	virtual void Init(AActor* NewUnit) override;
-	virtual void End() override;
 	virtual void OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile) override;
 	virtual void OnLeftClick(UTileComponent* SelectedTile) override;
 	virtual void OnRightClick() override;
@@ -30,10 +29,11 @@ public:
 	void SetPathfindingComponent();
 	void SetStartingTile();
 
-	void StartMove();
-	void EndMove(UTileComponent* SelectedTile);
+	void StartPlanningMovement();
+	void StartMove(UTileComponent* SelectedTile);
 	void CancelMove();
-
+	virtual void End() override;
+	
 private:
 	UFUNCTION()
 	void FindMovementTiles();

@@ -8,6 +8,7 @@
 #include "TeleportPoint.generated.h"
 
 class USphereComponent;
+class AExitGenerator;
 
 UCLASS()
 class PROCMAPGENERATION_API ATeleportPoint : public AActor, public IInteractable
@@ -34,19 +35,22 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void OnLeftClick_Implementation() override;
+
+	UFUNCTION(BlueprintCallable)
+	void TeleportObject(AActor* Object);
+	void SetTeleportLocation(FVector NewLocation) { TeleportLocation = NewLocation; }
 	
 	USphereComponent* GetCollider() { return Collider; }
 	UStaticMeshComponent* GetMesh() { return Mesh; }
 
-	UFUNCTION(BlueprintCallable)
-	void TeleportObject(AActor* Object);
+	AExitGenerator* GetOwningGenerator() { return OwningGenerator; }
+	void SetOwningGenerator(AExitGenerator* NewGenerator) { OwningGenerator = NewGenerator; }
 	
 	UFUNCTION(BlueprintCallable)
 	bool GetIsActive() const { return bIsActive; }
 	UFUNCTION(BlueprintCallable)
 	void SetIsActive(bool NewActive) { bIsActive = NewActive; }
 
-	void SetTeleportLocation(FVector NewLocation) { TeleportLocation = NewLocation; }
 	
 	
 private:
@@ -55,6 +59,7 @@ private:
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	//
+	TObjectPtr<AExitGenerator> OwningGenerator; 
 	bool bIsActive = true;
 	FVector TeleportLocation = FVector::ZeroVector; 
 };

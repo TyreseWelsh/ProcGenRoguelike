@@ -22,7 +22,8 @@ public:
 	void StartMove();
 	
 	virtual void Move() override;
-
+	virtual bool EndMove() override;
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

@@ -18,7 +18,7 @@ class UHasPathfinding : public UInterface
 /**
  * 
  */
-class PROCGENTESTING_API IHasPathfinding
+class PROCMAPGENERATION_API IHasPathfinding
 {
 	GENERATED_BODY()
 

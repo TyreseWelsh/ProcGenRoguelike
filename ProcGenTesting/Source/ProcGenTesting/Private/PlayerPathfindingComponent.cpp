@@ -49,8 +49,7 @@ void UPlayerPathfindingComponent::MoveToNextTile()
 		else
 		{
 			// End movement
-			MovementEndDelegate.ExecuteIfBound();
-			GetOwner()->GetWorldTimerManager().ClearTimer(MoveTimerHandle);
+			EndMove();
 		}
 	}
 }
@@ -74,6 +73,11 @@ void UPlayerPathfindingComponent::StartMove()
 		UTileMapFunctionLibrary::UnOccupyTile(GetOwner());
 		MoveToNextTile();
 	}
+}
+
+bool UPlayerPathfindingComponent::EndMove()
+{
+	return Super::EndMove();
 }
 
 void UPlayerPathfindingComponent::Move()

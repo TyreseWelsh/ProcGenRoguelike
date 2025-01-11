@@ -5,8 +5,9 @@
 
 #include "TileComponent.h"
 #include "MapRoom.h"
-#include "TileNode.h"
+#include "IsTile.h"
 #include "TileColour.h"
+#include "TileMapFunctionLibrary.h"
 
 #include "Algo/Reverse.h"
 
@@ -44,6 +45,22 @@ void UPathfindingComponent::Init()
 
 void UPathfindingComponent::Move()
 {
+}
+
+bool UPathfindingComponent::EndMove()
+{
+	GetOwner()->GetWorldTimerManager().ClearTimer(MoveTimerHandle);
+
+	if(UTileMapFunctionLibrary::OccupyTile(GetOwner()))
+	{
+		UnHighlightTiles(ValidTiles, FLinearColor::Green);
+		GetCurrentPath().Empty();
+		MovementEndDelegate.ExecuteIfBound();
+		
+		return true;
+	}
+	
+	return false;
 }
 
 TArray<AActor*> UPathfindingComponent::AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile)

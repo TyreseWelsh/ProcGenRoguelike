@@ -12,25 +12,21 @@ DECLARE_DELEGATE(FOnMovementEndSignature);
 class UTileComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PROCGENTESTING_API UPathfindingComponent : public UActorComponent
+class PROCMAPGENERATION_API UPathfindingComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
 	UPathfindingComponent();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:	
+	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Init();
 	UFUNCTION()
 	virtual void Move();
+	virtual bool EndMove();
 
 	TArray<AActor*> AttemptPathfinding(UTileComponent* StartTile, UTileComponent* TargetTile);
 	void HighlightTilesInNewPath(UTileComponent* StartTile, UTileComponent* TargetTile, FLinearColor HighlightColour);
@@ -52,6 +48,9 @@ public:
 	FOnMovementEndSignature* GetMovementEndDelegate() { return &MovementEndDelegate; }
 	
 protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+	
 	UPROPERTY()
 	FTimerHandle HighlightPathTimerHandle;
 	FTimerDelegate HighlightPathTimerDelegate;
