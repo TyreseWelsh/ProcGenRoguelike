@@ -4,6 +4,7 @@
 #include "TileMapFunctionLibrary.h"
 #include "IsTile.h"
 #include "TileComponent.h"
+#include "TBActor.h"
 #include "Kismet/GameplayStatics.h"
 
 float UTileMapFunctionLibrary::RoundToTileSizeMultiple(float OldValue, bool bRoundUp, int TileSize)
@@ -75,7 +76,7 @@ AActor* UTileMapFunctionLibrary::GetBelowTile(FVector StartingPos, UWorld* Curre
 	return nullptr;
 }
 
-bool UTileMapFunctionLibrary::OccupyTile(AActor* OccupyingActor)
+bool UTileMapFunctionLibrary::OccupyTile(ATBActor* OccupyingActor)
 {
 	if (AActor* Tile = GetBelowTile(OccupyingActor))
 	{

@@ -32,7 +32,7 @@ public:
 	void StartPlanningMovement();
 	void StartMove(UTileComponent* SelectedTile);
 	void CancelMove();
-	virtual void End() override;
+	virtual void EndAction() override;
 	
 private:
 	UFUNCTION()

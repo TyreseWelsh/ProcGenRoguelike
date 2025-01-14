@@ -70,18 +70,11 @@ void ATeleportPoint::TeleportObject(AActor* Object)
 
 				if(UPathfindingComponent* ObjPathfindingComponent = IHasPathfinding::Execute_GetPathfindingComponent(Object))
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "TELEPORT YO AAA");
-
 					TeleportLocation.Z = Object->GetActorLocation().Z;
 					Object->SetActorLocation(TeleportLocation);
-					GEngine->AddOnScreenDebugMessage(-1, 200.f, FColor::Green, FString::Printf(TEXT("%f %f %f"), TeleportLocation.X, TeleportLocation.Y, TeleportLocation.Z));
 
-					// TODO: Current fix: need to instead call the current action's (move action) End function because currently it is not being called after teleporting
-					//		 meaning that even though movement has stopped, we are not reverting back to an open action state
-					//		 However, this is only a very specific fix and is not very generic if I want to use the teleport points for anything else (which is intended)
-					//		 I probably need to separate this code into a derived exit teleporter class where this "TeleportObject" function is virtual so it can be overidden
-					//		 Then this code will be for the player specifically
-					//		 Will need to be extended with relevant room changing functionality such as moving all player units to this position and what not but its a start 
+					// TODO: Either move this functionality into a derived class (ARoomExit) or  have a boolean that determines if movement is stopped or not
+					// Lore wise reason for movement stopping objects that go through is that the portals are unstable so they destabalize objects that go through
 					ObjPathfindingComponent->EndMove();
 				}
 			}

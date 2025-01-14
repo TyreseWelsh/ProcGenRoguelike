@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "HasPathfinding.h"
 #include "Selectable.h"
-#include "GameFramework/Actor.h"
+#include "TBActor.h"
 #include "TBPlayerCharacter.generated.h"
 
 class UCapsuleComponent;
@@ -15,7 +15,7 @@ class UPlayerPathfindingComponent;
 class UUnitInfoBar;
 
 UCLASS()
-class PROCGENTESTING_API ATBPlayerCharacter : public AActor, public IHasPathfinding, public ISelectable
+class PROCGENTESTING_API ATBPlayerCharacter : public ATBActor, public IHasPathfinding, public ISelectable
 {
 	GENERATED_BODY()
 

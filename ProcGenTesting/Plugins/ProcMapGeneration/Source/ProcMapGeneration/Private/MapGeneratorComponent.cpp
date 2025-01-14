@@ -72,26 +72,12 @@ void UMapGeneratorComponent::InitMap()
 		FRoomData InitialRoomData(MapOrigin, MapSizeX, MapSizeY, InitialRoomSplitNum, RoomMinPadding, RoomMaxPadding);
 		RootRoom->InitRoom(this, nullptr, InitialRoomData);
 	}
-	
-	// Set room exit tiles
-	if(AllRoomExits.Num() > 0)
-	{
-		for(AExitGenerator* Exit : AllRoomExits)
-		{
-			/*if(IsValid(Exit->GetLeftTeleportPoint()))
-			{
-				UTileMapFunctionLibrary::OccupyTile(Exit->GetLeftTeleportPoint());
-			}
-
-			if(IsValid(Exit->GetRightTeleportPoint()))
-			{
-				UTileMapFunctionLibrary::OccupyTile(Exit->GetRightTeleportPoint());
-			}*/
-		}
-	}
 
 	RoomContentsManager = NewObject<URoomContentsManager>(this, RoomContentsManagerClass);
-	RoomContentsManager->FindSpawnRoom(MapRooms);
+	if(UMapRoom* StartingRoom = RoomContentsManager->FindSpawnRoom(MapRooms))
+	{
+		StartingRoom->Activate();
+	}
 }
 
 float UMapGeneratorComponent::CalculateNodeXPos(int Index)

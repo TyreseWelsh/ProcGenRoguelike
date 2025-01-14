@@ -6,6 +6,8 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "TileMapFunctionLibrary.generated.h"
 
+class ATBActor;
+
 /**
  * 
  */
@@ -32,7 +34,7 @@ public:
 	static AActor* GetBelowTile(AActor* StartingActor);
 	static AActor* GetBelowTile(FVector StartingPos, UWorld* CurrentWorld);
 	UFUNCTION(BlueprintCallable)
-	static bool OccupyTile(AActor* OccupyingActor);
+	static bool OccupyTile(ATBActor* OccupyingActor);
 	UFUNCTION(BlueprintCallable)
 	static bool UnOccupyTile(AActor* UnOccupyingActor);
 };

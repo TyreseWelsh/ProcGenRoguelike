@@ -6,6 +6,7 @@
 #include "RoomContentsManager.generated.h"
 
 class UMapRoom;
+class ATBActor;
 
 /**
  * 
@@ -19,8 +20,12 @@ public:
 	URoomContentsManager();
 	//~RoomContentsManager();
 
-	void FindSpawnRoom(TArray<UMapRoom*> MapRooms);
+	UMapRoom* FindSpawnRoom(TArray<UMapRoom*> MapRooms);
+	bool SpawnUnit(UMapRoom* SpawnRoom, int SpawnAttempts);
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> PlayerCharacterClass;
+
+	TArray<ATBActor*> RoomObjects;
 };

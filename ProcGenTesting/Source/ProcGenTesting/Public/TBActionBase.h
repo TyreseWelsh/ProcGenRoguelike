@@ -21,7 +21,7 @@ class PROCGENTESTING_API UTBActionBase : public UObject
 public:
 	virtual void Init(AActor* NewUnit);
 	UFUNCTION()
-	virtual void End();
+	virtual void EndAction();
 	virtual void OnHover(UTileComponent* CurrentHoveredTile, UTileComponent* NewHoveredTile);
 	virtual void OnLeftClick(UTileComponent* SelectedTile);
 	virtual void OnRightClick();

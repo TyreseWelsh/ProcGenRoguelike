@@ -26,6 +26,7 @@ public class ProcMapGeneration : ModuleRules
 			new string[]
 			{
 				"Core",
+				"TyresesUI",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

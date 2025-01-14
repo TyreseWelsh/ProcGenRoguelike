@@ -3,33 +3,64 @@
 
 #include "RoomContentsManager.h"
 
+#include "IsTile.h"
 #include "MapRoom.h"
+#include "TileComponent.h"
 #include "TileMapFunctionLibrary.h"
+#include "TBActor.h"
 
 URoomContentsManager::URoomContentsManager()
 {
 }
 
-void URoomContentsManager::FindSpawnRoom(TArray<UMapRoom*> MapRooms)
+UMapRoom* URoomContentsManager::FindSpawnRoom(TArray<UMapRoom*> MapRooms)
 {
 	// Loop through rooms, choosing one as the start room to spawn the player, and start from there
-	int RandNum = FMath::RandRange(0, MapRooms.Num() - 1);
-	UMapRoom* SpawnRoom = MapRooms[0];
+	int RoomNum = FMath::RandRange(0, MapRooms.Num() - 1);
+	UMapRoom* SpawnRoom = MapRooms[0];	// MapRooms[RoomNum]
 
-	RandNum = FMath::RandRange(0, SpawnRoom->GetRoomTiles().Num() - 1);
-	AActor* SpawnTile = SpawnRoom->GetRoomTiles()[RandNum];
+	// NOTE: TEMPORARY unit spawn
+	int UnitsToSpawn = 5;
+	for (int i = 0; i < UnitsToSpawn; ++i)
+	{
+		SpawnUnit(SpawnRoom, 10);
+	}
 
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	return SpawnRoom;
+}
+
+bool URoomContentsManager::SpawnUnit(UMapRoom* SpawnRoom, int SpawnAttempts)
+{
+	if(SpawnAttempts <= 0)
+	{
+		return false;
+	}
 	
-	if(IsValid(PlayerCharacterClass))
+	int TileNum = FMath::RandRange(0, SpawnRoom->GetRoomTiles().Num() - 1);
+	AActor* SpawnTile = SpawnRoom->GetRoomTiles()[TileNum];
+
+	if(UTileComponent* SpawnTileComponent = Cast<UTileComponent>(IIsTile::Execute_GetTileComponent(SpawnTile)))
 	{
-		AActor* SpawnedActor = SpawnTile->GetWorld()->SpawnActor<AActor>(PlayerCharacterClass, SpawnTile->GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
-		UTileMapFunctionLibrary::OccupyTile(SpawnedActor);
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 20.f, FColor::Red, FString::Printf(TEXT("Character class invalid")));
+		// If spawn tile is not occupied, spawn unit
+		if(!SpawnTileComponent->GetOccupyingObject())
+		{
+			FActorSpawnParameters SpawnParameters;
+			SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+			if(IsValid(PlayerCharacterClass))
+			{
+				ATBActor* SpawnedActor = SpawnTile->GetWorld()->SpawnActor<ATBActor>(PlayerCharacterClass, SpawnTile->GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
+				UTileMapFunctionLibrary::OccupyTile(SpawnedActor);
+				SpawnRoom->GetRoomObjects().Add(SpawnedActor);
+				return true;
+			}
+
+			return false;
+		}
+		
+		return SpawnUnit(SpawnRoom, SpawnAttempts - 1);
 	}
 
+	// "SpawnTile" does not have a UTileComponent
+	return false;
 }

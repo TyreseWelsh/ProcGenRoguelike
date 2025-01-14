@@ -7,6 +7,8 @@
 
 class UMapGeneratorComponent;
 class UWorld;
+class UBattleManager;
+class ATBActor;
 
 USTRUCT(BlueprintType)
 struct FRoomData
@@ -55,9 +57,10 @@ public:
 	void SplitVertically(const float SplitPercent);
 	void GenerateTiles();
 	AActor* SpawnTile(FVector TileSpawnPos, int RoomIndexX = -1, int RoomIndexY = -1);
-	void ChooseTileType(FVector TilePos);
 	TArray<UMapRoom*> GetLeaves(); 
 
+	void Activate();
+	
 	// Helper functions
 	float RoundToTileSizeMultiple(const float OldValue, const bool bRoundUp);
 	int CalculateLeftRoomSize(const int SplitLocation, const int Origin);
@@ -65,7 +68,8 @@ public:
 
 	FRoomData GetRoomData() { return RoomData; }
 	TArray<AActor*> GetRoomTiles() { return RoomTiles; }
-	
+	TArray<ATBActor*> GetRoomObjects() { return RoomObjects; }
+
 	// Debug Properties - All but "RoomColour" will be set on initialisation by the assigned MapGenerator
 	bool bDebugEnabled = false;
 	float RoomDrawDelay = 0.f;
@@ -76,21 +80,7 @@ public:
 	FTimerDelegate RoomSplitTimerDelegate;
 	
 	// Main Properties
-	TObjectPtr<UMapGeneratorComponent> MapGenerator;
-	/*FVector RoomOrigin = FVector::Zero();
-	int RoomSizeX = 0;
-	int RoomSizeY = 0;
-	int NumSplitsRemaining = 0;*/
-	
 	int MinRoomSize = 0;
-
-	TObjectPtr<UMapRoom> ParentRoom;
-	TObjectPtr<UMapRoom> LeftChildRoom;
-	TObjectPtr<UMapRoom> RightChildRoom;
-	TArray<UMapRoom*> ChildLeafRooms;
-	
-	UPROPERTY(VisibleAnywhere)
-	TArray<AActor*> RoomTiles;
 
 	float LowerMin = 0.2;
 	float LowerMax = 0.3;
@@ -99,6 +89,20 @@ public:
 	
 	int LastIndexX = 0;
 	int LastIndexY = 0;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<AActor*> RoomTiles;
+	UPROPERTY(VisibleAnywhere)
+	TArray<ATBActor*> RoomObjects;
+	
+	TObjectPtr<UMapGeneratorComponent> MapGenerator;	
+	TObjectPtr<UMapRoom> ParentRoom;
+	TObjectPtr<UMapRoom> LeftChildRoom;
+	TObjectPtr<UMapRoom> RightChildRoom;
+	TArray<UMapRoom*> ChildLeafRooms;
+	
+	TObjectPtr<UBattleManager> RoomBattleManager;
+
 
 private:
 	//

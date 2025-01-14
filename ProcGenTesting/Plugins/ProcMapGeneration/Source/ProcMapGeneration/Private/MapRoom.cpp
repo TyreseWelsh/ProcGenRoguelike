@@ -11,6 +11,7 @@
 #include "TileMapFunctionLibrary.h"
 
 #include "DrawDebugHelpers.h"
+#include "BattleManager.h"
 
 void UMapRoom::InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* ParentMapRoom, FRoomData NewRoomData)
 {
@@ -323,6 +324,15 @@ TArray<UMapRoom*> UMapRoom::GetLeaves()
 	ChildLeafRooms.Append(LeftChildRoom->GetLeaves());
 	ChildLeafRooms.Append(RightChildRoom->GetLeaves());
 	return ChildLeafRooms;
+}
+
+void UMapRoom::Activate()
+{
+	RoomBattleManager = NewObject<UBattleManager>();
+	if(RoomBattleManager)
+	{
+		RoomBattleManager->Activate();
+	}
 }
 
 float UMapRoom::RoundToTileSizeMultiple(const float OldValue, bool const bRoundUp)

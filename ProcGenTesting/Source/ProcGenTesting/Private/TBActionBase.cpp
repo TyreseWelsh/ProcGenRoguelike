@@ -9,7 +9,7 @@ void UTBActionBase::Init(AActor* NewUnit)
 {
 }
 
-void UTBActionBase::End()
+void UTBActionBase::EndAction()
 {
 }
 

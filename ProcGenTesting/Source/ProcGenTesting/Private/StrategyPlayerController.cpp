@@ -77,6 +77,7 @@ void AStrategyPlayerController::Tick(float DeltaTime)
 		{
 			if(UTileComponent* NewTileComponent = IIsTile::Execute_GetTileComponent(HitTile))
 			{
+
 				CurrentAction->OnHover(CurrentHoveredTileComponent, NewTileComponent);
 				
 				CurrentHoveredTileComponent = NewTileComponent;

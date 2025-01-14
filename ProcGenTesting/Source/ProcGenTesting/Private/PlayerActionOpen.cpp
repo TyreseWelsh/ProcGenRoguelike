@@ -10,7 +10,7 @@ void UPlayerActionOpen::Init(AActor* NewUnit)
 	Super::Init(NewUnit);
 }
 
-void UPlayerActionOpen::End()
+void UPlayerActionOpen::EndAction()
 {
 }
 
@@ -29,6 +29,8 @@ void UPlayerActionOpen::OnHover(UTileComponent* CurrentHoveredTile, UTileCompone
 		if(bCanHover)
 		{
 			NewHoveredTile->TileHover();
+			GEngine->AddOnScreenDebugMessage(1, 0.5f, FColor::Red, "LAG!");
+
 		}
 	}
 }

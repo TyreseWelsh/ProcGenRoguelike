@@ -92,7 +92,7 @@ void UPlayerActionMove::StartMove(UTileComponent* SelectedTile)
 		UnitPathfindingComponent->UnHighlightTiles(UnitPathfindingComponent->GetTilesInRange(), FLinearColor::Blue);
 		
 		// Call unit PathfindingComponent Move function
-		UnitPathfindingComponent->GetMovementEndDelegate()->BindUObject(this, &UPlayerActionMove::End);
+		UnitPathfindingComponent->GetMovementEndDelegate()->BindUObject(this, &UPlayerActionMove::EndAction);
 		UnitPathfindingComponent->Move();
 	}
 }
@@ -101,7 +101,7 @@ void UPlayerActionMove::CancelMove()
 {
 }
 
-void UPlayerActionMove::End()
+void UPlayerActionMove::EndAction()
 {
 	//
 	bPlanningMove = true;

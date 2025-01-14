@@ -6,6 +6,7 @@
 #include "TileComponent.h"
 #include "MapRoom.h"
 #include "IsTile.h"
+#include "TBActor.h"
 #include "TileColour.h"
 #include "TileMapFunctionLibrary.h"
 
@@ -51,7 +52,7 @@ bool UPathfindingComponent::EndMove()
 {
 	GetOwner()->GetWorldTimerManager().ClearTimer(MoveTimerHandle);
 
-	if(UTileMapFunctionLibrary::OccupyTile(GetOwner()))
+	if(UTileMapFunctionLibrary::OccupyTile(Cast<ATBActor>(GetOwner())))
 	{
 		UnHighlightTiles(ValidTiles, FLinearColor::Green);
 		GetCurrentPath().Empty();
