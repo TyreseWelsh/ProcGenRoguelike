@@ -18,7 +18,7 @@ UTileComponent::UTileComponent()
 	// ...
 }
 
-void UTileComponent::InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY)
+void UTileComponent::InitTile_Implementation(AMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY)
 {
 	OwningRoom = OwnerRoom;
 	TileSize = NewTileSize;
@@ -137,7 +137,7 @@ TArray<UTileComponent*> UTileComponent::GetNeighbourTiles()
 	return NeighbourTiles;
 }
 
-void UTileComponent::SetOwningRoom(UMapRoom* NewOwner)
+void UTileComponent::SetOwningRoom(AMapRoom* NewOwner)
 {
 	OwningRoom = NewOwner;
 }

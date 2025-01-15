@@ -27,7 +27,7 @@ DECLARE_MULTICAST_DELEGATE(FTileTypeToPathSignature);
 DECLARE_MULTICAST_DELEGATE(FTileTypeToGroundSignature);
 DECLARE_MULTICAST_DELEGATE(FTileTypeToExitSignature);
 
-class UMapRoom;
+class AMapRoom;
 
 /*
  *  Component to be attached to any actor the user wishes to be treated as a "Tile"
@@ -45,8 +45,8 @@ public:
 	UTileComponent();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void InitTile(UMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY);
-	virtual void InitTile_Implementation(UMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY);
+	void InitTile(AMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY);
+	virtual void InitTile_Implementation(AMapRoom* OwnerRoom, int NewTileSize, int NewRoomIndexX, int NewRoomIndexY);
 
 	void SetTileType();
 	void FindNeighbourTiles();
@@ -60,7 +60,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	TObjectPtr<UMapRoom> OwningRoom;
+	TObjectPtr<AMapRoom> OwningRoom;
 	TEnumAsByte<ETileType> TileType;
 
 	bool bIsWalkable = true;
@@ -78,7 +78,7 @@ public:
 	AActor* GetOccupyingObject() { return OccupyingObject; }
 	void SetOccupyingObject(AActor* NewObject) { OccupyingObject = NewObject; }
 
-	void SetOwningRoom(UMapRoom* NewOwner);
+	void SetOwningRoom(AMapRoom* NewOwner);
 	void SetRoomIndexX(int NewIndex);
 	void SetRoomIndexY(int NewIndex);
 
@@ -94,7 +94,7 @@ public:
 	void SetTileTypeToGround();
 	void SetTileTypeToExit();
 
-	TObjectPtr<UMapRoom> GetOwningRoom() const { return OwningRoom; }
+	TObjectPtr<AMapRoom> GetOwningRoom() const { return OwningRoom; }
 	UFUNCTION(BlueprintCallable)
 	TEnumAsByte<ETileType> GetTileType() const { return TileType; }
 	UFUNCTION(BlueprintCallable)

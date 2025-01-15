@@ -26,6 +26,7 @@ public class ProcMapGeneration : ModuleRules
 			new string[]
 			{
 				"Core",
+				"UMG",
 				"TyresesUI",
 				// ... add other public dependencies that you statically link with here ...
 			}
@@ -39,6 +40,7 @@ public class ProcMapGeneration : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"TyresesUI",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

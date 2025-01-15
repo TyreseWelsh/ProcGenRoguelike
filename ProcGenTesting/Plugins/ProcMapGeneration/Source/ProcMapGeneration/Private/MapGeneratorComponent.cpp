@@ -66,7 +66,8 @@ void UMapGeneratorComponent::InitMap()
 	MapTileHeights.SetNum(NumTilesX * NumTilesY);
 
 	// Initialising first room to start BSP algorithm
-	RootRoom = NewObject<UMapRoom>();
+	RootRoom = NewObject<AMapRoom>();
+	//RootRoom = GetOwner()->GetWorld()->SpawnActor<AMapRoom>(RoomClass->StaticClass(), MapOrigin, FRotator::ZeroRotator);
 	if(IsValid(RootRoom))
 	{
 		FRoomData InitialRoomData(MapOrigin, MapSizeX, MapSizeY, InitialRoomSplitNum, RoomMinPadding, RoomMaxPadding);
@@ -74,7 +75,7 @@ void UMapGeneratorComponent::InitMap()
 	}
 
 	RoomContentsManager = NewObject<URoomContentsManager>(this, RoomContentsManagerClass);
-	if(UMapRoom* StartingRoom = RoomContentsManager->FindSpawnRoom(MapRooms))
+	if(AMapRoom* StartingRoom = RoomContentsManager->FindSpawnRoom(MapRooms))
 	{
 		StartingRoom->Activate();
 	}
@@ -98,7 +99,7 @@ float UMapGeneratorComponent::CalculateTileHeight(int x, int y)
 	return HeightNoise->GetNoise(MapIndex2D.X, MapIndex2D.Y);
 }
 
-void UMapGeneratorComponent::AddToMapRooms(UMapRoom* NewRoom)
+void UMapGeneratorComponent::AddToMapRooms(AMapRoom* NewRoom)
 {
 	if(NewRoom)
 	{

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "RoomContentsManager.generated.h"
 
-class UMapRoom;
+class AMapRoom;
 class ATBActor;
 
 /**
@@ -20,8 +20,8 @@ public:
 	URoomContentsManager();
 	//~RoomContentsManager();
 
-	UMapRoom* FindSpawnRoom(TArray<UMapRoom*> MapRooms);
-	bool SpawnUnit(UMapRoom* SpawnRoom, int SpawnAttempts);
+	AMapRoom* FindSpawnRoom(TArray<AMapRoom*> MapRooms);
+	bool SpawnUnit(AMapRoom* SpawnRoom, int SpawnAttempts);
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "BattleManager.generated.h"
 
+class UUserWidget;
 enum class EBattlePriority : uint8;
 class ATBActor;
 class UBattleTimeline;
@@ -20,7 +21,7 @@ class PROCMAPGENERATION_API UBattleManager : public UObject
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> BattleTimelineClass;
-	UBattleTimeline* BattleTimeline;
+	TObjectPtr<UBattleTimeline> BattleTimeline;
 	
 	TArray<TArray<ATBActor*>> CurrentBattleObjects;
 	int PriorityIndex = 0;
@@ -30,10 +31,10 @@ class PROCMAPGENERATION_API UBattleManager : public UObject
 
 	
 public:
-	UBattleManager() {}
-	UBattleManager(TArray<ATBActor*> TurnActors);
+	/*UBattleManager() {}
+	UBattleManager(TArray<ATBActor*> TurnActors);*/
 	
-	//void Init(TArray<ATBActor*> TurnActors);
+	void Init(TArray<ATBActor*> TurnActors);
 	bool AddBattleObject(EBattlePriority TurnPriority, ATBActor* NewTurnObject);
 
 	void Activate();

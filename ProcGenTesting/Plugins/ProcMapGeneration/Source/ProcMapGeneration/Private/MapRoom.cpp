@@ -13,7 +13,7 @@
 #include "DrawDebugHelpers.h"
 #include "BattleManager.h"
 
-void UMapRoom::InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* ParentMapRoom, FRoomData NewRoomData)
+void AMapRoom::InitRoom(UMapGeneratorComponent* NewMapGenerator, AMapRoom* ParentMapRoom, FRoomData NewRoomData)
 {
 	MapGenerator = NewMapGenerator;
 	ParentRoom = ParentMapRoom;
@@ -48,7 +48,7 @@ void UMapRoom::InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* Paren
 	}
 }
 
-void UMapRoom::SplitRoom()
+void AMapRoom::SplitRoom()
 {
 	//float SplitPercent = FMath::RandRange(0.35, 0.65);
 	float num1 = 1 / (MapGenerator->InitialRoomSplitNum * 2);
@@ -104,27 +104,12 @@ void UMapRoom::SplitRoom()
 	}
 }
 
-void UMapRoom::SplitHorizontally(const float SplitPercent)
+void AMapRoom::SplitHorizontally(const float SplitPercent)
 {
 	int RoomBottom = RoomData.Origin.Y + RoomData.SizeY;
 
 	int SplitLocationY = RoomData.Origin.Y + ((RoomBottom - RoomData.Origin.Y) * SplitPercent);
 	SplitLocationY = (SplitPercent >= 0.5f) ? RoundToTileSizeMultiple(SplitLocationY, false) : RoundToTileSizeMultiple(SplitLocationY, true);
-	
-	FColor NewRoomColor = 	FColor::MakeRandomColor();
-	//
-	/*for(int i = 0; i < (RoomSizeX / TileSize); ++i)
-	{
-		FVector CurrentTilePos = FVector(RoomOrigin.X + (i * TileSize), SplitLocationY, RoomOrigin.Z);
-		if(AActor* CurrentTile = SpawnTile(CurrentTilePos))
-		{
-			if(UTileComponent* CurrenTileComponent = CurrentTile->FindComponentByClass<UTileComponent>())
-			{
-				CurrenTileComponent->SetTileTypeToWall();
-			}
-		}
-	}*/
-	//
 	
 	// Setup and spawn of Exit actor along split
 	int RandLocationAlongSplit;
@@ -146,7 +131,7 @@ void UMapRoom::SplitHorizontally(const float SplitPercent)
 	MapGenerator->AllRoomExits.Add(Exit);
 
 	// Creating and initialising child rooms
-	LeftChildRoom = NewObject<UMapRoom>();
+	LeftChildRoom = NewObject<AMapRoom>();
 	if(IsValid(LeftChildRoom))
 	{
 		FRoomData LeftRoomData(FVector(RoomData.Origin.X, RoomData.Origin.Y, RoomData.Origin.Z + RoomSpawnOffsetZ),
@@ -155,7 +140,7 @@ void UMapRoom::SplitHorizontally(const float SplitPercent)
 		LeftChildRoom->InitRoom(MapGenerator, this, LeftRoomData);
 	}
 
-	RightChildRoom = NewObject<UMapRoom>();
+	RightChildRoom = NewObject<AMapRoom>();
 	if(IsValid(RightChildRoom))
 	{
 		int RightRoomOriginY = SplitLocationY + TileSize;
@@ -166,29 +151,13 @@ void UMapRoom::SplitHorizontally(const float SplitPercent)
 	}
 }
 
-void UMapRoom::SplitVertically(const float SplitPercent)
+void AMapRoom::SplitVertically(const float SplitPercent)
 {
 	int RoomRight = RoomData.Origin.X + RoomData.SizeX;
 	
 	int SplitLocationX = RoomData.Origin.X + ((RoomRight - RoomData.Origin.X) * SplitPercent);
 	SplitLocationX = (SplitPercent >= 0.5f) ? RoundToTileSizeMultiple(SplitLocationX, false) : RoundToTileSizeMultiple(SplitLocationX, true);
 	
-	FColor NewRoomColor = 	FColor::MakeRandomColor();
-	//
-	/*for(int i = 0; i < (RoomSizeY / TileSize); ++i)
-	{
-		FVector CurrentTilePos = FVector(SplitLocationX, RoomOrigin.Y + (i * TileSize), RoomOrigin.Z);
-
-		if(AActor* CurrentTile = SpawnTile(CurrentTilePos))
-		{
-			if(UTileComponent* CurrenTileComponent = CurrentTile->FindComponentByClass<UTileComponent>())
-			{
-				CurrenTileComponent->SetTileTypeToWall();
-			}
-		}
-	}*/
-	//
-	UE_LOG(LogTemp, Warning, TEXT(""));
 	int RandLocationAlongSplit;
 	if(RoomData.BSPSplitsRemaining == 1)
 	{
@@ -208,7 +177,7 @@ void UMapRoom::SplitVertically(const float SplitPercent)
 	MapGenerator->AllRoomExits.Add(Exit);
 
 	// Creating and initialising child rooms
-	LeftChildRoom = NewObject<UMapRoom>();
+	LeftChildRoom = NewObject<AMapRoom>();
 	if(IsValid(LeftChildRoom))
 	{
 		FRoomData LeftRoomData(FVector(RoomData.Origin.X, RoomData.Origin.Y, RoomData.Origin.Z + RoomSpawnOffsetZ),
@@ -218,7 +187,7 @@ void UMapRoom::SplitVertically(const float SplitPercent)
 		LeftChildRoom->InitRoom(MapGenerator, this, LeftRoomData);
 	}
 	
-	RightChildRoom = NewObject<UMapRoom>();
+	RightChildRoom = NewObject<AMapRoom>();
 	if(IsValid(RightChildRoom))
 	{
 		int RightRoomOriginX = SplitLocationX + TileSize;
@@ -230,7 +199,7 @@ void UMapRoom::SplitVertically(const float SplitPercent)
 	}
 }
 
-void UMapRoom::GenerateTiles()
+void AMapRoom::GenerateTiles()
 {
 	int LeftPadding = FMath::RandRange(RoomData.MinPadding, RoomData.MaxPadding) * TileSize;
 	int TopPadding = FMath::RandRange(RoomData.MinPadding, RoomData.MaxPadding) * TileSize;
@@ -258,7 +227,7 @@ void UMapRoom::GenerateTiles()
 	RoomSplitTimerHandle.Invalidate();
 }
 
-AActor* UMapRoom::SpawnTile(FVector TileSpawnPos, int RoomIndexX, int RoomIndexY)
+AActor* AMapRoom::SpawnTile(FVector TileSpawnPos, int RoomIndexX, int RoomIndexY)
 {
 	int TileMapArrayIndex = UTileMapFunctionLibrary::CalculateIndexFromTilePos(TileSpawnPos, MapGenerator->MapOrigin, MapGenerator->MapSizeX, TileSize);
 	TObjectPtr<AActor> CurrentTile;
@@ -312,9 +281,9 @@ AActor* UMapRoom::SpawnTile(FVector TileSpawnPos, int RoomIndexX, int RoomIndexY
 	return CurrentTile;
 }
 
-TArray<UMapRoom*> UMapRoom::GetLeaves()
+TArray<AMapRoom*> AMapRoom::GetLeaves()
 {
-	TArray<UMapRoom*> Leaves;
+	TArray<AMapRoom*> Leaves;
 	if(!(IsValid(LeftChildRoom) && IsValid(RightChildRoom)))
 	{
 		Leaves.Add(this);
@@ -326,16 +295,18 @@ TArray<UMapRoom*> UMapRoom::GetLeaves()
 	return ChildLeafRooms;
 }
 
-void UMapRoom::Activate()
+void AMapRoom::Activate()
 {
-	RoomBattleManager = NewObject<UBattleManager>();
+	//RoomBattleManager = NewObject<UBattleManager>();
+	//RoomBattleManager = RoomTiles[0]->GetWorld()->SpawnActor<
 	if(RoomBattleManager)
 	{
+		RoomBattleManager->Init(RoomObjects);
 		RoomBattleManager->Activate();
 	}
 }
 
-float UMapRoom::RoundToTileSizeMultiple(const float OldValue, bool const bRoundUp)
+float AMapRoom::RoundToTileSizeMultiple(const float OldValue, bool const bRoundUp)
 {
 	float CurrentValue = OldValue / TileSize;
 	CurrentValue = (bRoundUp) ? ceil(CurrentValue) : floor(CurrentValue);
@@ -343,12 +314,12 @@ float UMapRoom::RoundToTileSizeMultiple(const float OldValue, bool const bRoundU
 	return CurrentValue * TileSize;
 }
 
-int UMapRoom::CalculateLeftRoomSize(const int SplitLocation, const int Origin)
+int AMapRoom::CalculateLeftRoomSize(const int SplitLocation, const int Origin)
 {
 	return SplitLocation - Origin;
 }
 
-int UMapRoom::CalculateRightRoomSize(const int SplitLocation, const int RoomEnd)
+int AMapRoom::CalculateRightRoomSize(const int SplitLocation, const int RoomEnd)
 {
 	return RoomEnd - SplitLocation;
 }

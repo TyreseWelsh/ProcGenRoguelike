@@ -3,7 +3,7 @@
 
 #include "BattleManager.h"
 #include "TBActor.h"
-#include "../../../../../Source/ProcGenTesting/Public/BattleTimeline.h"
+#include "BattleTimeline.h"
 #include "Blueprint/UserWidget.h"
 
 bool UBattleManager::InitTurnObject(ATBActor* TurnActor)
@@ -18,21 +18,21 @@ bool UBattleManager::InitTurnObject(ATBActor* TurnActor)
 	return false;
 }
 
-UBattleManager::UBattleManager(TArray<ATBActor*> TurnActors)
+/*UBattleManager::UBattleManager(/*TArray<ATBActor*> TurnActors#1#)
+{
+	for(ATBActor* TurnActor : TurnActors)
+	{
+		AddBattleObject(TurnActor->GetBattlePriority(), TurnActor);
+	}
+}*/
+
+void UBattleManager::Init(TArray<ATBActor*> TurnActors)
 {
 	for(ATBActor* TurnActor : TurnActors)
 	{
 		AddBattleObject(TurnActor->GetBattlePriority(), TurnActor);
 	}
 }
-
-/*void UTurnManager::Init(TArray<ATBActor*> TurnActors)
-{
-	for(ATBActor* TurnActor : TurnActors)
-	{
-		AddTurnObject(TurnActor->GetBattlePriority(), TurnActor);
-	}
-}*/
 
 bool UBattleManager::AddBattleObject(EBattlePriority NewBattlePriority, ATBActor* NewBattleObject)
 {

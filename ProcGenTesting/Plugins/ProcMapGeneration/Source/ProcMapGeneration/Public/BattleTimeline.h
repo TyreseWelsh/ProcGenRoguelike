@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class PROCGENTESTING_API UBattleTimeline : public UTWUserWidget
+class PROCMAPGENERATION_API UBattleTimeline : public UTWUserWidget
 {
 	GENERATED_BODY()
 	

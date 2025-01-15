@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
 #include "MapRoom.generated.h"
 
 class UMapGeneratorComponent;
@@ -42,22 +43,22 @@ struct FRoomData
  * Simply acts as a data object to store the room data such as Room: location, type, contained tiles, etc.
  */
 UCLASS()
-class PROCMAPGENERATION_API UMapRoom : public UObject
+class PROCMAPGENERATION_API AMapRoom : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	/*UMapRoom();
-	~UMapRoom();*/
+	/*AMapRoom();
+	~AMapRoom();*/
 
-	void InitRoom(UMapGeneratorComponent* NewMapGenerator, UMapRoom* ParentMapRoom, FRoomData NewRoomData);
+	void InitRoom(UMapGeneratorComponent* NewMapGenerator, AMapRoom* ParentMapRoom, FRoomData NewRoomData);
 	UFUNCTION()
 	void SplitRoom();
 	void SplitHorizontally(const float SplitPercent);
 	void SplitVertically(const float SplitPercent);
 	void GenerateTiles();
 	AActor* SpawnTile(FVector TileSpawnPos, int RoomIndexX = -1, int RoomIndexY = -1);
-	TArray<UMapRoom*> GetLeaves(); 
+	TArray<AMapRoom*> GetLeaves(); 
 
 	void Activate();
 	
@@ -96,11 +97,12 @@ public:
 	TArray<ATBActor*> RoomObjects;
 	
 	TObjectPtr<UMapGeneratorComponent> MapGenerator;	
-	TObjectPtr<UMapRoom> ParentRoom;
-	TObjectPtr<UMapRoom> LeftChildRoom;
-	TObjectPtr<UMapRoom> RightChildRoom;
-	TArray<UMapRoom*> ChildLeafRooms;
-	
+	TObjectPtr<AMapRoom> ParentRoom;
+	TObjectPtr<AMapRoom> LeftChildRoom;
+	TObjectPtr<AMapRoom> RightChildRoom;
+	TArray<AMapRoom*> ChildLeafRooms;
+
+	TSubclassOf<UBattleManager> BattleManagerClass;
 	TObjectPtr<UBattleManager> RoomBattleManager;
 
 

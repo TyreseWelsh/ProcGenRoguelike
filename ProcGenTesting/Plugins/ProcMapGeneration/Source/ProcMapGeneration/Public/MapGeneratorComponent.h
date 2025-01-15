@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "MapGeneratorComponent.generated.h"
 
-class UMapRoom;
+class AMapRoom;
 class FastNoiseLite;
 class AExitGenerator;
 struct FRoomData;
@@ -24,6 +24,7 @@ public:
 	// Main functions
 	UFUNCTION(BlueprintCallable)
 	void InitMap();
+	void SpawnRoom();
 	
 	// Helper functions
 	float CalculateNodeXPos(int Index);
@@ -31,7 +32,7 @@ public:
 
 	float CalculateTileHeight(int x, int y);
 
-	void AddToMapRooms(UMapRoom* NewRoom);
+	void AddToMapRooms(AMapRoom* NewRoom);
 
 protected:
 	// Called when the game starts
@@ -57,6 +58,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Map")
 	TSubclassOf<AActor> TileClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Map")
+	TSubclassOf<AMapRoom> RoomClass;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
 	TSubclassOf<URoomContentsManager> RoomContentsManagerClass;
 	UPROPERTY()
@@ -92,9 +95,9 @@ public:
 
 	// Other properties
 	UPROPERTY()
-	TArray<UMapRoom*> MapRooms;			
+	TArray<AMapRoom*> MapRooms;			
 	UPROPERTY()
-	TObjectPtr<UMapRoom> RootRoom;
+	TObjectPtr<AMapRoom> RootRoom;
 	UPROPERTY()
 	int LeafRoomIndex = 0;
 	TArray<AExitGenerator*> AllRoomExits;
