@@ -10,6 +10,7 @@ class AMapRoom;
 class FastNoiseLite;
 class AExitGenerator;
 struct FRoomData;
+class UMapRoomsGenerator;
 class URoomContentsManager;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -55,11 +56,11 @@ public:
 	// Map properties
 	UPROPERTY(BlueprintReadOnly, Category = "Map")
 	TArray<AActor*> MapTiles;										// WIP: Will be changed to store pointers to tile node class
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Map")
-	TSubclassOf<AActor> TileClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Map")
-	TSubclassOf<AMapRoom> RoomClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
+	TSubclassOf<UMapRoomsGenerator> MapRoomsGeneratorClass;
+	UPROPERTY()
+	TObjectPtr<UMapRoomsGenerator> MapRoomsGenerator;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Map")
 	TSubclassOf<URoomContentsManager> RoomContentsManagerClass;
 	UPROPERTY()

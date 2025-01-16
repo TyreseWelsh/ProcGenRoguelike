@@ -37,7 +37,7 @@ public:
 	virtual void OnLeftClick_Implementation() override;
 
 	UFUNCTION(BlueprintCallable)
-	void TeleportObject(AActor* Object);
+	virtual void TeleportObject(AActor* Object);
 	void SetTeleportLocation(FVector NewLocation) { TeleportLocation = NewLocation; }
 	
 	USphereComponent* GetCollider() { return Collider; }
@@ -53,7 +53,7 @@ public:
 
 	
 	
-private:
+protected:
 	//
 	UFUNCTION()
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

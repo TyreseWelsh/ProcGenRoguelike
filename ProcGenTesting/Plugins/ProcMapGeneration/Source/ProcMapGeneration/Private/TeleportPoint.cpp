@@ -3,9 +3,6 @@
 
 #include "TeleportPoint.h"
 
-#include "ExitGenerator.h"
-#include "HasPathfinding.h"
-#include "PathfindingComponent.h"
 #include "Components/SphereComponent.h"
 
 // Sets default values
@@ -60,25 +57,6 @@ void ATeleportPoint::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 
 void ATeleportPoint::TeleportObject(AActor* Object)
 {
-	if (bIsActive)
-	{
-		if(Object->Implements<UHasPathfinding>())
-		{
-			if(IsValid(OwningGenerator))
-			{
-				OwningGenerator->ToggleExits(false);
 
-				if(UPathfindingComponent* ObjPathfindingComponent = IHasPathfinding::Execute_GetPathfindingComponent(Object))
-				{
-					TeleportLocation.Z = Object->GetActorLocation().Z;
-					Object->SetActorLocation(TeleportLocation);
-
-					// TODO: Either move this functionality into a derived class (ARoomExit) or  have a boolean that determines if movement is stopped or not
-					// Lore wise reason for movement stopping objects that go through is that the portals are unstable so they destabalize objects that go through
-					ObjPathfindingComponent->EndMove();
-				}
-			}
-		}
-	}
 }
 

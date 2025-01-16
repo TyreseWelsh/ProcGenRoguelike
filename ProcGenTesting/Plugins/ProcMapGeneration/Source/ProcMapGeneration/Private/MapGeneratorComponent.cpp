@@ -5,12 +5,10 @@
 
 #include "MapRoom.h"
 #include "ExitGenerator.h"
-#include "TileComponent.h"
-#include "IsTile.h"
 #include "FastNoiseLite.h"
 #include "TileMapFunctionLibrary.h"
 #include "RoomContentsManager.h"
-#include "TeleportPoint.h"
+#include "MapRoomsGenerator.h"
 
 
 // Sets default values for this component's properties
@@ -64,14 +62,13 @@ void UMapGeneratorComponent::InitMap()
 	UE_LOG(LogTemp, Warning, TEXT("Frequency is : %f"), freq);
 
 	MapTileHeights.SetNum(NumTilesX * NumTilesY);
-
-	// Initialising first room to start BSP algorithm
-	RootRoom = NewObject<AMapRoom>();
-	//RootRoom = GetOwner()->GetWorld()->SpawnActor<AMapRoom>(RoomClass->StaticClass(), MapOrigin, FRotator::ZeroRotator);
-	if(IsValid(RootRoom))
+	
+	// Start room generation
+	MapRoomsGenerator = NewObject<UMapRoomsGenerator>(this, MapRoomsGeneratorClass);
+	if(MapRoomsGenerator)
 	{
 		FRoomData InitialRoomData(MapOrigin, MapSizeX, MapSizeY, InitialRoomSplitNum, RoomMinPadding, RoomMaxPadding);
-		RootRoom->InitRoom(this, nullptr, InitialRoomData);
+		MapRoomsGenerator->Init(TileSize,  InitialRoomData, this);
 	}
 
 	RoomContentsManager = NewObject<URoomContentsManager>(this, RoomContentsManagerClass);
@@ -93,10 +90,11 @@ float UMapGeneratorComponent::CalculateNodeYPos(int Index)
 
 float UMapGeneratorComponent::CalculateTileHeight(int x, int y)
 {
-	int MapIndex1D = UTileMapFunctionLibrary::CalculateIndexFromTilePos(FVector(x, y, 0), RootRoom->GetRoomData().Origin, RootRoom->GetRoomData().SizeX, TileSize);
+	/*int MapIndex1D = UTileMapFunctionLibrary::CalculateIndexFromTilePos(FVector(x, y, 0), RootRoom->GetRoomData().Origin, RootRoom->GetRoomData().SizeX, TileSize);
 	FVector2D MapIndex2D = UTileMapFunctionLibrary::ConvertIndex1Dto2D(MapIndex1D, RootRoom->GetRoomData().SizeX, TileSize);
 	
-	return HeightNoise->GetNoise(MapIndex2D.X, MapIndex2D.Y);
+	return HeightNoise->GetNoise(MapIndex2D.X, MapIndex2D.Y);*/
+	return 0.f;
 }
 
 void UMapGeneratorComponent::AddToMapRooms(AMapRoom* NewRoom)

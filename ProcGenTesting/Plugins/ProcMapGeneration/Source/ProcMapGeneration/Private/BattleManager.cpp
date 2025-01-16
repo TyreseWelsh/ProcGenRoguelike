@@ -6,7 +6,7 @@
 #include "BattleTimeline.h"
 #include "Blueprint/UserWidget.h"
 
-bool UBattleManager::InitTurnObject(ATBActor* TurnActor)
+bool ABattleManager::InitTurnObject(ATBActor* TurnActor)
 {
 	if(TurnActor)
 	{
@@ -18,15 +18,7 @@ bool UBattleManager::InitTurnObject(ATBActor* TurnActor)
 	return false;
 }
 
-/*UBattleManager::UBattleManager(/*TArray<ATBActor*> TurnActors#1#)
-{
-	for(ATBActor* TurnActor : TurnActors)
-	{
-		AddBattleObject(TurnActor->GetBattlePriority(), TurnActor);
-	}
-}*/
-
-void UBattleManager::Init(TArray<ATBActor*> TurnActors)
+void ABattleManager::Init(TArray<ATBActor*> TurnActors)
 {
 	for(ATBActor* TurnActor : TurnActors)
 	{
@@ -34,7 +26,7 @@ void UBattleManager::Init(TArray<ATBActor*> TurnActors)
 	}
 }
 
-bool UBattleManager::AddBattleObject(EBattlePriority NewBattlePriority, ATBActor* NewBattleObject)
+bool ABattleManager::AddBattleObject(EBattlePriority NewBattlePriority, ATBActor* NewBattleObject)
 {
 	switch(NewBattlePriority)
 	{
@@ -61,15 +53,22 @@ bool UBattleManager::AddBattleObject(EBattlePriority NewBattlePriority, ATBActor
 // Is called once the player enters a room that has not been cleared yet, starts the turn based combat
 // Adds turn based UI to viewport at the top of the screen
 // Plays relevant UI sounds and visuals/animations
-void UBattleManager::Activate()
+void ABattleManager::Activate()
 {
 	if(BattleTimelineClass)
 	{
 		BattleTimeline = CreateWidget<UBattleTimeline>(GetWorld(), BattleTimelineClass);
 		if(BattleTimeline)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Orange, FString::Printf(TEXT("Added battle timeline to viewport")));
+
 			BattleTimeline->AddToViewport();
+
 			// Play BattleTimeline opening animation
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Orange, FString::Printf(TEXT("Battle timeline null...")));
 		}
 	}
 }
@@ -77,13 +76,13 @@ void UBattleManager::Activate()
 // Is called once the player clears a room as turn based combat has ended
 // Removes turn based UI from viewport
 // Plays relevant UI sounds and visuals/animations
-void UBattleManager::Deactivate()
+void ABattleManager::Deactivate()
 {
 }
 
 // NOTE: TurnManager will subscribe to the current actors relevant delegates declared in "TBActor.h" such as:
 //		 OnDeath-To remove the actor from the TurnObjects array, OnTurnEnd-To signal to the TurnManager that we should move to the next turn, etc
-void UBattleManager::InitNextTurn()
+void ABattleManager::InitNextTurn()
 {
 	ObjectIndex++;
 	// TRUE if all objects of this priority have taken action if able

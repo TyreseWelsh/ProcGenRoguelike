@@ -8,7 +8,7 @@
 #include "MaterialHLSLTree.h"
 #include "Components/SceneComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "TeleportPoint.h"
+#include "RoomExit.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -47,8 +47,8 @@ void AExitGenerator::CalculateRelativeExits()
 	RightTeleporterPos = (GetActorLocation() + OffsetVector) + GetActorRightVector() * TileSize;
 	RightTeleporterPos.Z = TileSize;
 
-	LeftTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), LeftTeleporterPos, FRotator(0, 0, 0));
-	RightTeleportPoint = GetWorld()->SpawnActor<ATeleportPoint>(ATeleportPoint::StaticClass(), RightTeleporterPos, FRotator(0, 0, 0));
+	LeftTeleportPoint = GetWorld()->SpawnActor<ARoomExit>(ARoomExit::StaticClass(), LeftTeleporterPos, FRotator(0, 0, 0));
+	RightTeleportPoint = GetWorld()->SpawnActor<ARoomExit>(ARoomExit::StaticClass(), RightTeleporterPos, FRotator(0, 0, 0));
 
 	LeftTeleportPoint->SetOwningGenerator(this);
 	LeftTeleportPoint->SetTeleportLocation(RightTeleporterPos);

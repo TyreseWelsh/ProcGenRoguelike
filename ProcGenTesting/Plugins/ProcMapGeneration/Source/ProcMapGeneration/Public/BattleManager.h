@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "GameFramework/Actor.h"
 #include "BattleManager.generated.h"
 
-class UUserWidget;
+class UTWUserWidget;
 enum class EBattlePriority : uint8;
 class ATBActor;
 class UBattleTimeline;
@@ -14,14 +14,14 @@ class UBattleTimeline;
 /**
  * 
  */
-UCLASS()
-class PROCMAPGENERATION_API UBattleManager : public UObject
+UCLASS(Blueprintable)
+class PROCMAPGENERATION_API ABattleManager : public AActor
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UUserWidget> BattleTimelineClass;
-	TObjectPtr<UBattleTimeline> BattleTimeline;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UTWUserWidget> BattleTimelineClass;
+	UBattleTimeline* BattleTimeline;
 	
 	TArray<TArray<ATBActor*>> CurrentBattleObjects;
 	int PriorityIndex = 0;
@@ -31,9 +31,6 @@ class PROCMAPGENERATION_API UBattleManager : public UObject
 
 	
 public:
-	/*UBattleManager() {}
-	UBattleManager(TArray<ATBActor*> TurnActors);*/
-	
 	void Init(TArray<ATBActor*> TurnActors);
 	bool AddBattleObject(EBattlePriority TurnPriority, ATBActor* NewTurnObject);
 

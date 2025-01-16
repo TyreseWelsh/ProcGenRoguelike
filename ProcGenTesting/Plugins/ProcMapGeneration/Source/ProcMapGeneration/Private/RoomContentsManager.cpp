@@ -16,17 +16,22 @@ URoomContentsManager::URoomContentsManager()
 AMapRoom* URoomContentsManager::FindSpawnRoom(TArray<AMapRoom*> MapRooms)
 {
 	// Loop through rooms, choosing one as the start room to spawn the player, and start from there
-	int RoomNum = FMath::RandRange(0, MapRooms.Num() - 1);
-	AMapRoom* SpawnRoom = MapRooms[0];	// MapRooms[RoomNum]
-
-	// NOTE: TEMPORARY unit spawn
-	int UnitsToSpawn = 5;
-	for (int i = 0; i < UnitsToSpawn; ++i)
+	if(!MapRooms.IsEmpty())
 	{
-		SpawnUnit(SpawnRoom, 10);
+		int RoomNum = FMath::RandRange(0, MapRooms.Num() - 1);
+		AMapRoom* SpawnRoom = MapRooms[0];	// MapRooms[RoomNum]
+
+		// NOTE: TEMPORARY unit spawn
+		int UnitsToSpawn = 5;
+		for (int i = 0; i < UnitsToSpawn; ++i)
+		{
+			SpawnUnit(SpawnRoom, 10);
+		}
+
+		return SpawnRoom;
 	}
 
-	return SpawnRoom;
+	return nullptr;
 }
 
 bool URoomContentsManager::SpawnUnit(AMapRoom* SpawnRoom, int SpawnAttempts)

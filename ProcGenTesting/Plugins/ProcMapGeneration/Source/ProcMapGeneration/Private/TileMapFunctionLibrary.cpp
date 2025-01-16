@@ -80,8 +80,6 @@ bool UTileMapFunctionLibrary::OccupyTile(ATBActor* OccupyingActor)
 {
 	if (AActor* Tile = GetBelowTile(OccupyingActor))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "BELOW TILE GOTTEN");
-
 		if (!IIsTile::Execute_GetTileComponent(Tile)->GetOccupyingObject())
 		{
 			IIsTile::Execute_GetTileComponent(Tile)->SetOccupyingObject(OccupyingActor);
