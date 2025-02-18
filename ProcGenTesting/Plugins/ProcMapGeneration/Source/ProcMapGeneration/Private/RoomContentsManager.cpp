@@ -56,7 +56,13 @@ bool URoomContentsManager::SpawnUnit(AMapRoom* SpawnRoom, int SpawnAttempts)
 			{
 				ATBActor* SpawnedActor = SpawnTile->GetWorld()->SpawnActor<ATBActor>(PlayerCharacterClass, SpawnTile->GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
 				UTileMapFunctionLibrary::OccupyTile(SpawnedActor);
-				SpawnRoom->GetRoomObjects().Add(SpawnedActor);
+				
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("RoomContentsManager: Spawn new actor")));
+
+				//SpawnRoom->GetRoomObjects().Emplace(SpawnedActor);
+				SpawnRoom->RoomObjects.Add(SpawnedActor);
+				GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("Room objects: %i"), SpawnRoom->GetRoomObjects().Num()));
+
 				return true;
 			}
 

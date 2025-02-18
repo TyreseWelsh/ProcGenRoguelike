@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TBActor.h"
 #include "GameFramework/Actor.h"
 #include "BattleManager.generated.h"
 
@@ -24,20 +25,28 @@ class PROCMAPGENERATION_API ABattleManager : public AActor
 	UBattleTimeline* BattleTimeline;
 	
 	TArray<TArray<ATBActor*>> CurrentBattleObjects;
+	TArray<ATBActor*> BattleObjects;
+	TObjectPtr<ATBActor> CurrentTurnObject;
 	int PriorityIndex = 0;
 	int ObjectIndex = 0;
 
-	bool InitTurnObject(ATBActor* TurnActor);
+	bool InitBattleObject(ATBActor* BattleObject);
+	void RemoveBattleObject(ATBActor* ActorToRemove);
 
-	
+	void OrderBattleObject(EBattlePriority BattlePriority);
+	bool SortByDexterity(const ATBActor& lhs,const ATBActor& rhs);
 public:
 	void Init(TArray<ATBActor*> TurnActors);
-	bool AddBattleObject(EBattlePriority TurnPriority, ATBActor* NewTurnObject);
+	bool AddBattleObject(EBattlePriority TurnPriority, ATBActor* NewTurnObject);	// OLD
+	void AddBattleObject(ATBActor* NewBattleObject);
 
 	void Activate();
 	void Deactivate();
 	
-	void InitNextTurn();
+	void InitNextTurn();	// OLD
+	void BeginNextTurn();
 	void StartTurn();
 	void EndTurn();
+
+	void BeginNewRound();
 };

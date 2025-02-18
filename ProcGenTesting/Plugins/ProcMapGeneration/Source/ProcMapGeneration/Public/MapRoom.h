@@ -99,4 +99,6 @@ public:
 private:
 	//
 	FRoomData* RoomData;
+
+	bool bIsCleared = false;
 };

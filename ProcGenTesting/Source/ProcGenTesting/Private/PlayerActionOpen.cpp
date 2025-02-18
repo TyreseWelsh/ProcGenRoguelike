@@ -29,8 +29,6 @@ void UPlayerActionOpen::OnHover(UTileComponent* CurrentHoveredTile, UTileCompone
 		if(bCanHover)
 		{
 			NewHoveredTile->TileHover();
-			GEngine->AddOnScreenDebugMessage(1, 0.5f, FColor::Red, "LAG!");
-
 		}
 	}
 }

@@ -74,6 +74,7 @@ void UMapGeneratorComponent::InitMap()
 	RoomContentsManager = NewObject<URoomContentsManager>(this, RoomContentsManagerClass);
 	if(AMapRoom* StartingRoom = RoomContentsManager->FindSpawnRoom(MapRooms))
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, FString::Printf(TEXT("Found STARTING ROOM")));
 		StartingRoom->Activate();
 	}
 }

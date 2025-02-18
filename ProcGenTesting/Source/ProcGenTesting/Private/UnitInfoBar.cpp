@@ -3,9 +3,12 @@
 
 #include "UnitInfoBar.h"
 
+//#include "../../../../ProcMapGeneration/Source/ProcMapGeneration/Public/TBActor.h"
+#include "../../ProcMapGeneration/Source/ProcMapGeneration/Public/TBActor.h"
+
 void UUnitInfoBar::Init(AActor* NewOwner)
 {
-	Owner = NewOwner;
+	Owner = Cast<ATBActor>(NewOwner);
 }
 
 void UUnitInfoBar::BroadcastOnHovered()
@@ -21,5 +24,13 @@ void UUnitInfoBar::BroadcastOnUnHovered()
 	if(OnUnHoveredDelegate.IsBound())
 	{
 		OnUnHoveredDelegate.Broadcast();
+	}
+}
+
+void UUnitInfoBar::EndTurn()
+{
+	if(Owner)
+	{
+		Owner->EndTurn();
 	}
 }

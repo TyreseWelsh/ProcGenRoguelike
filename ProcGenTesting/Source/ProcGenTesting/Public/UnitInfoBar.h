@@ -9,11 +9,13 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInfoBarHoveredSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInfoBarUnHoveredSignature);
 
+class ATBActor;
+
 /**
  * 
  */
 UCLASS()
-class TYRESESUI_API UUnitInfoBar : public UTWUserWidget
+class PROCGENTESTING_API UUnitInfoBar : public UTWUserWidget
 {
 	GENERATED_BODY()
 
@@ -23,13 +25,15 @@ protected:
 	void BroadcastOnHovered();
 	UFUNCTION(BlueprintCallable)
 	void BroadcastOnUnHovered();
+	UFUNCTION(BlueprintCallable)
+	void EndTurn();
 	
 public:
 	void Init(AActor* NewOwner);
 	void MoveAction();
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	AActor* GetOwner() { return Owner; }
+	ATBActor* GetOwner() { return Owner; }
 
 	// Delegate to bind to Controller function (to remove current hovered tile)
 	FOnInfoBarHoveredSignature* GetOnHoveredDelegate() { return &OnHoveredDelegate; }
@@ -37,7 +41,7 @@ public:
 	
 private:
 	UPROPERTY()
-	TObjectPtr<AActor> Owner;
+	TObjectPtr<ATBActor> Owner;
 
 	FOnInfoBarHoveredSignature OnHoveredDelegate;
 	FOnInfoBarUnHoveredSignature OnUnHoveredDelegate;

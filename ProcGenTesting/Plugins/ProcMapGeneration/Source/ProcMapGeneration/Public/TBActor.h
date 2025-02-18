@@ -8,7 +8,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnTurnEndSignature);
 
-DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeathSignature, ATBActor* /*BattleObject*/);
 
 UENUM(BlueprintType)
 enum class EBattlePriority : uint8
@@ -28,6 +28,7 @@ class PROCMAPGENERATION_API ATBActor : public AActor
 	GENERATED_BODY()
 
 	EBattlePriority BattlePriority = EBattlePriority::None;
+	int Dexterity = 0;
 	int Fatigue = 0;
 
 	FOnTurnEndSignature OnTurnEndDelegate;
@@ -50,6 +51,7 @@ public:
 	
 	// Getters
 	EBattlePriority GetBattlePriority() const { return BattlePriority; }
+	int GetDexterity() const { return Dexterity; }
 	
 	FOnTurnEndSignature* GetOnTurnEndDelegate() { return &OnTurnEndDelegate; }
 	FOnDeathSignature* GetOnDeathDelegate() { return &OnDeathDelegate; }

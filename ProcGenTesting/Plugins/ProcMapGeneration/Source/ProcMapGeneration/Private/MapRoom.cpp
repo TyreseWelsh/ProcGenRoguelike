@@ -113,10 +113,17 @@ void AMapRoom::Enter()
 
 void AMapRoom::Activate()
 {
-	RoomBattleManager = GetWorld()->SpawnActor<ABattleManager>(BattleManagerClass, GetActorLocation(), FRotator::ZeroRotator);
-	if(RoomBattleManager)
+	if(!bIsCleared)
 	{
-		RoomBattleManager->Init(RoomObjects);
-		RoomBattleManager->Activate();
+		RoomBattleManager = GetWorld()->SpawnActor<ABattleManager>(BattleManagerClass, GetActorLocation(), FRotator::ZeroRotator);
+		if(RoomBattleManager)
+		{
+			RoomBattleManager->Init(RoomObjects);
+			RoomBattleManager->Activate();
+		}
 	}
+}
+
+void AMapRoom::Leave()
+{
 }

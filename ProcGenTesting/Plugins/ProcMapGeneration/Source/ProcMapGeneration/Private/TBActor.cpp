@@ -15,7 +15,6 @@ ATBActor::ATBActor()
 void ATBActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -27,9 +26,12 @@ void ATBActor::Tick(float DeltaTime)
 
 void ATBActor::StartTurn()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Starting %s's turn..."), *this->GetName()));
+
 }
 
 void ATBActor::EndTurn()
 {
+	OnTurnEndDelegate.Broadcast();
 }
 
