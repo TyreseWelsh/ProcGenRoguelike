@@ -6,6 +6,8 @@
 #include "ActionButton.h"
 #include "MoveActionButton.generated.h"
 
+class UTWButton;
+
 /**
  * 
  */
@@ -14,9 +16,9 @@ class PROCGENTESTING_API UMoveActionButton : public UActionButton
 {
 	GENERATED_BODY()
 
+
+
 public:
-	UFUNCTION(BlueprintCallable)
-	void Init(AActor* NewOwner);
 	UFUNCTION(BlueprintCallable)
 	void OnButtonPress();
 
@@ -24,8 +26,7 @@ public:
 	void EnableButton();
 	UFUNCTION()
 	void DisableButton();
-
+	
 private:
 	bool bEnabled = true;
-	TObjectPtr<AActor> Owner;
 };

@@ -6,6 +6,9 @@
 #include "TWUserWidget.h"
 #include "ActionButton.generated.h"
 
+class ATBActor;
+class UTWButton;
+
 /**
  * 
  */
@@ -15,6 +18,16 @@ class TYRESESUI_API UActionButton : public UTWUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
+
+	UFUNCTION(BlueprintCallable)
+	void Init(AActor* NewOwner);
 	UFUNCTION(BlueprintCallable)
 	void OnButtonClicked(FString ClickedActionName);
+
+	UTWButton* GetActionButton() { return ActionButton; }
+protected:
+	UPROPERTY(meta=(BindWidget, AllowPrivateAccess))
+	UTWButton* ActionButton;
+	TObjectPtr<AActor> Owner;
 };

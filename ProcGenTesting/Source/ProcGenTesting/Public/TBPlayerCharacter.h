@@ -12,6 +12,7 @@ class UCapsuleComponent;
 class UStaticMeshComponent;
 class UArrowComponent;
 class UPlayerPathfindingComponent;
+class UTBActionComponent;
 class UUnitInfoBar;
 
 UCLASS()
@@ -30,6 +31,8 @@ class PROCGENTESTING_API ATBPlayerCharacter : public ATBActor, public IHasPathfi
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UPlayerPathfindingComponent* PathfindingComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UTBActionComponent* ActionComponent;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -47,7 +50,7 @@ public:
 	
 	UPathfindingComponent* GetPathfindingComponent() const;
 	UPathfindingComponent* GetPathfindingComponent_Implementation() const;
-
+	UTBActionComponent* GetActionComponent() const { return ActionComponent; }
 	
 	void OnMouseHover();
 	void OnMouseHover_Implementation();

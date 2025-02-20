@@ -9,11 +9,12 @@ DECLARE_MULTICAST_DELEGATE(FOnActionEndSignature);
 
 class AActor;
 class UTileComponent;
+class UTWUserWidget;
 
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class PROCGENTESTING_API UTBActionBase : public UObject
 {
 	GENERATED_BODY()
@@ -30,6 +31,8 @@ public:
 	virtual void EnableHover();
 
 	FOnActionEndSignature* GetActionEndDelegate() { return &ActionEndDelegate; }
+	
+	TSubclassOf<UTWUserWidget> ActionButtonClass;
 	
 protected:
 	bool bCanHover = true;

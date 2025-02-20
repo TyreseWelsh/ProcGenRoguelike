@@ -4,11 +4,28 @@
 #include "UnitInfoBar.h"
 
 //#include "../../../../ProcMapGeneration/Source/ProcMapGeneration/Public/TBActor.h"
-#include "../../ProcMapGeneration/Source/ProcMapGeneration/Public/TBActor.h"
+//#include "../../ProcMapGeneration/Source/ProcMapGeneration/Public/TBActor.h"
+#include <TBActor.h>
 
-void UUnitInfoBar::Init(AActor* NewOwner)
+#include "ActionButton.h"
+#include "TBActionBase.h"
+#include "TWButton.h"
+#include "Components/HorizontalBox.h"
+
+void UUnitInfoBar::Init(AActor* NewOwner, TArray<UTBActionBase*> Actions)
 {
 	Owner = Cast<ATBActor>(NewOwner);
+
+	for(UTBActionBase* TBAction : Actions)
+	{
+		if(UActionButton* NewButton = CreateWidget<UActionButton>(GetWorld(), TBAction->ActionButtonClass))
+		{
+			NewButton->GetActionButton()->OnHovered.AddDynamic(this, &UUnitInfoBar::BroadcastOnHovered);
+			NewButton->GetActionButton()->OnUnhovered.AddDynamic(this, &UUnitInfoBar::BroadcastOnUnHovered);
+			NewButton->Init(Owner);
+			actionBox->AddChildToHorizontalBox(NewButton);
+		}
+	}
 }
 
 void UUnitInfoBar::BroadcastOnHovered()

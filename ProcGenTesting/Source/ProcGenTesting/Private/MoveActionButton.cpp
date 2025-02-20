@@ -4,14 +4,11 @@
 #include "MoveActionButton.h"
 
 #include "PlayerActionMove.h"
+#include "TWButton.h"
 #include "StrategyPlayerController.h"
 #include "TileComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-void UMoveActionButton::Init(AActor* NewOwner)
-{
-	Owner = NewOwner;
-}
 
 void UMoveActionButton::OnButtonPress()
 {

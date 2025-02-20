@@ -10,6 +10,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInfoBarHoveredSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInfoBarUnHoveredSignature);
 
 class ATBActor;
+class UTBActionBase;
+class UHorizontalBox;
 
 /**
  * 
@@ -29,7 +31,7 @@ protected:
 	void EndTurn();
 	
 public:
-	void Init(AActor* NewOwner);
+	void Init(AActor* NewOwner, TArray<UTBActionBase*> Actions);
 	void MoveAction();
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -42,7 +44,8 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<ATBActor> Owner;
-
+	TObjectPtr<UHorizontalBox> actionBox; 
+	
 	FOnInfoBarHoveredSignature OnHoveredDelegate;
 	FOnInfoBarUnHoveredSignature OnUnHoveredDelegate;
 };

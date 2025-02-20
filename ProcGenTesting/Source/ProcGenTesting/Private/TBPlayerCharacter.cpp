@@ -6,6 +6,7 @@
 #include "IsTile.h"
 #include "PlayerPathfindingComponent.h"
 #include "StrategyPlayerController.h"
+#include "TBActionComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "TileMapFunctionLibrary.h"
@@ -38,6 +39,7 @@ ATBPlayerCharacter::ATBPlayerCharacter()
 	FrontFacingArrow->SetHiddenInGame(false);
 
 	PathfindingComponent = CreateDefaultSubobject<UPlayerPathfindingComponent>(TEXT("PathfindingComponent"));
+	ActionComponent = CreateDefaultSubobject<UTBActionComponent>(TEXT("TBActionComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -95,7 +97,7 @@ void ATBPlayerCharacter::DisplayInfo()
 		UnitInfoWidget = CreateWidget<UUnitInfoBar>(GetWorld(), InfoWidgetClass);
 		if(UnitInfoWidget)
 		{
-			UnitInfoWidget->Init(this);
+			UnitInfoWidget->Init(this, ActionComponent->AvailableActions);
 			if(AStrategyPlayerController* StrategyController = Cast<AStrategyPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
 			{
 				UnitInfoWidget->GetOnHoveredDelegate()->AddDynamic(StrategyController, &AStrategyPlayerController::DisableHovering);
