@@ -18,7 +18,7 @@ void UUnitInfoBar::Init(AActor* NewOwner, TArray<UTBActionBase*> Actions)
 
 	for(UTBActionBase* TBAction : Actions)
 	{
-		if(UActionButton* NewButton = CreateWidget<UActionButton>(GetWorld(), TBAction->ActionButtonClass))
+		if(UActionButton* NewButton = CreateWidget<UActionButton>(GetWorld(), TBAction->GetData().ButtonClass))
 		{
 			NewButton->GetActionButton()->OnHovered.AddDynamic(this, &UUnitInfoBar::BroadcastOnHovered);
 			NewButton->GetActionButton()->OnUnhovered.AddDynamic(this, &UUnitInfoBar::BroadcastOnUnHovered);

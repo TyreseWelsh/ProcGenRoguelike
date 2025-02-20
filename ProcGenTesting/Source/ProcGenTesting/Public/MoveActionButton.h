@@ -16,17 +16,6 @@ class PROCGENTESTING_API UMoveActionButton : public UActionButton
 {
 	GENERATED_BODY()
 
-
-
 public:
-	UFUNCTION(BlueprintCallable)
-	void OnButtonPress();
-
-	UFUNCTION()
-	void EnableButton();
-	UFUNCTION()
-	void DisableButton();
-	
-private:
-	bool bEnabled = true;
+	virtual void OnButtonPressed() override;
 };

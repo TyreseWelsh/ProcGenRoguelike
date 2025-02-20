@@ -10,7 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 
 
-void UMoveActionButton::OnButtonPress()
+void UMoveActionButton::OnButtonPressed()
 {
 	if(bEnabled && IsValid(Owner))
 	{
@@ -27,14 +27,4 @@ void UMoveActionButton::OnButtonPress()
 			}
 		}
 	}
-}
-
-void UMoveActionButton::EnableButton()
-{
-	bEnabled = true;
-}
-
-void UMoveActionButton::DisableButton()
-{
-	bEnabled = false;
 }

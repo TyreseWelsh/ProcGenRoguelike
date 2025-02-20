@@ -8,12 +8,14 @@
 
 class ATBActor;
 class UTWButton;
+class UTWTextBlock;
+struct FActionData;
 
 /**
  * 
  */
 UCLASS()
-class TYRESESUI_API UActionButton : public UTWUserWidget
+class PROCGENTESTING_API UActionButton : public UTWUserWidget
 {
 	GENERATED_BODY()
 
@@ -21,13 +23,23 @@ public:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION(BlueprintCallable)
-	void Init(AActor* NewOwner);
+	void Init(AActor* NewOwner, FActionData NewActionData);
 	UFUNCTION(BlueprintCallable)
-	void OnButtonClicked(FString ClickedActionName);
-
+	virtual void OnButtonPressed();
+	UFUNCTION(BlueprintCallable)
+	void EnableButton();
+	UFUNCTION(BlueprintCallable)
+	void DisableButton();
+	
 	UTWButton* GetActionButton() { return ActionButton; }
 protected:
 	UPROPERTY(meta=(BindWidget, AllowPrivateAccess))
 	UTWButton* ActionButton;
+	UPROPERTY(meta=(BindWidget, AllowPrivateAccess))
+	UTWTextBlock* ActionName;
+	UPROPERTY(meta=(BindWidget, AllowPrivateAccess))
+	UTWTextBlock* ActionCost;
+
 	TObjectPtr<AActor> Owner;
+	bool bEnabled = true;
 };

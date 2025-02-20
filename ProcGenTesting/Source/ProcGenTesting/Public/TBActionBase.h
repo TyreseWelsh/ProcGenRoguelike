@@ -11,6 +11,19 @@ class AActor;
 class UTileComponent;
 class UTWUserWidget;
 
+USTRUCT(BlueprintType)
+struct FActionData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Name;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Cost;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UTWUserWidget> ButtonClass;
+};
+
 /**
  * 
  */
@@ -30,12 +43,15 @@ public:
 	virtual void DisableHover(UTileComponent* CurrentHoveredTile);
 	virtual void EnableHover();
 
+	FActionData GetData() { return ActionData; }
+	
 	FOnActionEndSignature* GetActionEndDelegate() { return &ActionEndDelegate; }
 	
-	TSubclassOf<UTWUserWidget> ActionButtonClass;
 	
 protected:
 	bool bCanHover = true;
+	UPROPERTY(EditAnywhere)
+	FActionData ActionData;
 	
 	FOnActionEndSignature ActionEndDelegate;
 };
